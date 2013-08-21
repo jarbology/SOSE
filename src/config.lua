@@ -25,6 +25,11 @@ return {
 		}
 	},
 
+	console = {
+		port = 9001, --over 9000
+		setupScript = "setupConsole.lua"
+	},
+
 	updatePhases = {
 		"gui",
 		"gameplay"
@@ -34,11 +39,15 @@ return {
 		"jaeger.GraphicsSystem",
 		"jaeger.SceneManager",
 		"jaeger.EntityManager",
-		"jaeger.TaskManager"
+		"jaeger.TaskManager",
+		"jaeger.RemoteConsole"
 	},
 
 	tasks = {
 		{"jaeger.EntityManager", "update"},
+		{"jaeger.RemoteConsole", "update"},
+
+		-- These tasks must be the last
 		{"jaeger.EntityManager", "cleanUp"}
 	}
 }
