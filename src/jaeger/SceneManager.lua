@@ -8,10 +8,9 @@ return class(..., function(i)
 		self.sceneEnd = Event.new()
 	end
 
-	function i:start(systems)
-		self.systems = systems
-		self.taskMgr = systems["jaeger.TaskManager"]
-		systems["jaeger.EntityManager"].entityCreated:addListener(Event.makeListener(self, "onEntityCreated"))
+	function i:start(engine)
+		self.engine = engine
+		engine:getSystem("jaeger.EntityManager").entityCreated:addListener(self, "onEntityCreated")
 	end
 
 	function i:onEntityCreated(entity, spec)
@@ -50,7 +49,7 @@ return class(..., function(i)
 		local scene = assert(sceneClass.create(data))
 		self.currentScene = scene
 		MOAIRenderMgr.setRenderTable(scene:getRenderTable())
-		scene:start(self.systems)
+		scene:start(self.engine)
 		self.sceneBegin:fire(scene)
 	end
 end)

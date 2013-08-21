@@ -7,14 +7,13 @@ return class(..., function(i)
 		self.tasks = {}
 	end
 
-	function i:start(systems)
+	function i:start(engine)
 		MOAIActionMgr.setRoot(self.root)
 		for _, taskDesc in ipairs(self.config) do
 			local systemName, methodName = unpack(taskDesc)
 			print("Spawning task "..systemName.."/"..methodName)
-			local system = assert(systems[systemName], "Cannot locate system "..systemName)
+			local system = assert(engine:getSystem(systemName), "Cannot locate system "..systemName)
 			local task = MOAICoroutine.new()
-			task:attach(self.root)
 			system:setUpdateTask(methodName, task)
 			local yield = coroutine.yield
 			task:run(function()
@@ -23,6 +22,7 @@ return class(..., function(i)
 					yield()
 				end
 			end)
+			task:attach(self.root)
 		end
 	end
 end)

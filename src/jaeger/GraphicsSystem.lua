@@ -6,12 +6,12 @@ return class(..., function(i)
 		self.config = config.graphics
 	end
 
-	function i:start(systems)
+	function i:start(engine)
 		local config = self.config
-		self.assetMgr = systems["jaeger.AssetManager"]
+		self.assetMgr = engine:getSystem("jaeger.AssetManager")
 		MOAISim.openWindow(config.title, config.windowWidth, config.windowHeight)
 
-		systems["jaeger.EntityManager"].entityCreated:addListener(self, "onEntityCreated")
+		engine:getSystem("jaeger.EntityManager").entityCreated:addListener(self, "onEntityCreated")
 	end
 
 	function i:onEntityCreated(entity, spec)
@@ -49,6 +49,10 @@ return class(..., function(i)
 	end
 
 	function i:playAnimation(component, entity)
-		component.anim:start(entity:getResource("updateAction"))
+		local updateAction = assert(
+			entity:getResource("updateAction"),
+			"Only active entity can play animation"
+		)
+		component.anim:start(updateAction)
 	end
 end)

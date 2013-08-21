@@ -17,8 +17,8 @@ return class(..., function(i, c)
 		}
 	end
 
-	function i:start(systems)
-		local entityMgr = systems["jaeger.EntityManager"]
+	function i:start(engine)
+		local entityMgr = engine:getSystem("jaeger.EntityManager")
 		local entity = entityMgr:createEntity {
 			name = "testEntity",
 			layer = "default",
@@ -29,6 +29,7 @@ return class(..., function(i, c)
 			updatePhase = "gameplay"
 		}
 		entity:sendMessage("playAnimation")
+		entity:getResource("prop"):moveLoc(math.random(50), 40)
 		--entityMgr:destroyEntity(entity)
 	end
 
