@@ -64,7 +64,19 @@ return class(..., function(i)
 		self.destroyedEntities = Set.new()
 	end
 
-	function i:start(systems)
+	function i:start(engine)
+		local sceneMgr = engine:getSystem("jaeger.SceneManager")
+		sceneMgr.sceneEnd:addListener(self, "onSceneEnd")
+	end
+
+	function i:onSceneEnd()
+		for name, updatePhase in pairs(self.updatePhases) do
+			updatePhase:clear()
+		end
+	end 
+
+	function i:getUpdatePhase(name)
+		return self.updatePhases[name]
 	end
 
 	function i:setUpdateTask(methodName, task)
@@ -84,16 +96,15 @@ return class(..., function(i)
 				updateAction:stop()
 			end
 
-			if entity.name then self:unnameEntity(entity) end
 			entity:sendMessage("destroyEntity")
 			destroyedEntities:remove(entity)
 		end
 	end
 
 	function i:nameEntity(entity, name)
-		entity.name = name
+		--[[entity.name = name
 		assert(self.namedEntities[name] == nil, "Another entity with the name '"..name.."' already exists")
-		self.namedEntities[name] = entity
+		self.namedEntities[name] = entity]]
 	end
 
 	function i:unnameEntity(entity)
@@ -125,6 +136,7 @@ return class(..., function(i)
 	end
 
 	function i:destroyEntity(entity)
+		if entity.name then self:unnameEntity(entity) end
 		self.destroyedEntities:add(entity)
 	end
 end)
