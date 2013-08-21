@@ -1,11 +1,12 @@
 return function(name, config, assetManager, oldInstance)
 	local texture = oldInstance or MOAITexture.new()
-	texture:load(config.texturePath .. name)
+	local texturePath = config.texturePath..name
+	texture:load(texturePath)
 	texture:setFilter(MOAITexture.GL_LINEAR)
 	texture:setWrap(true)
 	local w, h = texture:getSize()
 	if w * h ~= 0 then
-		return texture
+		return texture, {texturePath}
 	else
 		return nil, "Can't load texture "..name
 	end
