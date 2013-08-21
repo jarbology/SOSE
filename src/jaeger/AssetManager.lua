@@ -11,27 +11,37 @@ return class(..., function(i)
 		self.resourceMap = {}
 	end
 
-	function i:start(systems)
+	function i:start(engine)
 		local function loader(modulename)
 			local errmsg = ""
 			-- Find source
 			local modulepath = string.gsub(modulename, "%.", "/")
 			for path in string.gmatch(package.path, "([^;]+)") do
 				local filename = string.gsub(path, "%?", modulepath)
-				local file = io.open(filename, "rb")
 				self:mapResource("module:"..modulename, filename)
-				if file then
-					-- Compile and return the module
-					return assert(loadstring(assert(file:read("*a")), filename))
+				-- Compile and return the module
+				if MOAIFileSystem.checkFileExists(filename) then
+					return assert(loadfile(filename))
 				end
 				errmsg = errmsg.."\n\tno file '"..filename.."' (checked with custom loader)"
 			end
 			return errmsg
 		end
 
-		package.loaders[2] = loader
+		-- Load built-in modules which create global variable
+		-- TODO: figure out a more elegant way to do this
+		require "socket"
+		require "lfs"
 
-		-- register module factory
+		-- register custom loader and make loaded modules sticky
+		table.insert(package.loaders, 2, loader)
+		for moduleName, module in pairs(package.loaded) do
+			package.preload[moduleName] = function()
+				return module
+			end
+		end
+
+		-- register module factory and override the require function
 		local oldRequire = require
 		_G.require = function(modName)
 			return self:getAsset("module:"..modName)
