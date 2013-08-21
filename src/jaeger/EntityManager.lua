@@ -1,5 +1,6 @@
 local class = require "jaeger.Class"
 local Event = require "jaeger.Event"
+local Set = require "jaeger.Set"
 
 local Entity = class("jaeger.Entity", function(i)
 	function i:__constructor(spec)
@@ -59,6 +60,8 @@ return class(..., function(i)
 		end
 		self.updatePhases = updatePhases
 		self.updatePhaseNames = updatePhaseNames
+
+		self.destroyedEntities = Set.new()
 	end
 
 	function i:start(systems)
@@ -71,6 +74,20 @@ return class(..., function(i)
 	end
 
 	function i:update()
+	end
+
+	function i:cleanUp()
+		local destroyedEntities = self.destroyedEntities
+		for entity in destroyedEntities:iterator() do
+			local updateAction = entity:getResource("updateAction")
+			if updateAction then
+				updateAction:stop()
+			end
+
+			if entity.name then self:unnameEntity(entity) end
+			entity:sendMessage("destroyEntity")
+			destroyedEntities:remove(entity)
+		end
 	end
 
 	function i:nameEntity(entity, name)
@@ -108,13 +125,6 @@ return class(..., function(i)
 	end
 
 	function i:destroyEntity(entity)
-		local updateAction = entity:getResource("updateAction")
-		if updateAction then
-			updateAction:stop()
-		end
-		
-		if entity.name then self:unnameEntity(entity) end
-
-		entity:sendMessage("destroyEntity")
+		self.destroyedEntities:add(entity)
 	end
 end)

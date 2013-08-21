@@ -38,6 +38,7 @@ return {
 	},
 
 	tasks = {
-		{"jaeger.EntityManager", "update"}
+		{"jaeger.EntityManager", "update"},
+		{"jaeger.EntityManager", "cleanUp"}
 	}
 }
