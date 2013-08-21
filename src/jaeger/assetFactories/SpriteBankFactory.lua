@@ -15,7 +15,7 @@ return function(name, config, assetManager, oldInstance)
 
 	local numIndicies = 0
 	for spriteName, spriteDef in pairs(spriteBankData.sprites) do
-		local numFrames = spriteDef.numFrames or 1
+		local numFrames = assert(spriteDef.numFrames, "Sprite "..spriteName.." does not provide number of frames")
 		numIndicies = numIndicies + numFrames
 	end
 	deck:reserve(numIndicies)
@@ -68,46 +68,32 @@ return function(name, config, assetManager, oldInstance)
 		--create animation curve
 		local sprite = sprites[spriteName] or {}
 		local animCurve = sprite.animCurve or MOAIAnimCurve.new()
-		local animSpeed = spriteDef.speed or 1
-		local timeStep = 1 / animSpeed
+		local animTime = assert(spriteDef.time, "Sprite "..spriteName.." does not provide animation time")
+		local timeStep = animTime / numFrames
 		local curveMode
 		local animMode = spriteDef.mode or "once"
 		animCurve:setWrapMode(MOAIAnimCurve.WRAP)
+		animCurve:reserveKeys(numFrames + 1)
+		local time = 0
+		for frameIndex = 1, numFrames do
+			animCurve:setKey(frameIndex, time, firstIndex - 1 + frameIndex, MOAIEaseType.FLAT)
+			time = time + timeStep
+		end
+		animCurve:setKey(numFrames + 1, time, firstIndex, MOAIEaseType.FLAT)
+
 		if animMode == "once" then
-			animCurve:reserveKeys(numFrames)
-			local time = 0
-			for frameIndex = 1, numFrames do
-				animCurve:setKey(frameIndex, time, firstIndex - 1 + frameIndex, MOAIEaseType.FLAT)
-				time = time + timeStep
-			end
 			curveMode = MOAITimer.NORMAL
 		elseif animMode == "pingpong" then
-			animCurve:reserveKeys(numFrames * 2 - 2)
-			local time = 0
-			for frameIndex = 1, numFrames do
-				animCurve:setKey(frameIndex, time, firstIndex - 1 + frameIndex, MOAIEaseType.FLAT)
-				time = time + timeStep
-			end
-			for frameIndex = 1, numFrames - 2 do
-				animCurve:setKey(numFrames + frameIndex, time, numFrames - frameIndex, MOAIEaseType.FLAT)
-				time = time + timeStep
-			end
-			curveMode = MOAITimer.LOOP
+			curveMode = MOAITimer.PING_PONG
 		elseif animMode == "loop" then
-			animCurve:reserveKeys(numFrames + 1)
-			local time = 0
-			for frameIndex = 1, numFrames do
-				animCurve:setKey(frameIndex, time, firstIndex - 1 + frameIndex, MOAIEaseType.FLAT)
-				time = time + timeStep
-			end
-			animCurve:setKey(numFrames + 1, time, firstIndex, MOAIEaseType.FLAT)
 			curveMode = MOAITimer.LOOP
 		else
 			return nil, "Sprite "..spriteName.." of bank "..name.." use unknown play mode: "..tostring(animMode).."\n"
 		end
 
 		sprite.firstFrame = firstIndex
-		sprite.speed = animSpeed
+		sprite.animTime = animTime
+		sprite.numFrames = numFrames
 		sprite.animCurve = animCurve
 		sprite.mode = curveMode
 		sprite.bank = deck

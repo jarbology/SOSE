@@ -11,41 +11,44 @@ return class(..., function(i)
 		self.assetMgr = systems["jaeger.AssetManager"]
 		MOAISim.openWindow(config.title, config.windowWidth, config.windowHeight)
 
-		systems["jaeger.EntityManager"].entityCreated:addListener(Event.makeListener(self, "onEntityCreated"))
+		systems["jaeger.EntityManager"].entityCreated:addListener(self, "onEntityCreated")
 	end
 
 	function i:onEntityCreated(entity, spec)
 		local spriteSpec = spec.sprite
 		if spriteSpec then
-			local spriteName = spriteSpec.name
 			local prop = MOAIProp2D.new()
+			prop.entity = entity
+
 			local anim = MOAIAnim.new()
 			anim:reserveLinks(1)
 
-			entity:addComponent{
+			local component = {
 				system = self,
 				name = "jaeger.Sprite",
 				prop = prop,
 				anim = anim
 			}
+			entity:addComponent(component)
 
 			entity:registerResource("prop", prop)
+
+			self:changeSprite(component, entity, spriteSpec.name)
 		end
 	end
 
-	function i:activateEntity(component, entity)
-		local sprite = self.assetMgr:getAsset("sprite:"..entity:getSpec().sprite.name)
+	function i:changeSprite(component, entity, spriteName)
+		local sprite = self.assetMgr:getAsset("sprite:"..spriteName)
 		local prop = component.prop
+		local anim = component.anim
+
 		prop:setDeck(sprite.bank)
 		prop:setIndex(sprite.firstFrame)
-		component.sprite = sprite
+		anim:setLink(1, sprite.animCurve, prop, MOAIProp2D.ATTR_INDEX)
+		anim:setMode(sprite.mode)
 	end
 
 	function i:playAnimation(component, entity)
-		local anim = component.anim
-		local sprite = component.sprite
-		anim:setLink(1, sprite.animCurve, component.prop, MOAIProp2D.ATTR_INDEX)
-		anim:setMode(sprite.mode)
-		anim:start(entity:getResource("updateAction"))
+		component.anim:start(entity:getResource("updateAction"))
 	end
 end)

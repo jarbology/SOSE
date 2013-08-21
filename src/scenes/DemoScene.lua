@@ -23,7 +23,7 @@ return class(..., function(i, c)
 			name = "testEntity",
 			layer = "default",
 			sprite = {
-				name = "test/man1_left",
+				name = "test/coin",
 				autoPlay = "true"
 			},
 			updatePhase = "gameplay"
