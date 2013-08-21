@@ -7,20 +7,20 @@ return class(..., function(i)
 	end
 
 	function i:start(config)
+		-- AssetManager is a special system
+		local assetManager = AssetManager.new(config)
+		self.systems["jaeger.AssetManager"] = assetManager
+		assetManager:start(self.systems)
+
 		-- protect global environment
 		setmetatable(_G, {
 			__index = function(table, index)
 				error("Trying to access non-existent global variable '" .. index.."'")
 			end,
-			__newindex = function()
-				error "Cannot create global variable"
+			__newindex = function(table, index)
+				error("Cannot create global variable "..index)
 			end
 		})
-
-		-- AssetManager is a special system
-		local assetManager = AssetManager.new(config)
-		self.systems["jaeger.AssetManager"] = assetManager
-		assetManager:start(self.systems)
 		
 		-- Load all systems
 		local systems = self.systems
@@ -33,7 +33,7 @@ return class(..., function(i)
 
 		for _, systemModuleName in ipairs(systemModuleNames) do
 			print("Starting " .. systemModuleName)
-			systems[systemModuleName]:start(systems)
+			systems[systemModuleName]:start(self, config)
 		end
 	end
 
