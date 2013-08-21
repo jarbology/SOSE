@@ -47,5 +47,5 @@ return function(name, config, assetManager, oldInstance)
 	local asset = oldInstance or {}
 	asset.texture = texture
 	asset.frames = frames
-	return asset
+	return asset, {dataFileName}
 end
