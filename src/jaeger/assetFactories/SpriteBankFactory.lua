@@ -22,7 +22,7 @@ return function(name, config, assetManager, oldInstance)
 
 	local frameDefs = atlas.frames
 	local currentIndex = 1
-	local sprites = {}
+	local sprites = deck.sprites or {}
 	for spriteName, spriteDef in pairs(spriteBankData.sprites) do
 		local numFrames = spriteDef.numFrames or 1
 		local xOrigin = spriteDef.xOrigin or 0
@@ -42,15 +42,32 @@ return function(name, config, assetManager, oldInstance)
 			end
 
 			local uvQuad = frameDef.uvQuad
-			deck:setUVQuad(currentIndex, uvQuad.x0, uvQuad.y0, uvQuad.x1, uvQuad.y1, uvQuad.x2, uvQuad.y2, uvQuad.x3, uvQuad.y3)
+			deck:setUVQuad(
+				currentIndex,
+				uvQuad.x0,
+				uvQuad.y0,
+				uvQuad.x1,
+				uvQuad.y1,
+				uvQuad.x2,
+				uvQuad.y2,
+				uvQuad.x3,
+				uvQuad.y3
+			)
 			local frameHeight = frameDef.size.height
 			local geomRect = frameDef.rect
-			deck:setRect(currentIndex, geomRect.x0 - xOrigin, geomRect.y0 - frameHeight + yOrigin, geomRect.x1 - xOrigin, geomRect.y1 - frameHeight + yOrigin)
+			deck:setRect(
+				currentIndex,
+				geomRect.x0 - xOrigin,
+				geomRect.y0 - frameHeight + yOrigin,
+				geomRect.x1 - xOrigin,
+				geomRect.y1 - frameHeight + yOrigin
+			)
 			currentIndex = currentIndex + 1
 		end
 
 		--create animation curve
-		local animCurve = MOAIAnimCurve.new()
+		local sprite = sprites[spriteName] or {}
+		local animCurve = sprite.animCurve or MOAIAnimCurve.new()
 		local animSpeed = spriteDef.speed or 1
 		local timeStep = 1 / animSpeed
 		local curveMode
@@ -89,16 +106,16 @@ return function(name, config, assetManager, oldInstance)
 			return nil, "Sprite "..spriteName.." of bank "..name.." use unknown play mode: "..tostring(animMode).."\n"
 		end
 
-		sprites[spriteName] = {
-			firstFrame = firstIndex,
-			speed = animSpeed,
-			animCurve = animCurve,
-			mode = curveMode,
-			bank = deck
-		}
+		sprite.firstFrame = firstIndex
+		sprite.speed = animSpeed
+		sprite.animCurve = animCurve
+		sprite.mode = curveMode
+		sprite.bank = deck
+
+		sprites[spriteName] = sprite
 	end
 
 	deck.sprites = sprites
 
-	return deck
+	return deck, {dataFileName}
 end
