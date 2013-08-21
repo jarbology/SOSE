@@ -11,6 +11,8 @@ return {
 	},
 
 	assets = {
+		assetsPath = "../assets",
+
 		texturePath = "../assets/gfx/textures/",
 		spriteBankPath = "../assets/gfx/sprites/",
 		atlasPath = "../assets/gfx/atlases/",
