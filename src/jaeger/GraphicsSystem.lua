@@ -46,6 +46,7 @@ return class(..., function(i)
 		prop:setIndex(sprite.firstFrame)
 		anim:setLink(1, sprite.animCurve, prop, MOAIProp2D.ATTR_INDEX)
 		anim:setMode(sprite.mode)
+		anim:setSpeed(1 / sprite.animTime)
 	end
 
 	function i:playAnimation(component, entity)
