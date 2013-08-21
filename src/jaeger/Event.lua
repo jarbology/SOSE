@@ -12,8 +12,14 @@ return class(..., function(i, c)
 		self.listeners = Set.new()
 	end
 
-	function i:addListener(listener)
-		self.listeners:add(listener)
+	function i:addListener(listener, methodName)
+		if methodName ~= nil then
+			local proxyListener = c.makeListener(listener, methodName)
+			self.listeners:add(proxyListener)
+			return proxyListener
+		else
+			self.listeners:add(listener)
+		end
 	end
 
 	function i:removeListener(listener)
