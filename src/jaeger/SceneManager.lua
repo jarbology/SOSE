@@ -43,7 +43,8 @@ return class(..., function(i)
 			self.sceneEnd:fire(self.currentScene)
 			self.currentScene:stop()
 		end
-		--TODO: gc here?
+
+		collectgarbage "collect"
 
 		local sceneClass = require(sceneName)
 		local scene = assert(sceneClass.create(data))
