@@ -1,16 +1,8 @@
 return function(name, config, assetManager, oldInstance)
 	local dataFileName = config.atlasPath..name..".lua"
-	if not MOAIFileSystem.checkFileExists(dataFileName) then
-		return nil, "Can't find data file for "..name
-	end
-
-	local atlasData = dofile(dataFileName)
-	if not atlasData then return end
+	local atlasData = assert(dofile(dataFileName), "Can't load data file for "..name)
 
 	local texture = assetManager:getAsset("texture:"..atlasData.texture)
-	if not texture then
-		return nil, "Can't find texture for "..name
-	end
 
 	local frames = {}
 	for _, frame in ipairs(atlasData.frames) do

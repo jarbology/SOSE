@@ -4,7 +4,8 @@ return function(name, config, assetManager, oldInstance)
 	texture:load(texturePath)
 	texture:setFilter(MOAITexture.GL_LINEAR)
 	texture:setWrap(true)
-	local w, h = texture:getSize()
+
+	local w, h = texture:getSize() -- A size of 0 means failure
 	if w * h ~= 0 then
 		return texture, {texturePath}
 	else

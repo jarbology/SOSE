@@ -1,21 +1,21 @@
 return function(name, config, assetManager, oldInstance)
 	local dataFileName = config.spriteBankPath..name..".lua"
-	if not MOAIFileSystem.checkFileExists(dataFileName) then
-		return nil, "Can't find data file for "..name
-	end
 	local spriteBankData = assert(dofile(dataFileName), "Can't load data file for '"..name.."'")
 
 	local atlas = assetManager:getAsset("atlas:"..spriteBankData.atlas)
-	if not atlas then
-		return nil, "Can't find atlas for "..atlas
-	end
 
 	local deck = oldInstance or MOAIGfxQuadDeck2D.new()
 	deck:setTexture(atlas.texture)
 
+	-- Since assertion messages for this factory is quite long
+	local function assert(cond, spriteName, msg)
+		return _G.assert(cond, "Sprite "..spriteName.." of bank "..name.." "..msg)
+	end
+
+	-- Count the number of frames
 	local numIndicies = 0
 	for spriteName, spriteDef in pairs(spriteBankData.sprites) do
-		local numFrames = assert(spriteDef.numFrames, "Sprite "..spriteName.." does not provide number of frames")
+		local numFrames = assert(spriteDef.numFrames, spriteName, "does not provide number of frames")
 		numIndicies = numIndicies + numFrames
 	end
 	deck:reserve(numIndicies)
@@ -28,18 +28,13 @@ return function(name, config, assetManager, oldInstance)
 		local xOrigin = spriteDef.xOrigin or 0
 		local yOrigin = spriteDef.yOrigin or 0
 		local frameFormat = spriteDef.frameFormat
-		if type(frameFormat) ~= "string" then
-			return nil, "Sprite "..spriteName.." of bank "..name.." has invalid frameFormat\n"
-		end
+		assert(type(frameFormat) == "string", spriteName, "has invalid frame format")
 
 		--define frames
 		local firstIndex = currentIndex
 		for frameIndex = 1, numFrames do
 			local frameName = frameFormat:format(frameIndex)
-			local frameDef = frameDefs[frameName]
-			if frameDef == nil then
-				return nil, "Sprite "..spriteName.." of bank "..name.." has an undefined frame: "..frameName.."\n"
-			end
+			local frameDef = assert(frameDefs[frameName], spriteName, "has an undefined frame: "..frameName)
 
 			local uvQuad = frameDef.uvQuad
 			deck:setUVQuad(
@@ -68,8 +63,8 @@ return function(name, config, assetManager, oldInstance)
 		--create animation curve
 		local sprite = sprites[spriteName] or {}
 		local animCurve = sprite.animCurve or MOAIAnimCurve.new()
-		local animTime = assert(spriteDef.time, "Sprite "..spriteName.." does not provide animation time")
-		local timeStep = animTime / numFrames
+		local animTime = assert(spriteDef.time, spriteName, "does not provide animation time")
+		local timeStep = 1 / numFrames
 		local curveMode
 		local animMode = spriteDef.mode or "once"
 		animCurve:setWrapMode(MOAIAnimCurve.WRAP)
