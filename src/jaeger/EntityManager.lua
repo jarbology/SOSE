@@ -56,7 +56,7 @@ return class(..., function(i)
 		local updatePhaseNames = config.updatePhases
 		local updatePhases = {}
 		for _, updatePhaseName in ipairs(updatePhaseNames) do
-			updatePhases[updatePhaseName] = MOAIAction.new()
+			updatePhases[updatePhaseName] = MOAIStickyAction.new()
 		end
 		self.updatePhases = updatePhases
 		self.updatePhaseNames = updatePhaseNames
@@ -122,7 +122,7 @@ return class(..., function(i)
 		local updatePhaseName = spec.updatePhase
 		if updatePhaseName then
 			local updatePhase = assert(self.updatePhases[updatePhaseName], "Unknown update phase '"..updatePhaseName.."'")
-			local updateAction = MOAIAction.new()
+			local updateAction = MOAIStickyAction.new()
 			updateAction:attach(updatePhase)
 			entity:registerResource("updateAction", updateAction)
 		end
