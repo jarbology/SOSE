@@ -31,7 +31,7 @@ return class(..., function(i, c)
 			},
 			updatePhase = "gameplay"
 		}
-		entity:sendMessage("playAnimation")
+		entity:sendMessage("msgPlayAnimation")
 	end
 
 	function i:stop()

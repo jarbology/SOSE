@@ -27,7 +27,7 @@ local Entity = class("jaeger.Entity", function(i)
 	end
 
 	function i:activate()
-		self:sendMessage("activateEntity")
+		self:sendMessage("msgActivate")
 	end
 
 	function i:sendMessage(msg, ...)
@@ -96,7 +96,7 @@ return class(..., function(i)
 				updateAction:stop()
 			end
 
-			entity:sendMessage("destroyEntity")
+			entity:sendMessage("msgDetroy")
 			destroyedEntities:remove(entity)
 		end
 	end

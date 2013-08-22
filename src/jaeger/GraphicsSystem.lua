@@ -33,11 +33,11 @@ return class(..., function(i)
 
 			entity:registerResource("prop", prop)
 
-			self:changeSprite(component, entity, spriteSpec.name)
+			self:msgChangeSprite(component, entity, spriteSpec.name)
 		end
 	end
 
-	function i:changeSprite(component, entity, spriteName)
+	function i:msgChangeSprite(component, entity, spriteName)
 		local sprite = self.assetMgr:getAsset("sprite:"..spriteName)
 		local prop = component.prop
 		local anim = component.anim
@@ -49,7 +49,7 @@ return class(..., function(i)
 		anim:setSpeed(1 / sprite.animTime)
 	end
 
-	function i:playAnimation(component, entity)
+	function i:msgPlayAnimation(component, entity)
 		local updateAction = assert(
 			entity:getResource("updateAction"),
 			"Only active entity can play animation"

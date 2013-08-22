@@ -22,7 +22,7 @@ return class(..., function(i)
 		end
 	end
 
-	function i:activateEntity(component, entity)
+	function i:msgActivate(component, entity)
 		local layerName = entity:getSpec().layer
 		local prop = entity:getResource("prop")
 
@@ -32,7 +32,7 @@ return class(..., function(i)
 		end
 	end
 
-	function i:destroyEntity(component, entity)
+	function i:msgDestroy(component, entity)
 		local layerName = entity:getSpec().layer
 		local prop = entity:getResource("prop")
 		self.currentScene:getLayer(layerName):removeProp(prop)
