@@ -8,6 +8,7 @@ return class(..., function(i, c)
 
 	function i:__constructor(config)
 		local defaultLayer = RenderUtil.newFullScreenLayer()
+		self.ignore = config
 		self.renderTable = {
 			defaultLayer
 		}
@@ -18,6 +19,8 @@ return class(..., function(i, c)
 	end
 
 	function i:start(engine)
+		if self.ignore then return end
+
 		local entityMgr = engine:getSystem("jaeger.EntityManager")
 		local entity = entityMgr:createEntity {
 			name = "testEntity",
@@ -29,8 +32,6 @@ return class(..., function(i, c)
 			updatePhase = "gameplay"
 		}
 		entity:sendMessage("playAnimation")
-		entity:getResource("prop"):moveLoc(math.random(50), 40)
-		--entityMgr:destroyEntity(entity)
 	end
 
 	function i:stop()

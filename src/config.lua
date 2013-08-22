@@ -7,7 +7,7 @@ return {
 
 	firstScene = {
 		name = "scenes.DemoScene",
-		data = "test"
+		data = false
 	},
 
 	assets = {
