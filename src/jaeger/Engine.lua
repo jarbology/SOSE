@@ -15,10 +15,10 @@ return class(..., function(i)
 		-- protect global environment
 		setmetatable(_G, {
 			__index = function(table, index)
-				error("Trying to access non-existent global variable '" .. index.."'")
+				error("Trying to access non-existent global variable '" .. index.."'", 2)
 			end,
 			__newindex = function(table, index)
-				error("Cannot create global variable "..index)
+				error("Cannot create global variable "..index, 2)
 			end
 		})
 		
