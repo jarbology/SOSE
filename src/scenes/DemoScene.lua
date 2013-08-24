@@ -24,6 +24,7 @@ return class(..., function(i, c)
 		local entityMgr = engine:getSystem("jaeger.EntityManager")
 		local entity = entityMgr:createEntity {
 			name = "testEntity",
+			tags = {"coin", "shit"},
 			layer = "default",
 			sprite = {
 				name = "test/coin",

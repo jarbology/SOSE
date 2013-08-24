@@ -29,6 +29,16 @@ local Entity = class("jaeger.Entity", function(i)
 	function i:activate()
 		self:sendMessage("msgActivate")
 	end
+	
+	function i:getName() return self.name end
+
+	function i:hasTag(tag)
+		return (self.tags ~= nil) and (self.tags[tag] ~= nil)
+	end
+
+	function i:getTags()
+		return pairs(self.tags)
+	end
 
 	function i:sendMessage(msg, ...)
 		for _, component in ipairs(self.components) do
@@ -52,7 +62,9 @@ end)
 return class(..., function(i)
 	function i:__constructor(config)
 		self.entityCreated = Event.new()
-		self.namedEntities = {}
+		self.nameRegistry = {}
+		self.tagRegistry = {}
+
 		local updatePhaseNames = config.updatePhases
 		local updatePhases = {}
 		for _, updatePhaseName in ipairs(updatePhaseNames) do
@@ -73,6 +85,10 @@ return class(..., function(i)
 		for name, updatePhase in pairs(self.updatePhases) do
 			updatePhase:clear()
 		end
+
+		-- Reset named and tagged entities
+		self.nameRegistry = {}
+		self.tagRegistry = {}
 	end 
 
 	function i:getUpdatePhase(name)
@@ -96,24 +112,58 @@ return class(..., function(i)
 				updateAction:stop()
 			end
 
-			entity:sendMessage("msgDetroy")
+			entity:sendMessage("msgDestroy")
 			destroyedEntities:remove(entity)
 		end
 	end
 
 	function i:nameEntity(entity, name)
-		--[[entity.name = name
-		assert(self.namedEntities[name] == nil, "Another entity with the name '"..name.."' already exists")
-		self.namedEntities[name] = entity]]
+		local nameRegistry = self.nameRegistry
+		entity.name = name
+		assert(nameRegistry[name] == nil, "Another entity with the name '"..name.."' already exists")
+		nameRegistry[name] = entity
 	end
 
 	function i:unnameEntity(entity)
-		self.namedEntities[entity.name] = nil
+		self.nameRegistry[entity.name] = nil
 		entity.name = nil
 	end
 
-	function i:getNamedEntity(name)
-		return self.namedEntities[name]
+	function i:getEntityByName(name)
+		return self.nameRegistry[name]
+	end
+
+	function i:tagEntity(entity, tag)
+		local entityTags = entity.tags or {}
+		entityTags[tag] = true
+		entity.tags = entityTags
+
+		local tagRegistry = self.tagRegistry
+		local entitySet = tagRegistry[tag] or Set.new()
+		entitySet:add(entity)
+		tagRegistry[tag] = entitySet
+	end
+
+	function i:untagEntity(entity, tag)
+		local entityTags = assert(entity.tags, "Cannot untag an untagged entity")
+		entityTags[tag] = nil
+
+		local tagRegistry = self.tagRegistry
+		local entitySet = tagRegistry[tag] 
+		if entitySet ~= nil then
+			entitySet:remove(entity)
+		end
+	end
+
+	local function nullIterator() end
+	function i:getEntitiesByTag(tag)
+		local tagRegistry = self.tagRegistry
+		local entitySet = tagRegistry[tag]
+		if entitySet == nil then
+			return nullIterator
+		else
+			return entitySet:iterator()
+		end
 	end
 
 	function i:createEntity(spec)
@@ -130,6 +180,13 @@ return class(..., function(i)
 		local name = spec.name
 		if name then self:nameEntity(entity, name) end
 
+		local tags = spec.tags
+		if tags then
+			for _, tag in ipairs(tags) do
+				self:tagEntity(entity, tag)
+			end
+		end
+
 		self.entityCreated:fire(entity, spec)
 		entity:activate()
 		return entity
@@ -137,6 +194,11 @@ return class(..., function(i)
 
 	function i:destroyEntity(entity)
 		if entity.name then self:unnameEntity(entity) end
+		if entity.tags then
+			for tag in pairs(entity.tags) do
+				self:untagEntity(entity, tag)
+			end
+		end
 		self.destroyedEntities:add(entity)
 	end
 end)
