@@ -44,8 +44,6 @@ return class(..., function(i)
 			self.currentScene:stop()
 		end
 
-		collectgarbage "collect"
-
 		local sceneClass = require(sceneName)
 		local scene = assert(sceneClass.create(data))
 		self.currentScene = scene

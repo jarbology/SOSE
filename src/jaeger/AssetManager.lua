@@ -6,7 +6,7 @@ return class(..., function(i)
 
 	function i:__constructor(config)
 		self.config = config.assets
-		self.cache = setmetatable({}, {__mode = "v"})
+		self.cache = {}
 		self.factories = {}
 		self.resourceMap = {}
 	end
