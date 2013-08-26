@@ -1,11 +1,23 @@
 local class = require "jaeger.Class"
 local Event = require "jaeger.Event"
 
+-- Manages the window and sprites (soon will be moved to SpriteManager)
+-- Component: jaeger.Sprite
+-- Relevant entity spec:
+--	* sprite: a table with the following keys:
+--		* name: name of the sprite
+--		* autoPlay: whether the sprite plays on created (not yet implemented)
+-- Shared resources:
+--	* prop: MOAIProp2D of the sprite
+-- Messages:
+--	* msgChangeSprite(spriteName): change the sprite
+--	* msgPlayAnimation(): play the sprite
 return class(..., function(i)
 	function i:__constructor(config)
 		self.config = config.graphics
 	end
 
+	--
 	function i:start(engine)
 		local config = self.config
 		self.assetMgr = engine:getSystem("jaeger.AssetManager")

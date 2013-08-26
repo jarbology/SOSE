@@ -1,9 +1,22 @@
 local class = require "jaeger.Class"
 
 -- Manage and cache assets, also takes care of hot reloading
+-- Relevant config keys:
+--	* assets: a table which contains:
+--		* assetsPath: a folder which holds non-code assets
+--			          AssetManager will monitor this folder for
+--			          changes
+--		* various asset paths, categorized by type. Refer to
+--			asset factory of that type for more information
+--		* factories: a table which maps a asset type to a factory
+--			         Each factory is a module with only one function:
+--			         func(name, config, assetManager, oldInstance)
+--			          name: name of the asset
+--			          config: configuration table
+--			          oldInstance: the old instance of the asset if
+--			                          it was loaded before, used for reloading
 return class(..., function(i)
 	local moduleFactory
-
 	function i:__constructor(config)
 		self.config = config.assets
 		self.cache = {}
@@ -87,11 +100,14 @@ return class(..., function(i)
 		self.resourceMap[absPath] = resourceName
 	end
 
+	-- Try to load an asset, will return a cached version if it's already loaded
+	--	* name: Name of the asset, in the form: typeName:assetName. e.g: texture:test.png
 	function i:getAsset(name)
 		assert(type(name) == "string", "Asset name must be a string, given "..tostring(name).."("..type(name)..")")
 		return self.cache[name] or self:loadAsset(name)
 	end
 
+	-- Force loading of an asset. Use if you want to force an asset to reload
 	function i:loadAsset(name)
 		local colonPos = name:find(":")
 		local assetType = name:sub(1, colonPos - 1)

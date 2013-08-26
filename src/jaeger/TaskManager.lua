@@ -1,5 +1,15 @@
 local class = require "jaeger.Class"
 
+-- Create a task tree where each system is has its own tasks
+-- And updated repeatedly
+-- Relevant config keys:
+--		* tasks: an array of 2-tuple where
+--			the first element is the system name
+--			the second element is the method name
+--		  This method will be called every frame
+--		  When an update task is assigned to a system,
+--		  system:setUpdateTask(methodName, task) will be called to inform
+--		  the system of this task. It can choose to do nothing in this method
 return class(..., function(i)
 	function i:__constructor(config)
 		self.config = config.tasks

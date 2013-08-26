@@ -1,6 +1,13 @@
 local class = require "jaeger.Class"
 local socket = require "socket"
 
+-- Open a remote console which let user enter a command and see it execute
+-- Relevant config keys
+--	* config: a table with the following keys:
+--		* port: the port to open a listening UDP socket
+--		* setupScript: the script to setup the console environment
+-- Tasks:
+--  * update
 return class(..., function(i)
 	function i:__constructor(config)
 		self.setupScript = assert(loadfile(config.console.setupScript))
