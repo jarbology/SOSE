@@ -15,6 +15,38 @@ local Event = require "jaeger.Event"
 -- mouseMiddle
 -- mouseWheel
 return class(..., function(i)
+	-- Deliver subsequent mouse events to this entity regardless of mouse position
+	-- Returns whether the grab is successful (focus grabbing will fail if another 
+	-- entity is grabbing focus)
+	function i:grabFocus(entity)
+		if self.focusedEntity == nil then
+			self.focusedEntity = entity
+			return true
+		else
+			return false
+		end
+	end
+
+	-- Release focus from an entity
+	-- Returns whether this entity held the focus previously
+	function i:releaseFocus(entity)
+		if self.focusedEntity == entity then
+			self.focusedEntity = nil
+			return true
+		else
+			return false
+		end
+	end
+
+	-- Check whether an entity has the focus
+	function i:isFocused(entity)
+		return self.focusedEntity == entity
+	end
+
+	-- Return the currently focused entity
+	function i:isFocused(entity)
+		return self.focusedEntity
+	end
 
 	-- Private
 	function i:__constructor(config)
@@ -62,6 +94,12 @@ return class(..., function(i)
 		end
 	end
 
+	function i:msgDestroy(component, entity)
+		if self.focusedEntity == entity then
+			self.focusedEntity = nil
+		end
+	end
+
 	function i:listen(sensor)
 		local event = Event.new()
 		sensor:setCallback(function(...)
@@ -71,30 +109,30 @@ return class(..., function(i)
 	end
 
 	function i:onMouseMoved(...)
-		self:dispatcEventMsg("msgMouseMoved", ...)
+		self:dispatchEventMsg("msgMouseMoved", ...)
 	end
 
 	function i:onMouseWheel(...)
-		self:dispatcEventMsg("msgMouseWheel", ...)
+		self:dispatchEventMsg("msgMouseWheel", ...)
 	end
 
 	function i:onMouseLeft(...)
-		self:dispatcEventMsg("msgMouseLeft", ...)
+		self:dispatchEventMsg("msgMouseLeft", ...)
 	end
 
 	function i:onMouseMiddle(...)
-		self:dispatcEventMsg("msgMouseMiddle", ...)
+		self:dispatchEventMsg("msgMouseMiddle", ...)
 	end
 
 	function i:onMouseRight(...)
-		self:dispatcEventMsg("msgMouseRight", ...)
+		self:dispatchEventMsg("msgMouseRight", ...)
 	end
 
-	function i:dispatcEventMsg(msg, ...)
+	function i:dispatchEventMsg(msg, ...)
 		if not self.renderTable then return end
 
-		if self.focusEntity ~= nil then
-			self.focusEntity:sendMessage(msg, ...)
+		if self.focusedEntity ~= nil then
+			self.focusedEntity:sendMessage(msg, ...)
 		else
 			local mouseX, mouseY = MOAIInputMgr.device.mouse:getLoc()
 			for _, renderPass in ipairs(self.renderTable) do
