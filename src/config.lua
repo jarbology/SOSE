@@ -44,6 +44,7 @@ return {
 	},
 
 	systems = {
+		"jaeger.InputSystem",
 		"jaeger.TaskManager",
 		"jaeger.GraphicsSystem",
 		"jaeger.SceneManager",

@@ -31,9 +31,13 @@ return class(..., function(i, c)
 				autoPlay = "true"
 			},
 			updatePhase = "gamelogic",
+			receiveInput = true,
 			script = {
 				msgPlayAnimation = function(self, entity)
 					print 'start playing anim'
+				end,
+				msgMouseLeft = function(self, entity, down)
+					print('mouseLeft', down)
 				end
 			}
 		}
