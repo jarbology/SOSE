@@ -30,7 +30,12 @@ return class(..., function(i, c)
 				name = "test/coin",
 				autoPlay = "true"
 			},
-			updatePhase = "gamelogic"
+			updatePhase = "gamelogic",
+			script = {
+				msgPlayAnimation = function(self, entity)
+					print 'start playing anim'
+				end
+			}
 		}
 		entity:sendMessage("msgPlayAnimation")
 	end

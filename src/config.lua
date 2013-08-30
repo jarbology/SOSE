@@ -50,6 +50,7 @@ return {
 		"jaeger.EntityManager",
 		"jaeger.RemoteConsole",
 		"jaeger.LockstepSim",
+		"jaeger.InlineScriptSystem",
 
 		"CmdInterpreter"
 	},
