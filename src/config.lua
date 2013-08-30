@@ -32,18 +32,30 @@ return {
 
 	updatePhases = {
 		"gui",
-		"gameplay"
+		"gamelogic"
+	},
+
+	lockstepSim = {
+		lockedPhase = "gamelogic",
+		queues = {
+			"test"
+		},
+		interpreter = "CmdInterpreter"
 	},
 
 	systems = {
+		"jaeger.TaskManager",
 		"jaeger.GraphicsSystem",
 		"jaeger.SceneManager",
 		"jaeger.EntityManager",
-		"jaeger.TaskManager",
-		"jaeger.RemoteConsole"
+		"jaeger.RemoteConsole",
+		"jaeger.LockstepSim",
+
+		"CmdInterpreter"
 	},
 
 	tasks = {
+		{"jaeger.LockstepSim", "update"},-- LockstepSim:update must be before EntityManager:update
 		{"jaeger.EntityManager", "update"},
 		{"jaeger.RemoteConsole", "update"},
 
