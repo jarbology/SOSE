@@ -2,10 +2,6 @@ local class = require "jaeger.Class"
 local RenderUtil = require "jaeger.utils.RenderUtils"
 
 return class(..., function(i, c)
-	function c.create(...)
-		return c.new(...)
-	end
-
 	function i:__constructor()
 		local defaultLayer = RenderUtil.newFullScreenLayer()
 		self.renderTable = {

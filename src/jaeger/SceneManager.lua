@@ -61,7 +61,7 @@ return class(..., function(i)
 		end
 
 		local sceneClass = require(sceneName)
-		local scene = assert(sceneClass.create(data))
+		local scene = assert(sceneClass.new(data))
 		self.currentScene = scene
 		MOAIRenderMgr.setRenderTable(scene:getRenderTable())
 		scene:start(self.engine)
