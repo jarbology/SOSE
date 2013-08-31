@@ -36,6 +36,7 @@ return class(..., function(i)
 		if layerName and prop then
 			local layer = assert(self.currentScene:getLayer(layerName), "Cannot find layer '"..layerName.."' in current scene")
 			layer:insertProp(prop)
+			prop.layer = layer
 		end
 	end
 

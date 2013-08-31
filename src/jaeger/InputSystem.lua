@@ -19,6 +19,7 @@ return class(..., function(i)
 	-- Returns whether the grab is successful (focus grabbing will fail if another 
 	-- entity is grabbing focus)
 	function i:grabFocus(entity)
+		assert(entity.sendMessage, "Only entity can grab focus")
 		if self.focusedEntity == nil then
 			self.focusedEntity = entity
 			return true
@@ -131,10 +132,13 @@ return class(..., function(i)
 	function i:dispatchEventMsg(msg, ...)
 		if not self.renderTable then return end
 
-		if self.focusedEntity ~= nil then
-			self.focusedEntity:sendMessage(msg, ...)
+		local mouseX, mouseY = MOAIInputMgr.device.mouse:getLoc()
+
+		local focusedEntity = self.focusedEntity
+		if focusedEntity ~= nil then
+			local worldX, worldY = focusedEntity:getResource("prop").layer:wndToWorld(mouseX, mouseY)
+			focusedEntity:sendMessage(msg, worldX, worldY, ...)
 		else
-			local mouseX, mouseY = MOAIInputMgr.device.mouse:getLoc()
 			for _, renderPass in ipairs(self.renderTable) do
 				-- if the render pass is a layer
 				if renderPass.wndToWorld then
@@ -143,7 +147,7 @@ return class(..., function(i)
 					if prop then
 						local entity = prop.entity
 						if entity and entity.receiveInput then
-							entity:sendMessage(msg, ...)
+							entity:sendMessage(msg, localX, localY, ...)
 						end
 					end
 				end
