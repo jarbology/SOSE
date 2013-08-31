@@ -11,12 +11,14 @@ return {
 		texturePath = "../assets/gfx/textures/",
 		spriteBankPath = "../assets/gfx/sprites/",
 		atlasPath = "../assets/gfx/atlases/",
+		fontPath = "../assets/fonts/",
 
 		factories = {
 			texture = "jaeger.assetFactories.TextureFactory",
 			spriteBank = "jaeger.assetFactories.SpriteBankFactory",
 			sprite = "jaeger.assetFactories.SpriteFactory",
 			atlas = "jaeger.assetFactories.AtlasFactory",
+			font = "jaeger.assetFactories.FontFactory"
 		}
 	},
 
@@ -50,7 +52,8 @@ return {
 		"jaeger.LockstepSim",
 		"jaeger.InlineScriptSystem",
 
-		"CmdInterpreter"
+		"CmdInterpreter",
+		"MatchManager"
 	},
 
 	tasks = {
