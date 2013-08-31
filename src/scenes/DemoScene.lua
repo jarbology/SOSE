@@ -6,9 +6,8 @@ return class(..., function(i, c)
 		return c.new(...)
 	end
 
-	function i:__constructor(config)
+	function i:__constructor()
 		local defaultLayer = RenderUtil.newFullScreenLayer()
-		self.ignore = config
 		self.renderTable = {
 			defaultLayer
 		}
@@ -19,8 +18,6 @@ return class(..., function(i, c)
 	end
 
 	function i:start(engine)
-		if self.ignore then return end
-
 		local entityMgr = engine:getSystem("jaeger.EntityManager")
 		local entity = entityMgr:createEntity {
 			name = "testEntity",

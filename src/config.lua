@@ -5,11 +5,6 @@ return {
 		windowHeight = 480
 	},
 
-	firstScene = {
-		name = "scenes.DemoScene",
-		data = false
-	},
-
 	assets = {
 		assetsPath = "../assets",
 
