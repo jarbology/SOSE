@@ -44,6 +44,8 @@ return {
 	},
 
 	systems = {
+		"jaeger.widget.WidgetManager",
+
 		"jaeger.InputSystem",
 		"jaeger.TaskManager",
 		"jaeger.GraphicsSystem",

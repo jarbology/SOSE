@@ -30,14 +30,27 @@ return class(..., function(i, c)
 				name = "test/coin",
 				autoPlay = "true"
 			},
-			updatePhase = "gamelogic",
+			updatePhase = "gui",
 			receiveInput = true,
+			widgetType = "jaeger.Button",
 			script = {
 				msgPlayAnimation = function(self, entity)
 					print 'start playing anim'
 				end,
 				msgMouseLeft = function(self, entity, down)
 					print('mouseLeft', down)
+				end,
+				msgGUIHoverIn = function(self, entity)
+					entity:sendMessage(
+						"msgPlayGUIAnimation",
+						entity:getResource("prop"):seekScl(1.2, 1.2, 0.3)
+					)
+				end,
+				msgGUIHoverOut = function(self, entity)
+					entity:sendMessage(
+						"msgPlayGUIAnimation",
+						entity:getResource("prop"):seekScl(1.0, 1.0, 0.3)
+					)
 				end
 			}
 		}
