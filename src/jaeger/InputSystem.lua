@@ -3,17 +3,17 @@ local Event = require "jaeger.Event"
 
 -- Provide input events for multiple listeners
 -- Relevant entity spec:
--- * receiveInput: boolean
+-- * receiveInput: boolean, whether an entity should receive mouse input
 --
 -- Events:
 --
--- mouseMoved
--- keyboard
--- textInput
--- mouseLeft
--- mouseRight
--- mouseMiddle
--- mouseWheel
+-- mouseMoved(x, y)
+-- keyboard(keycode)
+-- textInput(character)
+-- mouseLeft(x, y, down): fired when the left mouse is pressed or released
+-- mouseRight(x, y, down):
+-- mouseMiddle(x, y, down):
+-- mouseWheel(x, y, delta)
 return class(..., function(i)
 	-- Deliver subsequent mouse events to this entity regardless of mouse position
 	-- Returns whether the grab is successful (focus grabbing will fail if another 
