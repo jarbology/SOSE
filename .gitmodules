@@ -1,0 +1,3 @@
+[submodule "deps/lua-msgpack"]
+	path = deps/lua-msgpack
+	url = git://github.com/jarbology/lua-msgpack
