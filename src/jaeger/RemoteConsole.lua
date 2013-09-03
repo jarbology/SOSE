@@ -85,11 +85,12 @@ return class(..., function(i)
 		local values = {...}
 		local first = true
 		for index = 1, numValues do
-			socket:sendto(tostring(values[index]), ip, port)
 			if not first then
 				socket:sendto("\t", ip, port)
 			end
 			first = false
+
+			socket:sendto(tostring(values[index]), ip, port)
 		end
 	end
 end)
