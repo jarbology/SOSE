@@ -1,5 +1,6 @@
 local class = require "jaeger.Class"
 local Event = require "jaeger.Event"
+local KeyCodes = require "jaeger.KeyCodes"
 
 -- Manage scenes
 -- Component: jaeger.Renderable
@@ -10,6 +11,7 @@ local Event = require "jaeger.Event"
 --	* sceneEnd(scene): fired at the end of a scene
 return class(..., function(i)
 	function i:__constructor(config)
+		self.reloadKeyName = config.sceneManager.reloadKey
 		self.currentScene = nil
 		self.sceneBegin = Event.new()
 		self.sceneEnd = Event.new()
@@ -18,6 +20,7 @@ return class(..., function(i)
 	function i:start(engine)
 		self.engine = engine
 		engine:getSystem("jaeger.EntityManager").entityCreated:addListener(self, "onEntityCreated")
+		engine:getSystem("jaeger.InputSystem").keyboard:addListener(self, "onKey")
 	end
 
 	function i:onEntityCreated(entity, spec)
@@ -26,6 +29,12 @@ return class(..., function(i)
 				system = self,
 				name = "jaeger.Renderable"
 			}
+		end
+	end
+
+	function i:onKey(keycode, down)
+		if not down and keycode == KeyCodes[self.reloadKeyName] then
+			self:changeScene(self.currentSceneName, self.currentSceneData)
 		end
 	end
 
@@ -56,10 +65,15 @@ return class(..., function(i)
 	-- getLayer(name): return the layer with the given name or nil
 	function i:changeScene(sceneName, data)
 		if self.currentScene then
+			print("Ending scene:", self.currentSceneName)
 			self.sceneEnd:fire(self.currentScene)
 			self.currentScene:stop()
 		end
 
+		self.currentSceneName = sceneName
+		self.currentSceneData = data
+
+		print("Starting scene:", sceneName)
 		local sceneClass = require(sceneName)
 		local scene = assert(sceneClass.new(data))
 		self.currentScene = scene
