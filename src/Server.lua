@@ -17,13 +17,14 @@ local clientSockets = {}
 local clientMsgSockets = {}
 local serverSocket = assert(socket.tcp())
 assert(serverSocket:bind('*', port))
-assert(serverSocket:listen())
+assert(serverSocket:listen(3))
 
 print("Started server on port: "..port)
 local numPlayersJoined = 0
 
 while numPlayersJoined < numPlayers do
 	local clientSocket = assert(serverSocket:accept())
+	clientSocket:setoption('tcp-nodelay', true)
 	numPlayersJoined = numPlayersJoined + 1
 	print("Player "..numPlayersJoined.." joined")
 	clientSockets[numPlayersJoined] = clientSocket
@@ -32,9 +33,8 @@ end
 
 print "All clients joined. Starting game"
 
-local function broadcast(senderId, msg)
+local function broadcast(msg)
 	for playerId, msgSocket in ipairs(clientMsgSockets) do
-		msgSocket:send(senderId)
 		msgSocket:send(msg)
 	end
 end
@@ -46,18 +46,36 @@ end
 
 print "Id broadcasted"
 
+local numSkippedFrames = {0, 0}
 while true do
-	-- update sockets
-	for playerId in ipairs(clientSockets) do
-		clientMsgSockets[playerId]:update(0)
-	end
-
 	-- update message
+	local msgBuff = {}
 	for playerId, msgSocket in ipairs(clientMsgSockets) do
+		msgSocket:update(0)
 		if msgSocket:hasData() then
-			local msg = msgSocket:receive()
-			print(playerId, msg)
-			broadcast(playerId, msg)
+			msgBuff[playerId] = msgSocket:receive()
+			numSkippedFrames[playerId] = 0
+		else
+			local playerSkippedFrames = numSkippedFrames[playerId]
+			if playerSkippedFrames >= 2 then
+				print(playerId, 'pause!')
+				repeat
+					msgSocket:update(0)
+				until msgSocket:hasData()
+				msgBuff[playerId] = msgSocket:receive()
+			else
+				msgBuff[playerId] = 1
+				numSkippedFrames[playerId] = playerSkippedFrames + 1
+				print (playerId, 'skipped', playerSkippedFrames)
+			end
 		end
+		--[[while not msgSocket:hasData() do
+			msgSocket:update(0)
+			socket.sleep(0)
+		end]]
+
+		--msgBuff[playerId] = msgSocket:receive()
 	end
+	broadcast(msgBuff)
+	socket.sleep(0.05)
 end

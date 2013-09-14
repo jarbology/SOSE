@@ -32,12 +32,14 @@ return {
 		"gamelogic"
 	},
 
+	sceneManager = {
+		reloadKey = "F5"
+	},
+
 	lockstepSim = {
 		lockedPhase = "gamelogic",
-		queues = {
-			"test"
-		},
-		interpreter = "CmdInterpreter"
+		streams = {1, 2},
+		samplingInterval = 3
 	},
 
 	systems = {
@@ -52,14 +54,13 @@ return {
 		"jaeger.LockstepSim",
 		"jaeger.InlineScriptSystem",
 
-		"CmdInterpreter",
-		"MatchManager"
+		"MovableController"
 	},
 
 	tasks = {
 		{"jaeger.LockstepSim", "update"},-- LockstepSim:update must be before EntityManager:update
 		{"jaeger.EntityManager", "update"},
-		{"jaeger.RemoteConsole", "update"},
+		--{"jaeger.RemoteConsole", "update"},
 
 		-- These tasks must be the last
 		{"jaeger.EntityManager", "cleanUp"}

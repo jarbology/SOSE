@@ -8,7 +8,7 @@ local Event = require "jaeger.Event"
 -- Events:
 --
 -- mouseMoved(x, y)
--- keyboard(keycode)
+-- keyboard(keycode, down)
 -- textInput(character)
 -- mouseLeft(x, y, down): fired when the left mouse is pressed or released
 -- mouseRight(x, y, down):

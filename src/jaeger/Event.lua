@@ -4,6 +4,7 @@ local Set = require "jaeger.Set"
 -- Notifies an event to several receivers
 return class(..., function(i, c)
 	function c.makeListener(obj, methodName)
+		assert(obj[methodName], "Object does not have method "..tostring(methodName))
 		return function(...)
 			return obj[methodName](obj, ...)
 		end

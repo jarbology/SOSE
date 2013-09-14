@@ -7,7 +7,7 @@ return class(..., function(i)
 		self.hasNext = false -- a separate flag since nextMsg can be nil or false
 	end
 
-	function i:feed(data)
+	function i:put(data)
 		self.buff = self.buff .. data
 	end
 
@@ -16,7 +16,7 @@ return class(..., function(i)
 
 		local success, size, msg = pcall(msgpack.unpack, self.buff)
 
-		if success then
+		if success and size then
 			self.nextOffset = size + 1
 			self.nextMsg = msg
 			self.hasNext = true
