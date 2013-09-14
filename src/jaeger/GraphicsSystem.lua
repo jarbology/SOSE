@@ -62,10 +62,6 @@ return class(..., function(i)
 	end
 
 	function i:msgPlayAnimation(component, entity)
-		local updateAction = assert(
-			entity:getResource("updateAction"),
-			"Only active entity can play animation"
-		)
-		component.anim:start(updateAction)
+		entity:perform(component.anim)
 	end
 end)

@@ -40,7 +40,7 @@ return class(..., function(i)
 			component.animation = nil
 		end
 		if anim then
-			anim:attach(entity:getResource("updateAction"))
+			entity:perform(anim)
 			component.animation = anim
 		end
 	end

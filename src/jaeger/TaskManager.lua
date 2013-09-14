@@ -1,4 +1,5 @@
 local class = require "jaeger.Class"
+local ActionUtils = require "jaeger.utils.ActionUtils"
 
 -- Create a task tree where each system is has its own tasks
 -- And updated repeatedly
@@ -13,7 +14,7 @@ local class = require "jaeger.Class"
 return class(..., function(i)
 	function i:__constructor(config)
 		self.config = config.tasks
-		self.root = MOAIAction.new()
+		self.root = MOAIStickyAction.new()
 		self.tasks = {}
 	end
 
@@ -23,15 +24,8 @@ return class(..., function(i)
 			local systemName, methodName = unpack(taskDesc)
 			print("Spawning task "..systemName.."/"..methodName)
 			local system = assert(engine:getSystem(systemName), "Cannot locate system "..systemName)
-			local task = MOAICoroutine.new()
+			local task = ActionUtils.newLoopCoroutine(system, methodName)
 			system:setUpdateTask(methodName, task)
-			local yield = coroutine.yield
-			task:run(function()
-				while true do
-					system[methodName](system)
-					yield()
-				end
-			end)
 			task:attach(self.root)
 		end
 	end

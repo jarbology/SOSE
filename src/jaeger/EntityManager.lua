@@ -1,6 +1,7 @@
 local class = require "jaeger.Class"
 local Event = require "jaeger.Event"
 local Set = require "jaeger.Set"
+local ActionUtils = require "jaeger.utils.ActionUtils"
 
 local Entity = class("jaeger.Entity", function(i)
 	-- Don't call this manually
@@ -35,6 +36,20 @@ local Entity = class("jaeger.Entity", function(i)
 	-- Retrieve the specification that was used to create this entity
 	function i:getSpec()
 		return self.spec
+	end
+
+	-- Perform an action (attach the action to this entity's updateAction)
+	function i:perform(action)
+		local updateAction = assert(self.sharedResources.updateAction, "Only active entity can perform actions")
+		action:attach(updateAction)
+	end
+
+	-- Call obj:funcName(delta, entity, ...) every frame
+	-- Returns the coroutine which performs the action
+	function i:addUpdateFunc(obj, funcName, ...)
+		local action = ActionUtils.newLoopCoroutine(obj, funcName, self, ...)
+		self:perform(action)
+		return action
 	end
 
 	function i:activate()
