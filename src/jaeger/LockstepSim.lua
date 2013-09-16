@@ -44,12 +44,13 @@ return class(..., function(i)
 		self.entityMgr = engine:getSystem("jaeger.EntityManager")
 	end
 
-	function i:setUpdateTask(methodName, task)
+	function i:spawnTask(taskName)
+		assert(taskName == "update", "Unknown task")
+
+		local task = ActionUtils.newLoopCoroutine(self, "update")
 		self.updateTask = task
 		self:pause(true)
-	end
-
-	function i:doSample()
+		return task
 	end
 
 	function i:update()
@@ -73,7 +74,6 @@ return class(..., function(i)
 		for name, stream in pairs(self.streams) do
 			while not stream:hasData() do
 				yield()
-				print 'pause!'
 			end
 		end
 
@@ -94,7 +94,7 @@ return class(..., function(i)
 	function i:getLockedPhase()
 		local lockedPhase = self.lockedPhase
 		if lockedPhase == nil then
-			lockedPhase = self.entityMgr:getUpdatePhase(self.lockedPhaseName)
+			lockedPhase = assert(self.entityMgr:getUpdatePhase(self.lockedPhaseName), "Can't find phase "..self.lockedPhaseName)
 			self.lockedPhase = lockedPhase
 		end
 		return lockedPhase

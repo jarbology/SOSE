@@ -1,16 +1,13 @@
 local class = require "jaeger.Class"
-local ActionUtils = require "jaeger.utils.ActionUtils"
 
 -- Create a task tree where each system is has its own tasks
 -- And updated repeatedly
 -- Relevant config keys:
---		* tasks: an array of 2-tuple where
+--		* tasks: an array where
 --			the first element is the system name
---			the second element is the method name
---		  This method will be called every frame
---		  When an update task is assigned to a system,
---		  system:setUpdateTask(methodName, task) will be called to inform
---		  the system of this task. It can choose to do nothing in this method
+--			the following elements describe the task in an arbitrary manner
+--		  TaskManager will call system:spawnTask(...) with arguments in the array (except the first one)
+--		  The method must return a MOAIAction
 return class(..., function(i)
 	function i:__constructor(config)
 		self.config = config.tasks
@@ -21,11 +18,10 @@ return class(..., function(i)
 	function i:start(engine)
 		MOAIActionMgr.setRoot(self.root)
 		for _, taskDesc in ipairs(self.config) do
-			local systemName, methodName = unpack(taskDesc)
-			print("Spawning task "..systemName.."/"..methodName)
+			local systemName = taskDesc[1]
+			print("Spawning task ", unpack(taskDesc))
 			local system = assert(engine:getSystem(systemName), "Cannot locate system "..systemName)
-			local task = ActionUtils.newLoopCoroutine(system, methodName)
-			system:setUpdateTask(methodName, task)
+			local task = assert(system:spawnTask(select(2, unpack(taskDesc))), "Cannot spawn task")
 			task:attach(self.root)
 		end
 	end

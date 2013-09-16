@@ -110,13 +110,16 @@ return class(..., function(i)
 		self.nameRegistry = {}
 		self.tagRegistry = {}
 
+		local updateTask = MOAIStickyAction.new()
 		local updatePhaseNames = config.updatePhases
 		local updatePhases = {}
 		for _, updatePhaseName in ipairs(updatePhaseNames) do
-			updatePhases[updatePhaseName] = MOAIStickyAction.new()
+			local updatePhase = MOAIStickyAction.new()
+			updatePhases[updatePhaseName] = updatePhase
+			updatePhase:attach(updateTask)
 		end
 		self.updatePhases = updatePhases
-		self.updatePhaseNames = updatePhaseNames
+		self.updateTask = updateTask
 
 		self.destroyedEntities = Set.new()
 	end
@@ -140,13 +143,12 @@ return class(..., function(i)
 		return self.updatePhases[name]
 	end
 
-	function i:setUpdateTask(methodName, task)
-		for _, updatePhaseName in ipairs(self.updatePhaseNames) do
-			self.updatePhases[updatePhaseName]:attach(task)
+	function i:spawnTask(taskName)
+		if taskName == "update" then
+			return self.updateTask
+		elseif taskName == "cleanUp" then
+			return ActionUtils.newLoopCoroutine(self, "cleanUp")
 		end
-	end
-
-	function i:update()
 	end
 
 	function i:cleanUp()
