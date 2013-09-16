@@ -1,6 +1,7 @@
 local class = require "jaeger.Class"
 local Event = require "jaeger.Event"
 local KeyCodes = require "jaeger.KeyCodes"
+local ActionUtils = require "jaeger.utils.ActionUtils"
 
 -- Manage scenes
 -- Component: jaeger.Renderable
@@ -10,6 +11,20 @@ local KeyCodes = require "jaeger.KeyCodes"
 --	* sceneBegin(scene): fired at the beginning of a scene.
 --	* sceneEnd(scene): fired at the end of a scene
 return class(..., function(i)
+	-- Change to a scene
+	--	* sceneName: name of the scene class
+	--	* data: userdata to pass to the scene
+	-- A scene must have:
+	-- __constructor(data): where data is the data passed in earlier
+	-- start(engine): initialize the scene
+	-- getRenderTable(): returns a Moai render table (see MOAIRenderMgr)
+	-- getLayer(name): return the layer with the given name or nil
+	function i:changeScene(sceneName, data)
+		self.nextScene = sceneName
+		self.nextSceneData = data
+	end
+
+	-- Private
 	function i:__constructor(config)
 		self.reloadKeyName = config.sceneManager.reloadKey
 		self.currentScene = nil
@@ -55,30 +70,35 @@ return class(..., function(i)
 		self.currentScene:getLayer(layerName):removeProp(prop)
 	end
 
-	-- Change to a scene
-	--	* sceneName: name of the scene class
-	--	* data: userdata to pass to the scene
-	-- A scene must have:
-	-- __constructor(data): where data is the data passed in earlier
-	-- start(engine): initialize the scene
-	-- getRenderTable(): returns a Moai render table (see MOAIRenderMgr)
-	-- getLayer(name): return the layer with the given name or nil
-	function i:changeScene(sceneName, data)
-		if self.currentScene then
-			print("Ending scene:", self.currentSceneName)
-			self.sceneEnd:fire(self.currentScene)
-			self.currentScene:stop()
+	function i:spawnTask(taskName)
+		if taskName == "update" then
+			return ActionUtils.newLoopCoroutine(self, "update")
 		end
+	end
 
-		self.currentSceneName = sceneName
-		self.currentSceneData = data
+	function i:update()
+		if self.nextScene then
+			local sceneName = self.nextScene
+			local data = self.nextSceneData
+			self.nextScene = nil
+			self.nextSceneData = nil
 
-		print("Starting scene:", sceneName)
-		local sceneClass = require(sceneName)
-		local scene = assert(sceneClass.new(data))
-		self.currentScene = scene
-		MOAIRenderMgr.setRenderTable(scene:getRenderTable())
-		scene:start(self.engine)
-		self.sceneBegin:fire(scene)
+			if self.currentScene then
+				print("Ending scene:", self.currentSceneName)
+				self.sceneEnd:fire(self.currentScene)
+				self.currentScene:stop()
+			end
+
+			self.currentSceneName = sceneName
+			self.currentSceneData = data
+
+			print("Starting scene:", sceneName)
+			local sceneClass = require(sceneName)
+			local scene = assert(sceneClass.new(data))
+			self.currentScene = scene
+			MOAIRenderMgr.setRenderTable(scene:getRenderTable())
+			scene:start(self.engine)
+			self.sceneBegin:fire(scene)
+		end
 	end
 end)

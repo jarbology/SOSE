@@ -58,6 +58,7 @@ return {
 	},
 
 	tasks = {
+		{"jaeger.SceneManager", "update"},
 		{"jaeger.LockstepSim", "update"},-- LockstepSim:update must be before EntityManager:update
 		{"jaeger.EntityManager", "update"},
 		--{"jaeger.RemoteConsole", "update"},
