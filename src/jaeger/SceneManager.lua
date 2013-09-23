@@ -16,7 +16,8 @@ return class(..., function(i)
 	--	* data: userdata to pass to the scene
 	-- A scene must have:
 	-- __constructor(data): where data is the data passed in earlier
-	-- start(engine): initialize the scene
+	-- start(engine, task): initialize the scene. task is the scene manager's update task.
+	--                      The scene can use it as parent for its own update task(s)
 	-- getRenderTable(): returns a Moai render table (see MOAIRenderMgr)
 	-- getLayer(name): return the layer with the given name or nil
 	function i:changeScene(sceneName, data)
@@ -72,7 +73,9 @@ return class(..., function(i)
 
 	function i:spawnTask(taskName)
 		if taskName == "update" then
-			return ActionUtils.newLoopCoroutine(self, "update")
+			local task = ActionUtils.newLoopCoroutine(self, "update")
+			self.updateTask = task
+			return task
 		end
 	end
 
@@ -87,6 +90,7 @@ return class(..., function(i)
 				print("Ending scene:", self.currentSceneName)
 				self.sceneEnd:fire(self.currentScene)
 				self.currentScene:stop()
+				self.updateTask:clear()
 			end
 
 			self.currentSceneName = sceneName
@@ -97,7 +101,7 @@ return class(..., function(i)
 			local scene = assert(sceneClass.new(data))
 			self.currentScene = scene
 			MOAIRenderMgr.setRenderTable(scene:getRenderTable())
-			scene:start(self.engine)
+			scene:start(self.engine, self.updateTask)
 			self.sceneBegin:fire(scene)
 		end
 	end

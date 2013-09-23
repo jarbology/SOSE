@@ -13,6 +13,14 @@ return class(..., function(i, c)
 		return coro
 	end
 
+	function c.newCoroutine(obj, methodName, ...)
+		local coro = MOAICoroutine.new()
+		coro:run(function(...)
+			obj[methodName](obj, ...)
+		end, ...)
+		return coro
+	end
+
 	function c.skipFrames(n)
 		local frameSkipped = 0
 		local yield = coroutine.yield

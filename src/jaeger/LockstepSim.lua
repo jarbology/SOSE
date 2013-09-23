@@ -1,24 +1,26 @@
 local class = require "jaeger.Class"
 local Event = require "jaeger.Event"
+local StreamUtils = require "jaeger.utils.StreamUtils"
 local ActionUtils = require "jaeger.utils.ActionUtils"
 
 -- This system keeps the locked phase synchronized across the network
 -- and ensures determinism of simulation
--- It manages multiple command streams which are polled every update
 -- Relevant config keys:
 -- * lockstepSim: a table with the following keys:
 --	* lockedPhase: name of the update phase to synchronize
---	* streams: an array of command stream names
+--	* samplingInterval: how often should commands be sent to server
 -- Events:
 --	* sample(): fired everytime LockstepSim starts to sample the command streams
 return class(..., function(i)
-	-- Register a command stream
-	function i:registerCmdStream(name, stream)
-		self.streams[name] = stream
+	-- Set the command stream
+	-- Must be called once before unpausing LockstepSim
+	function i:setCommandStream(stream)
+		self.cmdStream = stream
 	end
 
 	-- Set the command interpreter
-	-- interpreter(cmd) will be called for every command
+	-- Must be called once before unpausing LockstepSim
+	-- interpreter(playerId, cmd) will be called for every command
 	function i:setInterpreter(interpreter)
 		self.interpreter = interpreter
 	end
@@ -32,12 +34,11 @@ return class(..., function(i)
 	-- Private
 
 	function i:__constructor(config)
+		self.sample = Event.new()
+
 		local config = config.lockstepSim
 		self.samplingInterval = config.samplingInterval
 		self.lockedPhaseName = config.lockedPhase
-		self.streamNames = config.streams
-		self.streams = {}
-		self.sample = Event.new()
 	end
 
 	function i:start(engine, config)
@@ -56,35 +57,17 @@ return class(..., function(i)
 	function i:update()
 		self.sample:fire()
 		-- wait for the next frame to continue sampling
-		local frameSkipped = 1
-		local interval = self.samplingInterval
-		local yield = coroutine.yield
-		while frameSkipped < interval do
-			yield()
-			frameSkipped = frameSkipped + 1
-		end
+		ActionUtils.skipFrames(self.samplingInterval - 1)
 
+		-- pause the locked phase
 		local lockedPhase = self:getLockedPhase()
-		local interpreter = self.interpreter
-	
-		-- first, pause the locked phase
 		lockedPhase:pause(true)
 
-		-- spinlock until all streams are ready
-		for name, stream in pairs(self.streams) do
-			while not stream:hasData() do
-				yield()
-			end
-		end
-
-		if(self.streams[1].queue) then
-			print(self.streams[1].queue:getSize(), self.streams[2].queue:getSize())
-		end
-		-- when all streams are ready
-		for _, streamName in pairs(self.streamNames) do
-			local stream = self.streams[streamName]
-			local cmd = stream:take()
-			interpreter(streamName, cmd)
+		-- wait for commands
+		local commands = StreamUtils.blockingPull(self.cmdStream)
+		local interpreter = self.interpreter
+		for playerId, command in pairs(commands) do
+			interpreter(playerId, command)
 		end
 
 		-- allow game to update

@@ -2,9 +2,7 @@ local class = require "jaeger.Class"
 
 return class(..., function(i, c)
 	c.commandNames = {
-		"noop",
-		"cmdMove",
-		"cmdStop"
+		"noop"
 	}
 
 	local commandCodes = {}
@@ -20,24 +18,20 @@ return class(..., function(i, c)
 		self.avatars = { player1, player2 }
 	end
 
+	function i:getInterpretFunc()
+		return function(playerId, cmd)
+			return self:execute(playerId, cmd)
+		end
+	end
+
 	-- Private
-	function i:execute(streamId, cmd)
+	function i:execute(playerId, cmd)
 		if cmd ~= c.commandCodes.noop then
-			return self:invoke(streamId, unpack(cmd))
+			return self:invoke(playerId, unpack(cmd))
 		end
 	end
 
 	function i:invoke(streamId, commandCode, ...)
 		return self[c.commandNames[commandCode]](self, streamId, ...)
-	end
-
-	-- Cmd implementations
-	function i:cmdMove(streamId, direction)
-		self.avatars[streamId]:sendMessage("msgSetAccel", 150 * direction)
-	end
-
-	function i:cmdStop(streamId)
-		self.avatars[streamId]:sendMessage("msgSetAccel", 0)
-		self.avatars[streamId]:sendMessage("msgSetVec", 0)
 	end
 end)

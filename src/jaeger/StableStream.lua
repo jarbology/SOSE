@@ -27,11 +27,14 @@ return class(..., function(i)
 		end
 	end
 
-	function i:take()
+	function i:pull()
 		return self.queue:dequeue()
 	end
 
-	function i:put(data)
+	function i:update()
+	end
+
+	function i:push(data)
 		self.queue:enqueue(data)
 	end
 end)

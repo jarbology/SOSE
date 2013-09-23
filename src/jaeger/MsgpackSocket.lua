@@ -3,14 +3,18 @@ local socket = require "socket"
 local msgpack = require "msgpack"
 local MsgpackAccumulator = require "jaeger.MsgpackAccumulator"
 
+-- A socket wrapper which sends and receive Msgpack messages
+-- It is an active readable stream + writable stream
 return class(..., function(i)
+	-- Create a MsgpackSocket from a luasocket
 	function i:__constructor(socket)
 		assert(socket.send and socket.receive, "Invalid socket")
 		self.socket = socket
 		self.accumulator = MsgpackAccumulator.new()
 	end
 
-	function i:send(msg)
+	-- Send a msgpack-encodable object
+	function i:push(msg)
 		local packet = msgpack.pack(msg)
 
 		local socket = self.socket
@@ -19,25 +23,12 @@ return class(..., function(i)
 		return socket:send(packet)
 	end
 
-	i.put = i.send
-
-	function i:receive()
+	-- Receive a decoded msgpack message
+	function i:pull()
 		assert(self:hasData(), "Empty stream")
 
-		return self.accumulator:take()
+		return self.accumulator:pull()
 	end
-
-	function i:blockingReceive(timeout)
-		local yield = coroutine.yield
-		while not self:hasData() do
-			self:update(timeout)
-			yield()
-		end
-
-		return self:receive()
-	end
-
-	i.take = i.receive
 
 	function i:hasData()
 		return self.accumulator:hasData()
@@ -51,12 +42,14 @@ return class(..., function(i)
 		self:handleReceive(socket:receive())
 	end
 
+	-- Private
+
 	function i:handleReceive(pattern, errorMsg, partial)
 		if pattern then
-			self.accumulator:put(pattern)
+			self.accumulator:push(pattern)
 		elseif errorMsg == 'timeout' then
 			if partial then
-				self.accumulator:put(partial)
+				self.accumulator:push(partial)
 			end
 		else -- TODO: do something
 			error(errorMsg)

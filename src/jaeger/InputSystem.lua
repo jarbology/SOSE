@@ -143,11 +143,14 @@ return class(..., function(i)
 				-- if the render pass is a layer
 				if renderPass.wndToWorld then
 					local localX, localY = renderPass:wndToWorld(mouseX, mouseY)
-					local prop = renderPass:getPartition():propForPoint(localX, localY)
-					if prop then
-						local entity = prop.entity
-						if entity and entity.receiveInput then
-							entity:sendMessage(msg, localX, localY, ...)
+					local partition = renderPass:getPartition()
+					if partition then
+						local prop = partition:propForPoint(localX, localY)
+						if prop then
+							local entity = prop.entity
+							if entity and entity.receiveInput then
+								entity:sendMessage(msg, localX, localY, ...)
+							end
 						end
 					end
 				end

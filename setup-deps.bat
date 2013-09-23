@@ -1,1 +1,1 @@
-set LUA_PATH=%LUA_PATH%;%~dp0\deps\lua-msgpack\?.lua
+set LUA_PATH=;;%~dp0\deps\lua-msgpack\?.lua

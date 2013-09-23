@@ -1,8 +1,8 @@
 return {
 	graphics = {
 		title = "BattleshipRT",
-		windowWidth = 640,
-		windowHeight = 480
+		windowWidth = 800,
+		windowHeight = 600
 	},
 
 	assets = {
@@ -38,7 +38,6 @@ return {
 
 	lockstepSim = {
 		lockedPhase = "gamelogic",
-		streams = {1, 2},
 		samplingInterval = 3
 	},
 
