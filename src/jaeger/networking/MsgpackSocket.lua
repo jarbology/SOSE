@@ -1,7 +1,7 @@
 local class = require "jaeger.class"
 local socket = require "socket"
 local msgpack = require "msgpack"
-local MsgpackAccumulator = require "jaeger.MsgpackAccumulator"
+local MsgpackAccumulator = require "jaeger.networking.MsgpackAccumulator"
 
 -- A socket wrapper which sends and receive Msgpack messages
 -- It is an active readable stream + writable stream

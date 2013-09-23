@@ -1,6 +1,6 @@
 local class = require "jaeger.Class"
-local PaddedStream = require "jaeger.PaddedStream"
-local MemoryStream = require "jaeger.MemoryStream"
+local PaddedStream = require "jaeger.streams.PaddedStream"
+local MemoryStream = require "jaeger.streams.MemoryStream"
 local ActionUtils = require "jaeger.utils.ActionUtils"
 local StreamUtils = require "jaeger.utils.StreamUtils"
 
