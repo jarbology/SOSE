@@ -12,13 +12,15 @@ return {
 		spriteBankPath = "../assets/gfx/sprites/",
 		atlasPath = "../assets/gfx/atlases/",
 		fontPath = "../assets/fonts/",
+		tilesetPath = "../assets/gfx/tilesets/",
 
 		factories = {
 			texture = "jaeger.assetFactories.TextureFactory",
 			spriteBank = "jaeger.assetFactories.SpriteBankFactory",
 			sprite = "jaeger.assetFactories.SpriteFactory",
 			atlas = "jaeger.assetFactories.AtlasFactory",
-			font = "jaeger.assetFactories.FontFactory"
+			font = "jaeger.assetFactories.FontFactory",
+			tileset = "jaeger.assetFactories.TilesetFactory"
 		}
 	},
 
@@ -53,6 +55,7 @@ return {
 		"jaeger.InlineScriptManager",
 		"jaeger.BackgroundManager",
 		"jaeger.SpriteManager",
+		"jaeger.TilemapManager"
 	},
 
 	tasks = {

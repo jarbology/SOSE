@@ -110,6 +110,23 @@ return class(..., function(i, c)
 				}
 			},
 		}
+		local grid = MOAIGrid.new()
+		grid:setSize(5, 5, 64, 64)
+		grid:fill(5)
+		entityMgr:createEntity{
+			components = {
+				["jaeger.Renderable"] = {
+					layer = "ground1",
+					xScale = 1,
+					yScale = 1
+				},
+
+				["jaeger.Tilemap"] = {
+					tileset = "ground",
+					grid = grid
+				}
+			}
+		}
 	end
 
 	function i:stop()
