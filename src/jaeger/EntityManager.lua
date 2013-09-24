@@ -44,6 +44,18 @@ local Entity = class("jaeger.Entity", function(i)
 		action:attach(updateAction)
 	end
 
+	-- Call a function after an amount of time
+	--	* delay: how many seconds to wait before calling the function.
+	--	         This is in entity's time which means if the entity's update phase is paused,
+	--	         the timer is also paused
+	--	* func: a function with signature () -> nil to be called after the delay
+	function i:performWithDelay(delay, func)
+		local timer = MOAITimer.new()
+		timer:setSpan(delay)
+		timer:setListener(MOAITimer.EVENT_TIMER_END_SPAN, func)
+		self:perform(timer)
+	end
+
 	-- Call obj:funcName(delta, entity, ...) every frame
 	-- Returns the coroutine which performs the action
 	function i:addUpdateFunc(obj, funcName, ...)

@@ -48,6 +48,7 @@ return class(..., function(i, c)
 			}
 		}
 		entity:sendMessage("msgPlayAnimation")
+		entity:performWithDelay(2.5, function() print('timer') end)
 	end
 
 	function i:stop()
