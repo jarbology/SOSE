@@ -1,8 +1,8 @@
 return {
 	graphics = {
 		title = "SoSE",
-		windowWidth = 800,
-		windowHeight = 600
+		windowWidth = 1024,
+		windowHeight = 576
 	},
 
 	assets = {
