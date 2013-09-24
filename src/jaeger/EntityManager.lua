@@ -24,20 +24,6 @@ local Entity = class("jaeger.Entity", function(i)
 		return self.sharedResources[name]
 	end
 
-	-- Used by a system to add a component to the entity
-	-- component is a table with these mandatory keys:
-	--	* system: a reference to the system which manges the component.
-	--	* name: a FQN for reference
-	--	* other keys: component-specific data
-	function i:addComponent(component)
-		table.insert(self.components, component)
-	end
-
-	-- Retrieve the specification that was used to create this entity
-	function i:getSpec()
-		return self.spec
-	end
-
 	-- Perform an action (attach the action to this entity's updateAction)
 	function i:perform(action)
 		local updateAction = assert(self.sharedResources.updateAction, "Only active entity can perform actions")
@@ -64,10 +50,6 @@ local Entity = class("jaeger.Entity", function(i)
 		return action
 	end
 
-	function i:activate()
-		self:sendMessage("msgActivate")
-	end
-	
 	-- Get the entity unique name
 	function i:getName() return self.name end
 
@@ -83,21 +65,26 @@ local Entity = class("jaeger.Entity", function(i)
 
 	-- Send a message to this entity
 	function i:sendMessage(msg, ...)
-		for _, component in ipairs(self.components) do
-			local system = component.system
-			local messageHandler = system[msg]
+		for _, component in pairs(self.components) do
+			local manager = component.manager
+			local messageHandler = manager[msg]
 			if messageHandler then
-				messageHandler(system, component, self, ...)
+				messageHandler(manager, component, self, ...)
 			end
 		end
 
-		for _, component in ipairs(self.components) do
-			local system = component.system
-			local messageHandler = system.onMessage
+		for _, component in pairs(self.components) do
+			local manager = component.manager
+			local messageHandler = manager.onMessage
 			if messageHandler then
-				messageHandler(system, msg, component, self, ...)
+				messageHandler(manager, msg, component, self, ...)
 			end
 		end
+	end
+
+	-- Check whether entity has a component
+	function i:hasComponent(type)
+		return self.components[type] ~= nil
 	end
 end)
 
@@ -105,22 +92,19 @@ end)
 -- Relevant config keys:
 -- * updatePhases: an array of update phase names
 --
--- Events:
--- * entityCreated(entity): fired when an entity is created
---                          interested systems should listen to this
---
 -- Special entity specs:
 -- * name: an unique name to identify this entity. Only one entity of a given name can exists
 -- * tags: an array of tags to identify this entity
+-- * updatePhase: name of the phase this entity gets updated
 --
 -- Tasks:
 -- * update: update all entities according to phases
 -- * cleanup: really destroy entities
 return class(..., function(i)
 	function i:__constructor(config)
-		self.entityCreated = Event.new()
 		self.nameRegistry = {}
 		self.tagRegistry = {}
+		self.componentFactories = {}
 
 		local updateTask = MOAIStickyAction.new()
 		local updatePhaseNames = config.updatePhases
@@ -219,6 +203,13 @@ return class(..., function(i)
 		end
 	end
 
+	function i:registerComponent(name, manager, methodName)
+		local componentFactories = self.componentFactories
+		assert(componentFactories[name] == nil, "Component type "..name.." is already registered")
+		componentFactories[name] = {manager, methodName}
+		print("Registered component type "..name)
+	end
+
 	local function nullIterator() end
 
 	-- Get an iterator to entities associated with a given tag
@@ -257,8 +248,22 @@ return class(..., function(i)
 			end
 		end
 
-		self.entityCreated:fire(entity, spec)
-		entity:activate()
+		local componentFactories = self.componentFactories
+		local componentSpecs = spec.components or {}
+		for componentType, componentData in pairs(componentSpecs) do
+			if type(componentType) == "number" then
+				componentType = componentData 
+				componentData = nil
+			end
+			local factory = assert(componentFactories[componentType], "Unknown component type "..componentType)
+			local manager, methodName = unpack(factory)
+			local component = manager[methodName](manager, entity, componentData)
+			component.manager = manager
+			component.type = componentType
+			entity.components[componentType] = component
+		end
+
+		entity:sendMessage("msgActivate")
 		return entity
 	end
 

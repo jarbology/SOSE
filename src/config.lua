@@ -43,7 +43,6 @@ return {
 
 	systems = {
 		"jaeger.widget.WidgetManager",
-
 		"jaeger.InputSystem",
 		"jaeger.TaskManager",
 		"jaeger.GraphicsSystem",
@@ -51,10 +50,9 @@ return {
 		"jaeger.EntityManager",
 		"jaeger.RemoteConsole",
 		"jaeger.LockstepSim",
-		"jaeger.InlineScriptSystem",
+		"jaeger.InlineScriptManager",
 		"jaeger.BackgroundManager",
-
-		"MovableController"
+		"jaeger.SpriteManager",
 	},
 
 	tasks = {

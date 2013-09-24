@@ -1,6 +1,6 @@
 local class = require "jaeger.Class"
 
--- Manages GUI widgets
+-- Manages jaeger.Widget
 -- Relevant specs:
 -- * widgetType: a string to show the type of widget.
 --
@@ -17,21 +17,13 @@ local class = require "jaeger.Class"
 return class(..., function(i)
 
 	-- Private
-	function i:__constructor(config)
-	end
-
 	function i:start(engine, config)
 		self.input = engine:getSystem("jaeger.InputSystem")
-		engine:getSystem("jaeger.EntityManager").entityCreated:addListener(self, "onEntityCreated")
+		engine:getSystem("jaeger.EntityManager"):registerComponent("jaeger.Widget", self, "createWidget")
 	end
 
-	function i:onEntityCreated(entity, spec)
-		if spec.widgetType then
-			entity:addComponent{
-				system = self,
-				name = "jaeger.Widget"
-			}
-		end
+	function i:createWidget(entity, data)
+		return {}
 	end
 
 	function i:msgPlayGUIAnimation(component, entity, anim)

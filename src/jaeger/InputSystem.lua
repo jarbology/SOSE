@@ -2,8 +2,7 @@ local class = require "jaeger.Class"
 local Event = require "jaeger.Event"
 
 -- Provide input events for multiple listeners
--- Relevant entity spec:
--- * receiveInput: boolean, whether an entity should receive mouse input
+-- Manage jaeger.InputReceiver
 --
 -- Events:
 --
@@ -74,7 +73,7 @@ return class(..., function(i)
 		self.sceneMgr = engine:getSystem("jaeger.SceneManager")
 		self.sceneMgr.sceneBegin:addListener(self, "onSceneBegin")
 		self.sceneMgr.sceneEnd:addListener(self, "onSceneEnd")
-		engine:getSystem("jaeger.EntityManager").entityCreated:addListener(self, "onEntityCreated")
+		engine:getSystem("jaeger.EntityManager"):registerComponent("jaeger.InputReceiver", self, "createInputReceiver")
 	end
 
 	function i:onSceneBegin(scene)
@@ -85,14 +84,8 @@ return class(..., function(i)
 		self.renderTable = nil
 	end
 
-	function i:onEntityCreated(entity, spec)
-		if spec.receiveInput then
-			entity:addComponent{
-				system = self,
-				name = "jaeger.InputReceiver"
-			}
-			entity.receiveInput = true
-		end
+	function i:createInputReceiver(entity, data)
+		return {}
 	end
 
 	function i:msgDestroy(component, entity)
@@ -148,7 +141,7 @@ return class(..., function(i)
 						local prop = partition:propForPoint(localX, localY)
 						if prop then
 							local entity = prop.entity
-							if entity and entity.receiveInput then
+							if entity and entity:hasComponent("jaeger.InputReceiver") then
 								entity:sendMessage(msg, localX, localY, ...)
 							end
 						end

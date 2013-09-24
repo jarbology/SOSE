@@ -4,12 +4,17 @@ local KeyCodes = require "jaeger.KeyCodes"
 local ActionUtils = require "jaeger.utils.ActionUtils"
 
 -- Manage scenes
--- Component: jaeger.Renderable
--- Relevant entity specs:
---	* layer: name of the layer this entity will be rendered in
+-- Manage jaeger.Renderable
+-- Creation parameters:
+-- * layer: name of the layer this entity will be rendered in
+-- * x (optional)
+-- * y (optional)
+-- * xScale (optional)
+-- * yScale (optional)
+-- * rotation (optional)
 -- Events:
---	* sceneBegin(scene): fired at the beginning of a scene.
---	* sceneEnd(scene): fired at the end of a scene
+-- * sceneBegin(scene): fired at the beginning of a scene.
+-- * sceneEnd(scene): fired at the end of a scene
 return class(..., function(i)
 	-- Change to a scene
 	--	* sceneName: name of the scene class
@@ -35,40 +40,14 @@ return class(..., function(i)
 
 	function i:start(engine)
 		self.engine = engine
-		engine:getSystem("jaeger.EntityManager").entityCreated:addListener(self, "onEntityCreated")
 		engine:getSystem("jaeger.InputSystem").keyboard:addListener(self, "onKey")
-	end
-
-	function i:onEntityCreated(entity, spec)
-		if spec.layer then
-			entity:addComponent{
-				system = self,
-				name = "jaeger.Renderable"
-			}
-		end
+		engine:getSystem("jaeger.EntityManager"):registerComponent("jaeger.Renderable", self, "createRenderable")
 	end
 
 	function i:onKey(keycode, down)
 		if not down and keycode == KeyCodes[self.reloadKeyName] then
 			self:changeScene(self.currentSceneName, self.currentSceneData)
 		end
-	end
-
-	function i:msgActivate(component, entity)
-		local layerName = entity:getSpec().layer
-		local prop = entity:getResource("prop")
-
-		if layerName and prop then
-			local layer = assert(self.currentScene:getLayer(layerName), "Cannot find layer '"..layerName.."' in current scene")
-			layer:insertProp(prop)
-			prop.layer = layer
-		end
-	end
-
-	function i:msgDestroy(component, entity)
-		local layerName = entity:getSpec().layer
-		local prop = entity:getResource("prop")
-		self.currentScene:getLayer(layerName):removeProp(prop)
 	end
 
 	function i:spawnTask(taskName)
@@ -104,5 +83,34 @@ return class(..., function(i)
 			scene:start(self.engine, self.updateTask)
 			self.sceneBegin:fire(scene)
 		end
+	end
+
+	-- jaeger.Renderable
+	function i:createRenderable(entity, data)
+		local prop = MOAIProp2D.new()
+		prop.entity = entity
+		entity:registerResource("prop", prop)
+		prop:setLoc(data.x or 0, data.y or 0)
+		prop:setScl(data.xScale or 1, data.yScale or 1)
+		prop:setRot(data.rotation or 0)
+
+		return {
+			prop = prop,
+			layerName = data.layer
+		}
+	end
+
+	function i:msgActivate(component, entity)
+		local layerName = component.layerName
+		local prop = component.prop
+		local layer = assert(self.currentScene:getLayer(component.layerName), "Cannot find layer '"..layerName.."' in current scene")
+		layer:insertProp(component.prop)
+		prop.layer = layer
+	end
+
+	function i:msgDestroy(component, entity)
+		local layerName = component.layerName
+		local prop = component.prop
+		self.currentScene:getLayer(layerName):removeProp(prop)
 	end
 end)

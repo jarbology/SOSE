@@ -85,20 +85,30 @@ return class(..., function(i, c)
 
 		local entityMgr = engine:getSystem("jaeger.EntityManager")
 		entityMgr:createEntity{
-			layer = "background1",
-			background = {
-				texture = "bg1.png",
-				width = 2000,
-				height = 2000
+			components = {
+				["jaeger.Renderable"] = {
+					layer = "background1"
+				},
+
+				["jaeger.Background"] = {
+					texture = "bg1.png",
+					width = 2000,
+					height = 2000
+				}
 			}
 		}
 		entityMgr:createEntity{
-			layer = "background2",
-			background = {
-				texture = "bg1.png",
-				width = 2000,
-				height = 2000
-			}
+			components = {
+				["jaeger.Renderable"] = {
+					layer = "background2"
+				},
+
+				["jaeger.Background"] = {
+					texture = "bg1.png",
+					width = 2000,
+					height = 2000
+				}
+			},
 		}
 	end
 
