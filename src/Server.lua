@@ -22,7 +22,13 @@ return class(..., function(i)
 
 	-- Spawn and return a coroutine which updates the server
 	function i:start()
-		return ActionUtils.newCoroutine(self, "run")
+		local action = ActionUtils.newCoroutine(self, "run")
+		self.action = action
+		return action
+	end
+
+	function i:stop()
+		self.action:stop()
 	end
 
 	-- Private
@@ -75,6 +81,7 @@ return class(..., function(i)
 						-- client lagged for too many ticks, pause the game
 						print("Pause to wait for ", playerId)
 						msgBuff[playerId] = StreamUtils.blockingPull(msgSocket)
+						print("Resumed")
 					else
 						-- number of lagged ticks is still acceptable, send a noopMsg
 						msgBuff[playerId] = noopMsg

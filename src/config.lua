@@ -1,6 +1,6 @@
 return {
 	graphics = {
-		title = "BattleshipRT",
+		title = "SoSE",
 		windowWidth = 800,
 		windowHeight = 600
 	},
@@ -52,6 +52,7 @@ return {
 		"jaeger.RemoteConsole",
 		"jaeger.LockstepSim",
 		"jaeger.InlineScriptSystem",
+		"jaeger.BackgroundManager",
 
 		"MovableController"
 	},
