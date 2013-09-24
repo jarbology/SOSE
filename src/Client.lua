@@ -25,7 +25,16 @@ return class(..., function(i)
 	end
 
 	function i:start()
-		return ActionUtils.newCoroutine(self, "run")
+		local action = ActionUtils.newCoroutine(self, "run")
+		self.action = action
+		return action
+	end
+
+	function i:stop()
+		self.action:stop()
+		if self.eventHandle then
+			self.lockstepSim.sample:removeListener(self.eventHandle)
+		end
 	end
 
 	-- Private
@@ -33,8 +42,8 @@ return class(..., function(i)
 		self.playerId = StreamUtils.blockingPull(self.connection)
 
 		MOAISim.setLoopFlags(MOAISim.SIM_LOOP_RESET_CLOCK)
-		self.lockstepSim.sample:addListener(self, "onSample")
-		self.lockstepSim:pause(false)
+		self.eventHandle = self.lockstepSim.sample:addListener(self, "onSample")
+		self.lockstepSim:startSim()
 
 		local commandStream = self.commandStream
 		local connection = self.connection

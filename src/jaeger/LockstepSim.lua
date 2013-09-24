@@ -25,10 +25,21 @@ return class(..., function(i)
 		self.interpreter = interpreter
 	end
 
-	-- Pause/unpause the simulation
-	-- Paused by default
-	function i:pause(status)
-		self.updateTask:pause(status)
+	-- Start the simulation
+	function i:startSim()
+		if self.updateTask then return end
+
+		local updateTask = ActionUtils.newLoopCoroutine(self, "update")
+		updateTask:attach(self.rootTask)
+		self.updateTask = updateTask
+	end
+
+	-- Stop the simulation
+	function i:stopSim()
+		if self.updateTask then
+			self.updateTask:stop()
+			self.updateTask = nil
+		end
 	end
 
 	-- Private
@@ -43,14 +54,20 @@ return class(..., function(i)
 
 	function i:start(engine, config)
 		self.entityMgr = engine:getSystem("jaeger.EntityManager")
+		engine:getSystem("jaeger.SceneManager").sceneEnd:addListener(self, "onSceneEnd")
+	end
+
+	function i:onSceneEnd()
+		self:stopSim()
+		self:setInterpreter(nil)
+		self:setCommandStream(nil)
 	end
 
 	function i:spawnTask(taskName)
 		assert(taskName == "update", "Unknown task")
 
-		local task = ActionUtils.newLoopCoroutine(self, "update")
-		self.updateTask = task
-		self:pause(true)
+		local task = MOAIStickyAction.new()
+		self.rootTask = task
 		return task
 	end
 
