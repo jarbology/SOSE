@@ -1,4 +1,5 @@
 local class = require "jaeger.Class"
+local StringUtils = require "jaeger.utils.StringUtils"
 
 -- Manage and cache assets, also takes care of hot reloading
 -- Relevant config keys:
@@ -109,9 +110,7 @@ return class(..., function(i)
 
 	-- Force loading of an asset. Use if you want to force an asset to reload
 	function i:loadAsset(name)
-		local colonPos = name:find(":")
-		local assetType = name:sub(1, colonPos - 1)
-		local assetName = name:sub(colonPos + 1)
+		local assetType, assetName = unpack(StringUtils.split(name, ":"))
 		local factory = assert(self.factories[assetType], "Unknown asset type "..assetType)
 		local asset, files = assert(factory(assetName, self.config, self, self.cache[name]))
 		print("Loaded "..name)
