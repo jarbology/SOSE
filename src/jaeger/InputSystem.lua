@@ -129,7 +129,7 @@ return class(..., function(i)
 
 		local focusedEntity = self.focusedEntity
 		if focusedEntity ~= nil then
-			local worldX, worldY = focusedEntity:getResource("prop").layer:wndToWorld(mouseX, mouseY)
+			local worldX, worldY = focusedEntity:query("getProp").layer:wndToWorld(mouseX, mouseY)
 			focusedEntity:sendMessage(msg, worldX, worldY, ...)
 		else
 			for _, renderPass in ipairs(self.renderTable) do

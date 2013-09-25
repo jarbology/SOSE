@@ -46,25 +46,27 @@ return {
 	systems = {
 		"jaeger.widget.WidgetManager",
 		"jaeger.InputSystem",
-		"jaeger.TaskManager",
 		"jaeger.GraphicsSystem",
 		"jaeger.SceneManager",
+		"jaeger.ActorManager",
+		"jaeger.NameManager",
 		"jaeger.EntityManager",
 		"jaeger.RemoteConsole",
 		"jaeger.LockstepSim",
 		"jaeger.InlineScriptManager",
 		"jaeger.BackgroundManager",
 		"jaeger.SpriteManager",
-		"jaeger.TilemapManager"
+		"jaeger.TilemapManager",
+
+		"jaeger.TaskManager"
 	},
 
 	tasks = {
-		{"jaeger.SceneManager", "update"},
-		{"jaeger.LockstepSim", "update"},-- LockstepSim:update must be before EntityManager:update
-		{"jaeger.EntityManager", "update"},
-		--{"jaeger.RemoteConsole", "update"},
+		"jaeger.SceneManager/Update",
+		"jaeger.LockstepSim/Update",-- LockstepSim/Update must be before ActorManager/Update
+		"jaeger.ActorManager/Update",
 
 		-- These tasks must be the last
-		{"jaeger.EntityManager", "cleanUp"}
+		"jaeger.EntityManager/CleanUp"
 	}
 }

@@ -50,12 +50,10 @@ return class(..., function(i)
 		end
 	end
 
-	function i:spawnTask(taskName)
-		if taskName == "update" then
-			local task = ActionUtils.newLoopCoroutine(self, "update")
-			self.updateTask = task
-			return task
-		end
+	function i:spawnUpdate()
+		local task = ActionUtils.newLoopCoroutine(self, "update")
+		self.updateTask = task
+		return task
 	end
 
 	function i:update()
@@ -89,7 +87,6 @@ return class(..., function(i)
 	function i:createRenderable(entity, data)
 		local prop = MOAIProp2D.new()
 		prop.entity = entity
-		entity:registerResource("prop", prop)
 		prop:setLoc(data.x or 0, data.y or 0)
 		prop:setScl(data.xScale or 1, data.yScale or 1)
 		prop:setRot(data.rotation or 0)
@@ -98,6 +95,10 @@ return class(..., function(i)
 			prop = prop,
 			layerName = data.layer
 		}
+	end
+
+	function i:getProp(component, entity)
+		return component.prop
 	end
 
 	function i:msgActivate(component, entity)

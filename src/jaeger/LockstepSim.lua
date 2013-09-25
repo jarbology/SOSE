@@ -53,7 +53,7 @@ return class(..., function(i)
 	end
 
 	function i:start(engine, config)
-		self.entityMgr = engine:getSystem("jaeger.EntityManager")
+		self.actorMgr = engine:getSystem("jaeger.ActorManager")
 		engine:getSystem("jaeger.SceneManager").sceneEnd:addListener(self, "onSceneEnd")
 	end
 
@@ -63,9 +63,7 @@ return class(..., function(i)
 		self:setCommandStream(nil)
 	end
 
-	function i:spawnTask(taskName)
-		assert(taskName == "update", "Unknown task")
-
+	function i:spawnUpdate()
 		local task = MOAIStickyAction.new()
 		self.rootTask = task
 		return task
@@ -94,7 +92,7 @@ return class(..., function(i)
 	function i:getLockedPhase()
 		local lockedPhase = self.lockedPhase
 		if lockedPhase == nil then
-			lockedPhase = assert(self.entityMgr:getUpdatePhase(self.lockedPhaseName), "Can't find phase "..self.lockedPhaseName)
+			lockedPhase = assert(self.actorMgr:getUpdatePhase(self.lockedPhaseName), "Can't find phase "..self.lockedPhaseName)
 			self.lockedPhase = lockedPhase
 		end
 		return lockedPhase

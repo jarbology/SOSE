@@ -1,9 +1,6 @@
 local class = require "jaeger.Class"
 
 -- Manages jaeger.Widget
--- Relevant specs:
--- * widgetType: a string to show the type of widget.
---
 -- Messages:
 --
 -- Passive:
@@ -15,7 +12,6 @@ local class = require "jaeger.Class"
 --   in world coordinate
 -- * msgGUIHoverOut(x, y): Delivered when mouse hovers out of this widget.
 return class(..., function(i)
-
 	-- Private
 	function i:start(engine, config)
 		self.input = engine:getSystem("jaeger.InputSystem")
@@ -32,7 +28,7 @@ return class(..., function(i)
 			component.animation = nil
 		end
 		if anim then
-			entity:perform(anim)
+			entity:sendMessage("msgPerformAction", anim)
 			component.animation = anim
 		end
 	end
@@ -41,7 +37,7 @@ return class(..., function(i)
 		local input = self.input
 
 		if input:isFocused(entity) then
-			local prop = entity:getResource("prop")
+			local prop = entity:query("getProp")
 			if not prop:inside(x, y) then--mouse moved out
 				entity:sendMessage("msgGUIHoverOut", x, y)
 				self.input:releaseFocus(entity)

@@ -22,6 +22,6 @@ return class(..., function(i)
 	end
 
 	function i:msgActivate(component, entity)
-		assert(entity:getResource("prop"), "A prop is required to display background"):setDeck(component.deck)
+		assert(entity:query("getProp"), "A prop is required to display background"):setDeck(component.deck)
 	end
 end)

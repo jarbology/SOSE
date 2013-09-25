@@ -3,6 +3,7 @@ local class = require "jaeger.Class"
 -- Manage jaeger.Sprite
 -- Creation parameters:
 -- * name: name of the sprite
+-- * autoPlay(optional): whether an animation should be played automatically
 -- Messages:
 -- * msgChangeSprite(spriteName): change the sprite
 -- * msgPlayAnimation(): play the sprite
@@ -18,6 +19,7 @@ return class(..., function(i)
 
 		return {
 			anim = anim,
+			autoPlay = data.autoPlay,
 			spriteName = data.spriteName
 		}
 	end
@@ -33,14 +35,18 @@ return class(..., function(i)
 		anim:setLink(1, sprite.animCurve, prop, MOAIProp2D.ATTR_INDEX)
 		anim:setMode(sprite.mode)
 		anim:setSpeed(1 / sprite.animTime)
+
+		if component.autoPlay then
+			entity:sendMessage("msgPlayAnimation")
+		end
 	end
 
 	function i:msgPlayAnimation(component, entity)
-		entity:perform(component.anim)
+		entity:sendMessage("msgPerformAction", component.anim)
 	end
 
 	function i:msgActivate(component, entity)
-		component.prop = assert(entity:getResource("prop"), "Need prop to play animation")
-		self:msgChangeSprite(component, entity, component.spriteName)
+		component.prop = assert(entity:query("getProp"), "Need a prop to play animation")
+		entity:sendMessage("msgChangeSprite", component.spriteName)
 	end
 end)

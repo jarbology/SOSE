@@ -14,7 +14,7 @@ return class(..., function(i)
 	end
 
 	function i:msgActivate(component, entity)
-		local prop = assert(entity:getResource("prop"), "A prop is needed to display tileset")
+		local prop = assert(entity:query("getProp"), "A prop is needed to display tileset")
 		prop:setDeck(component.tileset)
 		prop:setGrid(component.grid)
 	end
