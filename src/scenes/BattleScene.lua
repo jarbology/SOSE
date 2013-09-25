@@ -12,8 +12,6 @@ return class(..., function(i, c)
 		self.layerMap = {}
 
 		local zoneParams = {
-			zoneWidth = 38,
-			zoneHeight = 38,
 			map = {
 				'o_oooo',
 				'oooooo',
