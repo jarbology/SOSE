@@ -84,6 +84,10 @@ return class(..., function(i, c)
 		return self.layerMap[name]
 	end
 
+	function i:getZone(index)
+		return self.zones[index]
+	end
+
 	function i:onKey(keycode, down)
 	end
 
@@ -128,5 +132,14 @@ return class(..., function(i, c)
 		for _, zone in ipairs(self.zones) do
 			zone:init(entityMgr)
 		end
+
+		entityMgr:createEntity{
+			["GridWalker"] = {
+				zone = 1,
+				gridName = "missiles",
+				x = 6,
+				y = 7
+			}
+		}
 	end
 end)

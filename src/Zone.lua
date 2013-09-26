@@ -4,13 +4,14 @@ local Set = require "jaeger.Set"
 
 -- A zone for a player
 return class(..., function(i, c)
-	local MAP_PADDING = 10
+	local MAP_PADDING = 20
 
-	-- suffix: 1 or 2
-	-- viewport: viewport
-	-- map
-	-- renderTable
-	-- layerMap
+	-- params is a table with the following keys:
+	-- * suffix: 1 or 2
+	-- * viewport: viewport for this zone
+	-- * map: an ascii map of this zone
+	-- * renderTable: the render table to populate
+	-- * layerMap: the layer map to populate
 	function i:__constructor(params)
 		local layerNames = {
 			"background",
@@ -59,6 +60,7 @@ return class(..., function(i, c)
 		end)
 	end
 
+	-- Initialize the tilemaps using an entity manager
 	function i:init(entityMgr)
 		local map = self.map
 		entityMgr:createEntity{
@@ -112,7 +114,7 @@ return class(..., function(i, c)
 	end
 
 	function i:addBuilding(x, y, building)
-		assert(self.buildingGrid:get(x, y) == nil, "There is a building at ("..x..","..y..")")
+		assert(self.buildingGrid:get(x, y) == nil, "There is already a building at ("..x..","..y..")")
 		self.buildingGrid:set(x, y, building)
 	end
 
@@ -124,29 +126,37 @@ return class(..., function(i, c)
 		return buildingGrid:get(x, y)
 	end
 
-	function i:addObject(gridName, x, y, obj)
-		local set = self.objectGrid[gridName]:get(x, y)
-		set:add(obj)
+	function i:addGridWalker(gridName, x, y, obj)
+		local grid = assert(self.objectGrids[gridName], "Unknown grid: "..gridName)
+		grid:get(x, y):add(obj)
 	end
 
-	function i:removeObject(gridName, x, y, obj)
-		local set = self.objectGrid[gridName]:get(x, y)
-		set:remove(obj)
+	function i:removeGridWalker(gridName, x, y, obj)
+		local grid = assert(self.objectGrids[gridName], "Unknown grid: "..gridName)
+		grid:get(x, y):remove(obj)
 	end
 
-	function i:moveObject(gridName, oldX, oldY, newX, newY, obj)
-		self:removeObject(gridName, oldX, oldY, obj)
-		self:addObject(gridName, newX, newY, obj)
+	function i:moveGridWalker(gridName, oldX, oldY, newX, newY, obj)
+		self:removeGridWalker(gridName, oldX, oldY, obj)
+		self:addGridWalker(gridName, newX, newY, obj)
 	end
 
-	function i:getObjectsAt(gridName, x, y)
-		return self.objectGrid[gridName]:get(x, y):iterator()
+	function i:pickFirstObjectAt(gridName, x, y, predicate)
+		local set = self.objectGrids[gridName]:get(x, y)
+		set:beginIteration()
+		for _, object in set:iterator() do
+			if predicate(object) then
+				return object
+			end
+		end
+		set:endIteration()
 	end
 
 	function i:isCellVisible(x, y)
 		return self.layers.fog:getTile(x, y) == 0
 	end
 
+	-- Remove fog around an area
 	function i:reveal(xMin, xMax, yMin, yMax)
 		local fog = self.layers.fog
 		for x = xMin, xMax do
@@ -180,6 +190,7 @@ return class(..., function(i, c)
 				grid:set(x, y, Set.new())
 			end
 		end
+		return grid
 	end
 
 	function c.forEachCellInMap(map, func)

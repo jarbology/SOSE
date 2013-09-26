@@ -63,6 +63,8 @@ return {
 		"jaeger.SpriteManager",
 		"jaeger.TilemapManager",
 
+		"GridWalkerManager",
+
 		"jaeger.TaskManager"
 	},
 

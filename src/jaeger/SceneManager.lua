@@ -30,6 +30,11 @@ return class(..., function(i)
 		self.nextSceneData = data
 	end
 
+	-- Get the current scene
+	function i:getCurrentScene()
+		return self.currentScene
+	end
+
 	-- Private
 	function i:__constructor(config)
 		self.reloadKeyName = config.sceneManager.reloadKey
