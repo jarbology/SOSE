@@ -15,23 +15,14 @@ local class = require "jaeger.Class"
 --
 -- Queries:
 -- getUpdateAction(): returns the action that updates the entity
-return class(..., function(i)
+return class(..., function(i, c)
 	function i:getUpdatePhase(name)
 		return self.updatePhases[name]
 	end
 
 	-- Private
 	function i:__constructor(config)
-		local updateTask = MOAIStickyAction.new()
-		local updatePhaseNames = config.updatePhases
-		local updatePhases = {}
-		for _, updatePhaseName in ipairs(updatePhaseNames) do
-			local updatePhase = MOAIStickyAction.new()
-			updatePhases[updatePhaseName] = updatePhase
-			updatePhase:attach(updateTask)
-		end
-		self.updatePhases = updatePhases
-		self.updateTask = updateTask
+		self.updateTreeConfig = config.updatePhases
 	end
 
 	function i:start(engine)
@@ -47,7 +38,14 @@ return class(..., function(i)
 	end
 
 	function i:spawnUpdate()
-		return self.updateTask
+		local updatePhases = {}
+		local rootTask = MOAIStickyAction.new()
+		for _, updatePhase in ipairs(self.updateTreeConfig) do
+			c.spawnUpdateTree(updatePhase, updatePhases, rootTask)
+		end
+		self.updatePhases = updatePhases
+		self.rootTask = rootTask
+		return rootTask
 	end
 
 	function i:onSceneEnd()
@@ -71,4 +69,24 @@ return class(..., function(i)
 		local action = ActionUtils.newLoopCoroutine(obj, methodName, entity, ...)
 		action:attach(component.updateAction)
 	end
+
+	function c.spawnUpdateTree(treeConfig, updatePhases, rootTask)
+		local treeConfigType = type(treeConfig)
+		if treeConfigType == "string" then --simple phase
+			local updatePhase = MOAIStickyAction.new()
+			updatePhases[treeConfig] = updatePhase
+			updatePhase:attach(rootTask)
+		elseif treeConfigType == "table" then -- tree phase
+			local updatePhaseName, childPhases = unpack(treeConfig)
+			print(updatePhaseName, childPhases)
+			local updatePhase = MOAIStickyAction.new()
+			updatePhases[updatePhaseName] = updatePhase
+			updatePhase:attach(rootTask)
+
+			for _, childPhase in ipairs(childPhases) do
+				c.spawnUpdateTree(childPhase, updatePhases, updatePhase)
+			end
+		end
+	end
+
 end)

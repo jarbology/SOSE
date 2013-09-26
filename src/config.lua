@@ -31,7 +31,12 @@ return {
 
 	updatePhases = {
 		"gui",
-		"gamelogic"
+		{"gamelogic", {
+			"building",
+			"missile",
+			"robot",
+			"visual"
+		}}
 	},
 
 	sceneManager = {

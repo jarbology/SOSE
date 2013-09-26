@@ -68,6 +68,15 @@ return class(..., function(i, c)
 			}
 		}
 		entityMgr:destroyEntity(entity3)
+
+		local entity4 = entityMgr:createEntity{
+			["jaeger.Actor"] = "building"
+		}
+		-- This will never be printed
+		entity4:sendMessage("msgPerformWithDelay", 1, function() print("never") end)
+
+		-- pausing gameplay phase will pause all of its children
+		engine:getSystem("jaeger.ActorManager"):getUpdatePhase("gamelogic"):pause()
 	end
 
 	function i:stop()
