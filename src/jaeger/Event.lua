@@ -41,8 +41,11 @@ return class(..., function(i, c)
 	-- Notifies all listener of the event
 	-- All listeners will be invoked with the provided parameters
 	function i:fire(...)
-		for listener in self.listeners:iterator() do
+		local listeners = self.listeners
+		listeners:beginIteration()
+		for _, listener in listeners:iterator() do
 			listener(...)
 		end
+		listeners:endIteration()
 	end
 end)
