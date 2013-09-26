@@ -1,6 +1,5 @@
 local class = require "jaeger.Class"
 local Event = require "jaeger.Event"
-local Set = require "jaeger.Set"
 local ActionUtils = require "jaeger.utils.ActionUtils"
 
 local Entity = class("jaeger.Entity", function(i)
@@ -8,6 +7,7 @@ local Entity = class("jaeger.Entity", function(i)
 	-- You can't anyway
 	function i:__constructor()
 		self.components = {}
+		self.alive = true
 	end
 
 	-- Send a message to this entity
@@ -38,6 +38,10 @@ local Entity = class("jaeger.Entity", function(i)
 				return queryHandler(manager, component, self, ...)
 			end
 		end
+	end
+
+	function i:isAlive()
+		return self.alive
 	end
 
 	-- Check whether an entity has a component
@@ -91,13 +95,20 @@ return class(..., function(i)
 	-- An entity is only marked as destroyed. Its destruction is
 	-- deferred to the end of the frame
 	function i:destroyEntity(entity)
-		self.destroyedEntities:add(entity)
+		if not entity.alive then return end
+
+		entity.alive = false
+
+		local numDestroyedEntities = self.numDestroyedEntities + 1
+		self.destroyedEntities[numDestroyedEntities] = entity
+		self.numDestroyedEntities = numDestroyedEntities
 	end
 
 	-- Private
 	function i:__constructor(config)
 		self.componentFactories = {}
-		self.destroyedEntities = Set.new()
+		self.destroyedEntities = {}
+		self.numDestroyedEntities = 0
 	end
 
 	function i:start(engine)
@@ -108,15 +119,14 @@ return class(..., function(i)
 	end
 
 	function i:cleanUp()
+		local numDestroyedEntities = self.numDestroyedEntities
 		local destroyedEntities = self.destroyedEntities
-		for entity in destroyedEntities:iterator() do
-			local updateAction = entity:getResource("updateAction")
-			if updateAction then
-				updateAction:stop()
-			end
-
+		for i = 1, numDestroyedEntities do
+			local entity = destroyedEntities[i]
 			entity:sendMessage("msgDestroy")
-			destroyedEntities:remove(entity)
+			destroyedEntities[i] = nil
 		end
+
+		self.numDestroyedEntities = 0
 	end
 end)

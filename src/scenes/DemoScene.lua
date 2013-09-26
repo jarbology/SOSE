@@ -50,6 +50,24 @@ return class(..., function(i, c)
 			}
 		}
 		entity:sendMessage("msgPerformWithDelay", 2.5, function() print('timer') end)
+
+		local entity2 = entityMgr:createEntity{
+			["jaeger.InlineScript"] = {
+				msgDestroy = function(self, entity)
+					print('dead')
+				end
+			}
+		}
+		entityMgr:destroyEntity(entity2)
+
+		local entity3 = entityMgr:createEntity{
+			["jaeger.InlineScript"] = {
+				msgDestroy = function(self, entity)
+					print('dead2')
+				end
+			}
+		}
+		entityMgr:destroyEntity(entity3)
 	end
 
 	function i:stop()
