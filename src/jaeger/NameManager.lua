@@ -1,5 +1,4 @@
 local class = require "jaeger.Class"
-local Set = require "jaeger.Set"
 
 -- Manage entities with unique names
 -- Manages: jaeger.Name
