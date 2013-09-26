@@ -32,8 +32,8 @@ return class(..., function(i)
 
 	function i:stop()
 		self.action:stop()
-		if self.eventHandle then
-			self.lockstepSim.sample:removeListener(self.eventHandle)
+		if self.listenerHandle then
+			self.lockstepSim.sample:removeListener(self.listenerHandle)
 		end
 	end
 
@@ -42,7 +42,7 @@ return class(..., function(i)
 		self.playerId = StreamUtils.blockingPull(self.connection)
 
 		MOAISim.setLoopFlags(MOAISim.SIM_LOOP_RESET_CLOCK)
-		self.eventHandle = self.lockstepSim.sample:addListener(self, "onSample")
+		self.listenerHandle = self.lockstepSim.sample:addListener(self, "onSample")
 		self.lockstepSim:startSim()
 
 		local commandStream = self.commandStream
