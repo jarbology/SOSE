@@ -32,9 +32,9 @@ return {
 	updatePhases = {
 		"gui",
 		{"gamelogic", {
-			"building",
-			"missile",
-			"robot",
+			"buildings",
+			"missiles",
+			"robots",
 			"visual"
 		}}
 	},

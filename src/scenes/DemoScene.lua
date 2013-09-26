@@ -70,7 +70,7 @@ return class(..., function(i, c)
 		entityMgr:destroyEntity(entity3)
 
 		local entity4 = entityMgr:createEntity{
-			["jaeger.Actor"] = "building"
+			["jaeger.Actor"] = "buildings"
 		}
 		-- This will never be printed
 		entity4:sendMessage("msgPerformWithDelay", 1, function() print("never") end)
