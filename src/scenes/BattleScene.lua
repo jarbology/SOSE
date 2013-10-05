@@ -13,12 +13,12 @@ return class(..., function(i, c)
 
 		local zoneParams = {
 			map = {
-				'o_oooo',
+				'o____o',
 				'oooooo',
 				'o_o__o',
 				'o_oooo',
-				'o__ooo',
-				'o__ooo'
+				'o_oooo',
+				'o_oooo'
 			},
 			renderTable = self.renderTable,
 			layerMap = self.layerMap
@@ -139,6 +139,22 @@ return class(..., function(i, c)
 				gridName = "missiles",
 				x = 6,
 				y = 7
+			}
+		}
+
+		local building = entityMgr:createEntity{
+			["jaeger.Sprite"] = {
+				spriteName = "test/coin"
+			},
+
+			["jaeger.Renderable"] = {
+				layer = "building1"
+			},
+
+			["Building"] = {
+				zone = 1,
+				x = 21,
+				y = 22
 			}
 		}
 	end

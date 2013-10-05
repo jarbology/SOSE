@@ -5,6 +5,8 @@ local Set = require "jaeger.Set"
 -- A zone for a player
 return class(..., function(i, c)
 	local MAP_PADDING = 20
+	local TILE_WIDTH = 64
+	local TILE_HEIGHT = 64
 
 	-- params is a table with the following keys:
 	-- * suffix: 1 or 2
@@ -77,9 +79,12 @@ return class(..., function(i, c)
 
 		local zoneWidth, zoneHeight = self.zoneWidth, self.zoneHeight
 		local grid = MOAIGrid.new()
-		grid:setSize(zoneWidth, zoneHeight, 64, 64)
+		grid:setSize(zoneWidth, zoneHeight, TILE_WIDTH, TILE_HEIGHT)
 		c.setGrid(grid, self.map, 5)
 		local centerX, centerY = grid:getTileLoc(self.zoneWidth / 2, self.zoneHeight / 2)
+		self.centerX = centerX
+		self.centerY = centerY
+		self.refGrid = grid
 
 		local ground = entityMgr:createEntity{
 			["jaeger.Renderable"] = {
@@ -96,12 +101,12 @@ return class(..., function(i, c)
 
 		local grid = MOAIGrid.new()
 		local suffix = self.suffix
-		grid:setSize(zoneWidth, zoneHeight, 64, 64)
+		grid:setSize(zoneWidth, zoneHeight, TILE_WIDTH, TILE_HEIGHT)
 		c.setGrid(grid, self.map, 2)
 
 		local fog = entityMgr:createEntity{
 			["jaeger.Renderable"] = {
-				layer = "ground"..self.suffix,
+				layer = "fog"..self.suffix,
 				x = -centerX,
 				y = -centerY
 			},
@@ -111,6 +116,11 @@ return class(..., function(i, c)
 				grid = grid
 			}
 		}
+	end
+
+	function i:getTileLoc(x, y)
+		local x, y = self.refGrid:getTileLoc(x, y)
+		return x - self.centerX, y - self.centerX
 	end
 
 	function i:addBuilding(x, y, building)

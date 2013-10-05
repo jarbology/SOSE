@@ -64,6 +64,7 @@ return {
 		"jaeger.TilemapManager",
 
 		"GridWalkerManager",
+		"BuildingManager",
 
 		"jaeger.TaskManager"
 	},

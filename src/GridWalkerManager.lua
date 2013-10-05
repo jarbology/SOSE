@@ -3,6 +3,8 @@ local class = require "jaeger.Class"
 -- Manages objects which travels the grids
 -- Messages:
 -- * msgMoveToCell(x, y): move the walker to a new position
+-- Queries:
+-- * getZone(): get the zone this walker belongs to
 return class(..., function(i)
 	-- Private
 	function i:start(engine, config)
