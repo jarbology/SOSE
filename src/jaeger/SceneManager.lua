@@ -15,7 +15,7 @@ local ActionUtils = require "jaeger.utils.ActionUtils"
 -- Events:
 -- * sceneBegin(scene): fired at the beginning of a scene.
 -- * sceneEnd(scene): fired at the end of a scene
-return class(..., function(i)
+return class(..., function(i, c)
 	-- Change to a scene
 	--	* sceneName: name of the scene class
 	--	* data: userdata to pass to the scene
@@ -33,6 +33,25 @@ return class(..., function(i)
 	-- Get the current scene
 	function i:getCurrentScene()
 		return self.currentScene
+	end
+
+	function i:pickFirstEntityAt(windowX, windowY, predicate)
+		local renderTable = self.renderTable
+		if not renderTable then return end
+
+		for _, renderPass in ipairs(renderTable) do
+			-- if the render pass is a layer
+			if renderPass.wndToWorld then
+				local localX, localY = renderPass:wndToWorld(windowX, windowY)
+				local partition = renderPass:getPartition()
+				if partition then
+					local entity = c.pickFirstProp(predicate, partition:propListForPoint(localX, localY))
+					if entity then
+						return entity, localX, localY
+					end
+				end
+			end
+		end
 	end
 
 	-- Private
@@ -82,9 +101,21 @@ return class(..., function(i)
 			local sceneClass = require(sceneName)
 			local scene = assert(sceneClass.new(data))
 			self.currentScene = scene
-			MOAIRenderMgr.setRenderTable(scene:getRenderTable())
+			local renderTable = scene:getRenderTable()
+			MOAIRenderMgr.setRenderTable(renderTable)
+			self.renderTable = renderTable -- save for entity picking
 			scene:start(self.engine, self.updateTask)
 			self.sceneBegin:fire(scene)
+		end
+	end
+
+	function c.pickFirstProp(predicate, prop, ...)
+		if prop and prop.entity then
+			if predicate(prop.entity) then
+				return prop.entity
+			else
+				return c.pickFirstProp(predicate, ...)
+			end
 		end
 	end
 

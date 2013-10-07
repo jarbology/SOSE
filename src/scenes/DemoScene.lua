@@ -32,8 +32,8 @@ return class(..., function(i, c)
 				msgPlayAnimation = function(self, entity)
 					print 'start playing anim'
 				end,
-				msgMouseLeft = function(self, entity, down)
-					print('mouseLeft', down)
+				msgMouseLeft = function(self, entity, ...)
+					print('mouseLeft', ...)
 				end,
 				msgGUIHoverIn = function(self, entity)
 					entity:sendMessage(

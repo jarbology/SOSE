@@ -13,7 +13,7 @@ local Event = require "jaeger.Event"
 -- mouseRight(x, y, down):
 -- mouseMiddle(x, y, down):
 -- mouseWheel(x, y, delta)
-return class(..., function(i)
+return class(..., function(i, c)
 	-- Deliver subsequent mouse events to this entity regardless of mouse position
 	-- Returns whether the grab is successful (focus grabbing will fail if another 
 	-- entity is grabbing focus)
@@ -71,17 +71,7 @@ return class(..., function(i)
 
 	function i:start(engine, config)
 		self.sceneMgr = engine:getSystem("jaeger.SceneManager")
-		self.sceneMgr.sceneBegin:addListener(self, "onSceneBegin")
-		self.sceneMgr.sceneEnd:addListener(self, "onSceneEnd")
 		engine:getSystem("jaeger.EntityManager"):registerComponent("jaeger.InputReceiver", self, "createInputReceiver")
-	end
-
-	function i:onSceneBegin(scene)
-		self.renderTable = scene:getRenderTable()
-	end
-
-	function i:onSceneEnd(scene)
-		self.renderTable = nil
 	end
 
 	function i:createInputReceiver(entity, data)
@@ -123,8 +113,6 @@ return class(..., function(i)
 	end
 
 	function i:dispatchEventMsg(msg, ...)
-		if not self.renderTable then return end
-
 		local mouseX, mouseY = MOAIInputMgr.device.mouse:getLoc()
 
 		local focusedEntity = self.focusedEntity
@@ -132,22 +120,14 @@ return class(..., function(i)
 			local worldX, worldY = focusedEntity:query("getProp").layer:wndToWorld(mouseX, mouseY)
 			focusedEntity:sendMessage(msg, worldX, worldY, ...)
 		else
-			for _, renderPass in ipairs(self.renderTable) do
-				-- if the render pass is a layer
-				if renderPass.wndToWorld then
-					local localX, localY = renderPass:wndToWorld(mouseX, mouseY)
-					local partition = renderPass:getPartition()
-					if partition then
-						local prop = partition:propForPoint(localX, localY)
-						if prop then
-							local entity = prop.entity
-							if entity and entity:hasComponent("jaeger.InputReceiver") then
-								entity:sendMessage(msg, localX, localY, ...)
-							end
-						end
-					end
-				end
+			local entity, worldX, worldY = self.sceneMgr:pickFirstEntityAt(mouseX, mouseY, c.isInputReceiver)
+			if entity and entity:hasComponent("jaeger.InputReceiver") then
+				entity:sendMessage(msg, worldX, worldY, ...)
 			end
 		end
+	end
+
+	function c.isInputReceiver(entity)
+		return entity:hasComponent("jaeger.InputReceiver")
 	end
 end)
