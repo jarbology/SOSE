@@ -1,4 +1,5 @@
 local class = require "jaeger.Class"
+local Event = require "jaeger.Event"
 local Grid = require "jaeger.Grid"
 local Set = require "jaeger.Set"
 
@@ -15,6 +16,8 @@ return class(..., function(i, c)
 	-- * renderTable: the render table to populate
 	-- * layerMap: the layer map to populate
 	function i:__constructor(params)
+		self.tileClicked = Event.new()
+
 		local layerNames = {
 			"background",
 			"ground",
@@ -87,6 +90,7 @@ return class(..., function(i, c)
 		self.refGrid = grid
 
 		local ground = entityMgr:createEntity{
+			"jaeger.InputReceiver",
 			["jaeger.Renderable"] = {
 				layer = "ground"..self.suffix,
 				x = -centerX,
@@ -96,8 +100,17 @@ return class(..., function(i, c)
 			["jaeger.Tilemap"] = {
 				tileset = "ground",
 				grid = grid
+			},
+
+			["jaeger.InlineScript"] = {
+				msgMouseLeft = function(_self, entity, x, y, down)
+					if not down then
+						self:onTileClicked(x, y)
+					end
+				end
 			}
 		}
+		self.groundProp = ground:query("getProp")
 
 		local grid = MOAIGrid.new()
 		local suffix = self.suffix
@@ -188,6 +201,13 @@ return class(..., function(i, c)
 	end
 
 	-- Private
+	
+	function i:onTileClicked(x, y)
+		local x, y = self.refGrid:locToCoord(
+			self.groundProp:worldToModel(x, y)
+		)
+		self.tileClicked:fire(self, x, y)
+	end
 	
 	function c.getMapSize(map)
 		return #(map[1]), #map
