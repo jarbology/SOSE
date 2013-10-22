@@ -83,15 +83,11 @@ return class(..., function(i)
 		local entity = Entity.new()
 		local componentFactories = self.componentFactories
 
-		for componentType, componentData in pairs(spec) do
-			-- if component type is specified without creation data
-			if type(componentType) == "number" then
-				componentType = componentData 
-				componentData = nil
-			end
-			local factory = assert(componentFactories[componentType], "Unknown component type: '"..componentType.."'")
+		for _, componentSpec in ipairs(spec) do
+			local componentType = componentSpec[1]
+			local factory = assert(componentFactories[componentType], "Unknown component type: '"..tostring(componentType).."'")
 			local manager, methodName = unpack(factory)
-			local component = manager[methodName](manager, entity, componentData)
+			local component = manager[methodName](manager, entity, componentSpec)
 			component.manager = manager
 			entity.components[componentType] = component
 		end

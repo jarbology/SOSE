@@ -31,8 +31,11 @@ return class(..., function(i, c)
 		engine:getSystem("jaeger.SceneManager").sceneEnd:addListener(self, "onSceneEnd")
 	end
 
-	function i:createActor(entity, updatePhaseName)
-		local updatePhase = assert(self.updatePhases[updatePhaseName], "Unknown update phase '"..updatePhaseName.."'")
+	function i:createActor(entity, data)
+		local updatePhase = assert(
+			self.updatePhases[data.phase],
+			"Unknown update phase '"..tostring(data.phase).."'"
+		)
 		local updateAction = MOAIStickyAction.new()
 		updateAction:attach(updatePhase)
 		return { updateAction = updateAction }

@@ -23,12 +23,12 @@ return class(..., function(i)
 		self.nameRegistry = {}
 	end
 
-	function i:createName(entity, name)
+	function i:createName(entity, data)
 		local nameRegistry = self.nameRegistry
-		assert(nameRegistry[name] == nil, "Another entity with the name '"..name.."' already exists")
-		nameRegistry[name] = entity
+		assert(nameRegistry[data.name] == nil, "Another entity with the name '"..tostring(data.name).."' already exists")
+		nameRegistry[data.name] = entity
 
-		return { name = name }
+		return { name = data.name }
 	end
 
 	function i:msgDestroy(component, entity)

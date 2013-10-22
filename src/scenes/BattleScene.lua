@@ -3,7 +3,6 @@ local RenderUtils = require "jaeger.utils.RenderUtils"
 local Networking = require "Networking"
 local NetworkCommands = require "NetworkCommands"
 local Zone = require "Zone"
-local BattleGUI = require "BattleGUI"
 
 return class(..., function(i, c)
 	-- Private
@@ -138,8 +137,6 @@ return class(..., function(i, c)
 
 		local inputSystem = engine:getSystem("jaeger.InputSystem")
 		inputSystem.mouseLeft:addListener(self, "onMouseLeft")
-
-		self.entityMgr = engine:getSystem("jaeger.EntityManager")
 	end
 
 	function i:onGameStart()
@@ -193,23 +190,12 @@ return class(..., function(i, c)
 
 		if zone:isTileGround(x, y) and
 		   zone:getBuildingAt(x, y) == nil then
-			self.entityMgr:createEntity{
-				["jaeger.Actor"] = "gamelogic",
-				["jaeger.Sprite"] = {
-					spriteName = "test/coin",
-					autoPlay = true
-				},
-
-				["jaeger.Renderable"] = {
-					layer = "building"..zoneIndex
-				},
-
-				["Building"] = {
-					zone = zoneIndex,
-					x = x,
-					y = y
-				},
-				"MissileLauncher"
+			createEntity{
+				{"jaeger.Actor", phase="buildings"},
+				{"jaeger.Sprite", spriteName="test/coin", autoPlay=true},
+				{"jaeger.Renderable", layer = "building"..zoneIndex},
+				{"Building", zone = zoneIndex, x = x, y = y},
+				{"MissileLauncher", damage = 2}
 			}
 		end
 	end

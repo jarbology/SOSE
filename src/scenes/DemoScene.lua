@@ -14,21 +14,14 @@ return class(..., function(i, c)
 	end
 
 	function i:start(engine)
-		local entityMgr = engine:getSystem("jaeger.EntityManager")
-		local entity = entityMgr:createEntity{
-			"jaeger.InputReceiver",
-			"jaeger.Widget",
-			["jaeger.Name"] = "testEntity",
-			["jaeger.Actor"] = "gui",
-			["jaeger.Renderable"] = {
-				layer = "default",
-				x = 40
-			},
-			["jaeger.Sprite"] = {
-				spriteName = "test/coin",
-				autoPlay = "true"
-			},
-			["jaeger.InlineScript"] = {
+		local entity = createEntity{
+			{"jaeger.InputReceiver"},
+			{"jaeger.Widget"},
+			{"jaeger.Name", name="testEntity"},
+			{"jaeger.Actor", phase="gui"},
+			{"jaeger.Renderable", layer="default", x=40},
+			{"jaeger.Sprite", spriteName="test/coin", autoPlay="true"},
+			{"jaeger.InlineScript",
 				msgPlayAnimation = function(self, entity)
 					print 'start playing anim'
 				end,
@@ -51,27 +44,24 @@ return class(..., function(i, c)
 		}
 		entity:sendMessage("msgPerformWithDelay", 2.5, function() print('timer') end)
 
-		local entity2 = entityMgr:createEntity{
-			["jaeger.InlineScript"] = {
+		local entity2 = createEntity{
+			{"jaeger.InlineScript",
 				msgDestroy = function(self, entity)
 					print('dead')
 				end
 			}
 		}
-		entityMgr:destroyEntity(entity2)
+		destroyEntity(entity2)
 
-		local entity3 = entityMgr:createEntity{
-			["jaeger.InlineScript"] = {
+		local entity3 = createEntity{
+			{"jaeger.InlineScript",
 				msgDestroy = function(self, entity)
 					print('dead2')
 				end
 			}
 		}
-		entityMgr:destroyEntity(entity3)
+		destroyEntity(entity3)
 
-		local entity4 = entityMgr:createEntity{
-			["jaeger.Actor"] = "buildings"
-		}
 		-- This will never be printed
 		entity4:sendMessage("msgPerformWithDelay", 1, function() print("never") end)
 

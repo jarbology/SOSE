@@ -64,6 +64,7 @@ return class(..., function(i, c)
 
 	function i:start(engine)
 		self.engine = engine
+		self.scriptShortcut = engine:getSystem("jaeger.ScriptShortcut")
 		engine:getSystem("jaeger.InputSystem").keyboard:addListener(self, "onKey")
 		engine:getSystem("jaeger.EntityManager"):registerComponent("jaeger.Renderable", self, "createRenderable")
 	end
@@ -98,6 +99,7 @@ return class(..., function(i, c)
 			self.currentSceneData = data
 
 			print("Starting scene:", sceneName)
+			self.scriptShortcut:enableShortcut{sceneName}
 			local sceneClass = require(sceneName)
 			local scene = assert(sceneClass.new(data))
 			self.currentScene = scene

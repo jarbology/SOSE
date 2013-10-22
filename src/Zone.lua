@@ -67,15 +67,8 @@ return class(..., function(i, c)
 	function i:init(entityMgr)
 		local map = self.map
 		entityMgr:createEntity{
-			["jaeger.Renderable"] = {
-				layer = "background"..self.suffix
-			},
-
-			["jaeger.Background"] = {
-				texture = "bg1.png",
-				width = 4000,
-				height = 4000
-			}
+			{"jaeger.Renderable", layer = "background"..self.suffix},
+			{"jaeger.Background", texture = "bg1.png", width = 4000, height = 4000}
 		}
 
 		local zoneWidth, zoneHeight = self.zoneWidth, self.zoneHeight
@@ -88,17 +81,10 @@ return class(..., function(i, c)
 		self.refGrid = grid -- for object picking
 
 		local ground = entityMgr:createEntity{
-			"jaeger.InputReceiver",
-			["jaeger.Renderable"] = {
-				layer = "ground"..self.suffix,
-				x = -centerX,
-				y = -centerY
-			},
-
-			["jaeger.Tilemap"] = {
-				tileset = "ground",
-				grid = grid
-			}
+			{"jaeger.Renderable", layer = "ground"..self.suffix,
+			                      x = -centerX,
+			                      y = -centerY},
+			{"jaeger.Tilemap", tileset = "ground", grid = grid}
 		}
 		self.groundProp = ground:query("getProp")
 
@@ -109,16 +95,10 @@ return class(..., function(i, c)
 		self.fogGrid = grid
 
 		local fog = entityMgr:createEntity{
-			["jaeger.Renderable"] = {
-				layer = "fog"..self.suffix,
-				x = -centerX,
-				y = -centerY
-			},
-
-			["jaeger.Tilemap"] = {
-				tileset = "fog",
-				grid = grid
-			}
+			{"jaeger.Renderable", layer = "fog"..self.suffix,
+			                      x = -centerX,
+			                      y = -centerY},
+			{"jaeger.Tilemap", tileset = "fog",	grid = grid}
 		}
 	end
 
