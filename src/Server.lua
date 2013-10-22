@@ -70,24 +70,7 @@ return class(..., function(i)
 
 			-- aggregate message from all players
 			for playerId, msgSocket in ipairs(clientSockets) do
-				msgSocket:update(0)
-				if msgSocket:hasData() then
-					-- when a client sends data, reset numLagTicks to 0
-					msgBuff[playerId] = msgSocket:pull()
-					numLagTicks[playerId] = 0
-				else
-					local playerLagTicks = numLagTicks[playerId]
-					if playerLagTicks > maxLagTicks then
-						-- client lagged for too many ticks, pause the game
-						print("Pause to wait for ", playerId)
-						msgBuff[playerId] = StreamUtils.blockingPull(msgSocket)
-						print("Resumed")
-					else
-						-- number of lagged ticks is still acceptable, send a noopMsg
-						msgBuff[playerId] = noopMsg
-						numLagTicks[playerId] = playerLagTicks + 1
-					end
-				end
+				msgBuff[playerId] = StreamUtils.blockingPull(msgSocket)
 			end
 
 			for playerId, msgSocket in ipairs(clientSockets) do

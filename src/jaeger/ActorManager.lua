@@ -1,4 +1,5 @@
 local class = require "jaeger.Class"
+local ActionUtils = require "jaeger.utils.ActionUtils"
 
 -- Manage entities which gets updated every frame
 -- Relevant config keys:
@@ -65,7 +66,7 @@ return class(..., function(i, c)
 		timer:attach(component.updateAction)
 	end
 
-	function i:addUpdateFunc(component, entity, obj, methodName, ...)
+	function i:msgAddUpdateFunc(component, entity, obj, methodName, ...)
 		local action = ActionUtils.newLoopCoroutine(obj, methodName, entity, ...)
 		action:attach(component.updateAction)
 	end

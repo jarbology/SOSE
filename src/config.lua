@@ -43,11 +43,6 @@ return {
 		reloadKey = "F5"
 	},
 
-	lockstepSim = {
-		lockedPhase = "gamelogic",
-		samplingInterval = 3
-	},
-
 	systems = {
 		"jaeger.widget.WidgetManager",
 		"jaeger.InputSystem",
@@ -57,7 +52,6 @@ return {
 		"jaeger.NameManager",
 		"jaeger.EntityManager",
 		"jaeger.RemoteConsole",
-		"jaeger.LockstepSim",
 		"jaeger.InlineScriptManager",
 		"jaeger.BackgroundManager",
 		"jaeger.SpriteManager",
@@ -71,7 +65,6 @@ return {
 
 	tasks = {
 		"jaeger.SceneManager/Update",
-		"jaeger.LockstepSim/Update",-- LockstepSim/Update must be before ActorManager/Update
 		"jaeger.ActorManager/Update",
 
 		-- These tasks must be the last

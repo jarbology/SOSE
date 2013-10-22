@@ -1,10 +1,21 @@
 local class = require "jaeger.Class"
 local RenderUtils = require "jaeger.utils.RenderUtils"
 local Networking = require "Networking"
-local CmdInterpreter = require "CmdInterpreter"
 local Zone = require "Zone"
+local BattleGUI = require "BattleGUI"
 
 return class(..., function(i, c)
+	c.commandNames = {
+		"noop",
+		"cmdBuild"
+	}
+
+	local commandCodes = {}
+	for index, name in ipairs(c.commandNames) do
+		commandCodes[name] = index
+	end
+	c.commandCodes = commandCodes
+
 	-- Private
 	function i:__constructor(mode)
 		self.mode = mode
@@ -88,9 +99,6 @@ return class(..., function(i, c)
 		return self.zones[index]
 	end
 
-	function i:onKey(keycode, down)
-	end
-
 	function i:initSim()
 		MOAISim.clearLoopFlags()
 		MOAISim.setLoopFlags(MOAISim.SIM_LOOP_ALLOW_SPIN)
@@ -99,24 +107,29 @@ return class(..., function(i, c)
 	end
 
 	function i:initNetwork(engine, sceneTask)
-		local lockstepSim = engine:getSystem("jaeger.LockstepSim")
-		local noopMsg = CmdInterpreter.commandCodes.noop
-		local cmdInterpreter = CmdInterpreter.new()
-		lockstepSim:setInterpreter(cmdInterpreter:getInterpretFunc())
+		local actorMgr = engine:getSystem("jaeger.ActorManager")
+		local lockedPhase = assert(actorMgr:getUpdatePhase("gamelogic"))
+		local noopMsg = c.commandCodes.noop
 
 		if self.mode == "host" then
-			local client, server, serverSkt = Networking.initHost(lockstepSim, noopMsg)
+			local client, server, serverSkt = Networking.initHost(lockedPhase, noopMsg)
+			client.commandReceived:addListener(self, "onCommand")
+			client.gameStarted:addListener(self, "onGameStart")
 			client:start():attach(sceneTask)
 			server:start():attach(sceneTask)
 			self.client = client
 			self.server = server
 			self.serverSkt = serverSkt
 		elseif self.mode == "join" then
-			local client = Networking.initJoin(lockstepSim, noopMsg)
+			local client = Networking.initJoin(lockedPhase, noopMsg)
+			client.gameStarted:addListener(self, "onGameStart")
+			client.commandReceived:addListener(self, "onCommand")
 			client:start():attach(sceneTask)
 			self.client = client
 		elseif self.mode == "combo" then
-			local client1, client2, server = Networking.initCombo(lockstepSim, noopMsg)
+			local client1, client2, server = Networking.initCombo(lockedPhase, noopMsg)
+			client1.commandReceived:addListener(self, "onCommand")
+			client1.gameStarted:addListener(self, "onGameStart")
 			client1:start():attach(sceneTask)
 			client2:start():attach(sceneTask)
 			server:start():attach(sceneTask)
@@ -133,29 +146,91 @@ return class(..., function(i, c)
 			zone:init(entityMgr)
 		end
 
-		entityMgr:createEntity{
-			["GridWalker"] = {
-				zone = 1,
-				gridName = "missiles",
-				x = 6,
-				y = 7
+		local inputSystem = engine:getSystem("jaeger.InputSystem")
+		inputSystem.mouseLeft:addListener(self, "onMouseLeft")
+
+		self.entityMgr = engine:getSystem("jaeger.EntityManager")
+	end
+
+	function i:onGameStart()
+	end
+
+	function i:onMouseLeft(x, y, down)
+		if not down then
+			if x < (1024 / 2) then
+				self:onTileClicked(1, self.zones[1]:wndToTile(x, y))
+			else
+				self:onTileClicked(2, self.zones[2]:wndToTile(x, y))
+			end
+		end
+	end
+
+	function i:onTileClicked(zoneId, x, y)
+		if zoneId == 1 then
+			self:onMyTileClicked(x, y)
+		else
+			self:onEnemyTileClicked(x, y)
+		end
+	end
+
+	function i:onMyTileClicked(x, y)
+		self:sendCmd("cmdBuild", x, y)
+	end
+
+	function i:onEnemyTileClicked(x, y)
+	end
+
+	function i:sendCmd(cmdName, ...)
+		self.client:sendCmd{c.commandCodes[cmdName], ...}
+	end
+
+	function i:cmdBuild(playerId, x, y)
+		local zoneIndex = self:selectZone(playerId)
+		local zone = self.zones[zoneIndex]
+
+		if zone:isTileGround(x, y) and zone:getBuildingAt(x, y) == nil then
+			self.entityMgr:createEntity{
+				["jaeger.Actor"] = "gamelogic",
+				["jaeger.Sprite"] = {
+					spriteName = "test/coin",
+					autoPlay = true
+				},
+
+				["jaeger.Renderable"] = {
+					layer = "building"..zoneIndex
+				},
+
+				["Building"] = {
+					zone = zoneIndex,
+					x = x,
+					y = y
+				}
 			}
-		}
 
-		local building = entityMgr:createEntity{
-			["jaeger.Sprite"] = {
-				spriteName = "test/coin"
-			},
+			if playerId == self.client:getId() then
+				print("I build at ", x, y)
+			else
+				print("Enemy build at ", x, y)
+			end
+		end
+	end
 
-			["jaeger.Renderable"] = {
-				layer = "building1"
-			},
+	function i:selectZone(playerId)
+		if playerId == self.client:getId() then
+			return 1
+		else
+			return 2
+		end
+	end
 
-			["Building"] = {
-				zone = 1,
-				x = 21,
-				y = 22
-			}
-		}
+	function i:onCommand(turnNum, playerId, cmd)
+		if cmd ~= c.commandCodes.noop then
+			print("Cmd at:", turnNum)
+			return self:invoke(playerId, unpack(cmd))
+		end
+	end
+
+	function i:invoke(streamId, commandCode, ...)
+		return self[c.commandNames[commandCode]](self, streamId, ...)
 	end
 end)

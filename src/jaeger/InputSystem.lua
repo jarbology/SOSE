@@ -55,10 +55,10 @@ return class(..., function(i, c)
 		self.mouseMoved = self:listen(device.mouse)
 		self.keyboard = self:listen(device.keyboard)
 		self.textInput = self:listen(device.textInput)
-		self.mouseLeft = self:listen(device.mouseLeft)
-		self.mouseRight = self:listen(device.mouseRight)
-		self.mouseMiddle = self:listen(device.mouseMiddle)
-		self.mouseWheel = self:listen(device.mouseWheel)
+		self.mouseLeft = self:listenMouse(device.mouseLeft)
+		self.mouseRight = self:listenMouse(device.mouseRight)
+		self.mouseMiddle = self:listenMouse(device.mouseMiddle)
+		self.mouseWheel = self:listenMouse(device.mouseWheel)
 
 		self.mouseMoved:addListener(self, "onMouseMoved")
 		self.mouseLeft:addListener(self, "onMouseLeft")
@@ -88,6 +88,15 @@ return class(..., function(i, c)
 		local event = Event.new()
 		sensor:setCallback(function(...)
 			event:fire(...)
+		end)
+		return event
+	end
+
+	function i:listenMouse(sensor)
+		local event = Event.new()
+		sensor:setCallback(function(...)
+			local mouseX, mouseY = MOAIInputMgr.device.mouse:getLoc()
+			event:fire(mouseX, mouseY, ...)
 		end)
 		return event
 	end

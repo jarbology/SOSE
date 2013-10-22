@@ -54,7 +54,13 @@ return class(..., function(i)
 
 	function i:start(engine, config)
 		self.actorMgr = engine:getSystem("jaeger.ActorManager")
+		engine:getSystem("jaeger.SceneManager").sceneBegin:addListener(self, "onSceneBegin")
 		engine:getSystem("jaeger.SceneManager").sceneEnd:addListener(self, "onSceneEnd")
+	end
+
+	function i:onSceneBegin()
+		local lockedPhase = self:getLockedPhase()
+		lockedPhase:pause(false)
 	end
 
 	function i:onSceneEnd()
@@ -81,7 +87,7 @@ return class(..., function(i)
 		-- wait for commands
 		local commands = StreamUtils.blockingPull(self.cmdStream)
 		local interpreter = self.interpreter
-		for playerId, command in pairs(commands) do
+		for playerId, command in ipairs(commands) do
 			interpreter(playerId, command)
 		end
 

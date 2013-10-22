@@ -13,12 +13,11 @@ local StableStream = require "jaeger.streams.StableStream"
 local VoidStream = require "jaeger.streams.VoidStream"
 
 return class(..., function(i, c)
-	function c.initHost(lockstepSim, noopMsg)
+	function c.initHost(lockedPhase, noopMsg)
 		-- A host must run both client and server components
 		-- "Connect" to the local server using a virtual connection
-		local commandStream = StableStream.new(0, 2)
-		local client, backwardSkt = c.createLocalClient(lockstepSim, noopMsg, commandStream)
-		lockstepSim:setCommandStream(commandStream)
+		local commandStream = MemoryStream.new()
+		local client, backwardSkt = c.createLocalClient(lockedPhase, noopMsg, commandStream)
 
 		local serverSkt = assert(socket.tcp())
 		assert(serverSkt:bind("*", 9001))
@@ -38,28 +37,26 @@ return class(..., function(i, c)
 		return client, server, serverSkt
 	end
 
-	function c.initJoin(lockstepSim, noopMsg)
+	function c.initJoin(lockedPhase, noopMsg)
 		local socketConnection = assert(socket.tcp())
 		assert(socketConnection:connect("localhost", 9001))
 
-		local commandStream = StableStream.new(0, 2)
+		local commandStream = MemoryStream.new()
 		local client = Client.new{
 			connection = MsgpackSocket.new(socketConnection),
-			lockstepSim = lockstepSim,
+			lockedPhase = lockedPhase,
 			noopMsg = noopMsg,
 			commandStream = commandStream
 		}
-		lockstepSim:setCommandStream(commandStream)
 
 		return client
 	end
 
-	function c.initCombo(lockstepSim, noopMsg)
+	function c.initCombo(lockedPhase, noopMsg)
 		-- Run 2 clients and server
-		local commandStream = StableStream.new(0, 2)
-		local client1, backwardSkt1 = c.createLocalClient(lockstepSim, noopMsg, commandStream)
-		local client2, backwardSkt2 = c.createLocalClient(lockstepSim, noopMsg, VoidStream.new())
-		lockstepSim:setCommandStream(commandStream)
+		local commandStream = MemoryStream.new()
+		local client1, backwardSkt1 = c.createLocalClient(lockedPhase, noopMsg, commandStream)
+		local client2, backwardSkt2 = c.createLocalClient(lockedPhase, noopMsg, VoidStream.new())
 
 		local localConnectionStream = MemoryStream.new()
 		localConnectionStream:push(backwardSkt1)
@@ -79,12 +76,12 @@ return class(..., function(i, c)
 		}
 	end
 
-	function c.createLocalClient(lockstepSim, noopMsg, commandStream)
+	function c.createLocalClient(lockedPhase, noopMsg, commandStream)
 		local forwardSkt, backwardSkt = VirtualConnection.create()
 		local client = Client.new{
 			connection = forwardSkt,
-			lockstepSim = lockstepSim,
 			commandStream = commandStream,
+			lockedPhase = lockedPhase,
 			noopMsg = noopMsg
 		}
 

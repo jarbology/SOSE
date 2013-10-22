@@ -27,7 +27,6 @@ return class(..., function(i, c)
 			"fog"
 		}
 
-		local layers = {}
 		local layerMap = params.layerMap
 		local renderTable = params.renderTable
 		local viewport = params.viewport
@@ -40,12 +39,11 @@ return class(..., function(i, c)
 			layer:setCamera(camera)
 			table.insert(renderTable, layer)
 			layerMap[layerName..suffix] = layer
-			layers[layerName] = layer
 		end
+		self.refLayer = layerMap["ground"..suffix]--for object picking
 
 		self.camera = camera
 		self.suffix = suffix
-		self.layers = layers
 
 		local map = params.map
 		local mapWidth, mapHeight = c.getMapSize(map)
@@ -60,8 +58,8 @@ return class(..., function(i, c)
 		self.zoneHeight = zoneHeight
 		self.map = map
 
-		c.forEachCellInMap(map, function(x, y, filled)
-			self.groundGrid:set(x, y, true)
+		c.forEachTileInMap(map, function(x, y, filled)
+			self.groundGrid:set(x, y, filled)
 		end)
 	end
 
@@ -87,7 +85,7 @@ return class(..., function(i, c)
 		local centerX, centerY = grid:getTileLoc(self.zoneWidth / 2, self.zoneHeight / 2)
 		self.centerX = centerX
 		self.centerY = centerY
-		self.refGrid = grid
+		self.refGrid = grid -- for object picking
 
 		local ground = entityMgr:createEntity{
 			"jaeger.InputReceiver",
@@ -100,14 +98,6 @@ return class(..., function(i, c)
 			["jaeger.Tilemap"] = {
 				tileset = "ground",
 				grid = grid
-			},
-
-			["jaeger.InlineScript"] = {
-				msgMouseLeft = function(_self, entity, x, y, down)
-					if not down then
-						self:onTileClicked(x, y)
-					end
-				end
 			}
 		}
 		self.groundProp = ground:query("getProp")
@@ -116,6 +106,7 @@ return class(..., function(i, c)
 		local suffix = self.suffix
 		grid:setSize(zoneWidth, zoneHeight, TILE_WIDTH, TILE_HEIGHT)
 		c.setGrid(grid, self.map, 2)
+		self.fogGrid = grid
 
 		local fog = entityMgr:createEntity{
 			["jaeger.Renderable"] = {
@@ -129,6 +120,13 @@ return class(..., function(i, c)
 				grid = grid
 			}
 		}
+	end
+
+	function i:wndToTile(wndX, wndY)
+		local worldX, worldY = self.refLayer:wndToWorld(wndX, wndY)
+		return self.refGrid:locToCoord(
+			self.groundProp:worldToModel(worldX, worldY)
+		)
 	end
 
 	function i:getTileLoc(x, y)
@@ -146,7 +144,7 @@ return class(..., function(i, c)
 	end
 
 	function i:getBuildingAt(x, y)
-		return buildingGrid:get(x, y)
+		return self.buildingGrid:get(x, y)
 	end
 
 	function i:addGridWalker(gridName, x, y, obj)
@@ -175,13 +173,17 @@ return class(..., function(i, c)
 		set:endIteration()
 	end
 
-	function i:isCellVisible(x, y)
-		return self.layers.fog:getTile(x, y) == 0
+	function i:isTileVisible(x, y)
+		return self.fogGrid:getTile(x, y) == 0
+	end
+
+	function i:isTileGround(x, y)
+		return self.groundGrid:get(x, y) == true
 	end
 
 	-- Remove fog around an area
 	function i:reveal(xMin, xMax, yMin, yMax)
-		local fog = self.layers.fog
+		local fog = self.fogGrid
 		for x = xMin, xMax do
 			for y = yMin, yMax do
 				-- Clear fog
@@ -223,7 +225,7 @@ return class(..., function(i, c)
 		return grid
 	end
 
-	function c.forEachCellInMap(map, func)
+	function c.forEachTileInMap(map, func)
 		local o = ("o"):byte()
 		for y, row in ipairs(map) do
 			local rowWidth = #row
@@ -235,7 +237,7 @@ return class(..., function(i, c)
 	end
 
 	function c.setGrid(grid, map, oValue)
-		c.forEachCellInMap(map, function(x, y, filled)
+		c.forEachTileInMap(map, function(x, y, filled)
 			if filled then
 				grid:setTile(x, y, oValue)
 			end
