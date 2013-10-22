@@ -105,7 +105,7 @@ return class(..., function(i, c)
 		local grid = MOAIGrid.new()
 		local suffix = self.suffix
 		grid:setSize(zoneWidth, zoneHeight, TILE_WIDTH, TILE_HEIGHT)
-		c.setGrid(grid, self.map, 2)
+		--c.setGrid(grid, self.map, 2)
 		self.fogGrid = grid
 
 		local fog = entityMgr:createEntity{
