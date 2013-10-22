@@ -12,6 +12,7 @@ local Entity = class("jaeger.Entity", function(i)
 
 	-- Send a message to this entity
 	function i:sendMessage(msg, ...)
+		-- TODO: would the order be indeterministic?
 		for _, component in pairs(self.components) do
 			local manager = component.manager
 			local messageHandler = manager[msg]
@@ -24,7 +25,7 @@ local Entity = class("jaeger.Entity", function(i)
 			local manager = component.manager
 			local messageHandler = manager.onMessage
 			if messageHandler then
-				messageHandler(manager, msg, component, self, ...)
+				messageHandler(manager, component, self, msg, ...)
 			end
 		end
 	end
@@ -36,6 +37,14 @@ local Entity = class("jaeger.Entity", function(i)
 			local queryHandler = manager[queryMsg]
 			if queryHandler then
 				return queryHandler(manager, component, self, ...)
+			end
+		end
+
+		for _, component in pairs(self.components) do
+			local manager = component.manager
+			local canAnswerQuery = manager.canAnswerQuery
+			if canAnswerQuery and canAnswerQuery(manager, component, queryMsg) then
+				return manager:onQuery(component, self, queryMsg, ...)
 			end
 		end
 	end

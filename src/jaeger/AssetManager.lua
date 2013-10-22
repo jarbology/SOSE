@@ -1,5 +1,6 @@
 local class = require "jaeger.Class"
 local StringUtils = require "jaeger.utils.StringUtils"
+local Event = require "jaeger.Event"
 
 -- Manage and cache assets, also takes care of hot reloading
 -- Relevant config keys:
@@ -23,6 +24,7 @@ return class(..., function(i)
 		self.cache = {}
 		self.factories = {}
 		self.resourceMap = {}
+		self.moduleLoaded = Event.new()
 	end
 
 	function i:start(engine)
@@ -32,10 +34,12 @@ return class(..., function(i)
 			local modulepath = string.gsub(modulename, "%.", "/")
 			for path in string.gmatch(package.path, "([^;]+)") do
 				local filename = string.gsub(path, "%?", modulepath)
-				self:mapResource("module:"..modulename, filename)
 				-- Compile and return the module
 				if MOAIFileSystem.checkFileExists(filename) then
-					return assert(loadfile(filename))
+					self:mapResource("module:"..modulename, filename)
+					local moduleFunc = assert(loadfile(filename))
+					self.moduleLoaded:fire(modulename, moduleFunc)
+					return moduleFunc
 				end
 				errmsg = errmsg.."\n\tno file '"..filename.."' (checked with custom loader)"
 			end

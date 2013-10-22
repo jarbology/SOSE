@@ -10,11 +10,8 @@ return class(..., function(i)
 	-- noopMsg: what to send when there is no command
 	-- lockedPhase: the locked phase
 	-- samplingInterval: how often to sample input
-	-- interpreter: a function to execute replicated commands
-	-- commandStream: an output stream to push command into
 	function i:__constructor(params)
 		self.playerId = nil
-		self.commandStream = params.commandStream
 		self.connection = params.connection
 		self.uploadStream = MemoryStream.new()
 		self.paddedUploadStream = PaddedStream.new(self.uploadStream, params.noopMsg)
@@ -60,7 +57,6 @@ return class(..., function(i)
 
 		MOAISim.setLoopFlags(MOAISim.SIM_LOOP_RESET_CLOCK)
 
-		local commandStream = self.commandStream
 		local connection = self.connection
 		local turnNum = 0
 		while true do

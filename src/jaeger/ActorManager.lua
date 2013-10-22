@@ -79,7 +79,6 @@ return class(..., function(i, c)
 			updatePhase:attach(rootTask)
 		elseif treeConfigType == "table" then -- tree phase
 			local updatePhaseName, childPhases = unpack(treeConfig)
-			print(updatePhaseName, childPhases)
 			local updatePhase = MOAIStickyAction.new()
 			updatePhases[updatePhaseName] = updatePhase
 			updatePhase:attach(rootTask)

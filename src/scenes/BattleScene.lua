@@ -1,21 +1,11 @@
 local class = require "jaeger.Class"
 local RenderUtils = require "jaeger.utils.RenderUtils"
 local Networking = require "Networking"
+local NetworkCommands = require "NetworkCommands"
 local Zone = require "Zone"
 local BattleGUI = require "BattleGUI"
 
 return class(..., function(i, c)
-	c.commandNames = {
-		"noop",
-		"cmdBuild"
-	}
-
-	local commandCodes = {}
-	for index, name in ipairs(c.commandNames) do
-		commandCodes[name] = index
-	end
-	c.commandCodes = commandCodes
-
 	-- Private
 	function i:__constructor(mode)
 		self.mode = mode
@@ -109,7 +99,7 @@ return class(..., function(i, c)
 	function i:initNetwork(engine, sceneTask)
 		local actorMgr = engine:getSystem("jaeger.ActorManager")
 		local lockedPhase = assert(actorMgr:getUpdatePhase("gamelogic"))
-		local noopMsg = c.commandCodes.noop
+		local noopMsg = NetworkCommands.nameToCode("noop")
 
 		if self.mode == "host" then
 			local client, server, serverSkt = Networking.initHost(lockedPhase, noopMsg)
@@ -174,21 +164,35 @@ return class(..., function(i, c)
 	end
 
 	function i:onMyTileClicked(x, y)
-		self:sendCmd("cmdBuild", x, y)
+		local zone = self.zones[1]
+		if zone:isTileGround(x, y) then
+			local building = zone:getBuildingAt(x, y)
+		    if building == nil then
+				self:sendCmd("cmdBuild", x, y)
+			else
+				self.selectedBuilding = zone:getBuildingAt(x, y)
+			end
+		end
 	end
 
 	function i:onEnemyTileClicked(x, y)
+		local selectedBuilding = self.selectedBuilding
+		if selectedBuilding == nil then return end
+
+		local srcX, srcY = selectedBuilding:query("getTileLoc")
+		self:sendCmd("cmdUseBuilding", srcX, srcY, x, y)
 	end
 
 	function i:sendCmd(cmdName, ...)
-		self.client:sendCmd{c.commandCodes[cmdName], ...}
+		self.client:sendCmd{NetworkCommands.nameToCode(cmdName), ...}
 	end
 
 	function i:cmdBuild(playerId, x, y)
 		local zoneIndex = self:selectZone(playerId)
 		local zone = self.zones[zoneIndex]
 
-		if zone:isTileGround(x, y) and zone:getBuildingAt(x, y) == nil then
+		if zone:isTileGround(x, y) and
+		   zone:getBuildingAt(x, y) == nil then
 			self.entityMgr:createEntity{
 				["jaeger.Actor"] = "gamelogic",
 				["jaeger.Sprite"] = {
@@ -204,15 +208,19 @@ return class(..., function(i, c)
 					zone = zoneIndex,
 					x = x,
 					y = y
-				}
+				},
+				"MissileLauncher"
 			}
-
-			if playerId == self.client:getId() then
-				print("I build at ", x, y)
-			else
-				print("Enemy build at ", x, y)
-			end
 		end
+	end
+
+	function i:cmdUseBuilding(playerId, buildingX, buildingY, targetX, targetY)
+		local zoneIndex = self:selectZone(playerId)
+		local zone = self.zones[zoneIndex]
+		local building = zone:getBuildingAt(buildingX, buildingY)
+		if building == nil then return end
+
+		building:sendMessage("msgUse", self.zones[3 - zoneIndex], targetX, targetY)
 	end
 
 	function i:selectZone(playerId)
@@ -224,13 +232,13 @@ return class(..., function(i, c)
 	end
 
 	function i:onCommand(turnNum, playerId, cmd)
-		if cmd ~= c.commandCodes.noop then
+		if cmd ~= NetworkCommands.nameToCode("noop") then
 			print("Cmd at:", turnNum)
 			return self:invoke(playerId, unpack(cmd))
 		end
 	end
 
 	function i:invoke(streamId, commandCode, ...)
-		return self[c.commandNames[commandCode]](self, streamId, ...)
+		return self[NetworkCommands.codeToName(commandCode)](self, streamId, ...)
 	end
 end)

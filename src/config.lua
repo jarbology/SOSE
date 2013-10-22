@@ -52,15 +52,20 @@ return {
 		"jaeger.NameManager",
 		"jaeger.EntityManager",
 		"jaeger.RemoteConsole",
-		"jaeger.InlineScriptManager",
-		"jaeger.BackgroundManager",
-		"jaeger.SpriteManager",
-		"jaeger.TilemapManager",
-
-		"GridWalkerManager",
-		"BuildingManager",
-
+		"jaeger.ScriptShortcut",
+		"jaeger.SimpleComponentManager",
 		"jaeger.TaskManager"
+	},
+
+	components = {
+		"jaeger.Sprite",
+		"jaeger.Tilemap",
+		"jaeger.Background",
+		"jaeger.InlineScript",
+
+		"GridWalker",
+		"Building",
+		"MissileLauncher"
 	},
 
 	tasks = {
