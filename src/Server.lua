@@ -58,10 +58,8 @@ return class(..., function(i)
 
 	function i:gameLoop()
 		-- Track number of ticks a player lagged
-		local numLagTicks = {0, 0}
 		local msgBuff = {}
 		local samplingGap = self.samplingInterval - 1
-		local maxLagTicks = self.maxLagTicks
 		local clientSockets = self.clientSockets
 		local noopMsg = self.noopMsg
 
@@ -70,7 +68,12 @@ return class(..., function(i)
 
 			-- aggregate message from all players
 			for playerId, msgSocket in ipairs(clientSockets) do
-				msgBuff[playerId] = StreamUtils.blockingPull(msgSocket)
+				msgSocket:update(0)
+				if msgSocket:hasData() then
+					msgBuff[playerId] = msgSocket:pull()
+				else
+					msgBuff[playerId] = noopMsg
+				end
 			end
 
 			for playerId, msgSocket in ipairs(clientSockets) do

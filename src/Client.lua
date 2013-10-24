@@ -1,7 +1,5 @@
 local class = require "jaeger.Class"
 local Event = require "jaeger.Event"
-local PaddedStream = require "jaeger.streams.PaddedStream"
-local MemoryStream = require "jaeger.streams.MemoryStream"
 local ActionUtils = require "jaeger.utils.ActionUtils"
 local StreamUtils = require "jaeger.utils.StreamUtils"
 
@@ -13,8 +11,6 @@ return class(..., function(i)
 	function i:__constructor(params)
 		self.playerId = nil
 		self.connection = params.connection
-		self.uploadStream = MemoryStream.new()
-		self.paddedUploadStream = PaddedStream.new(self.uploadStream, params.noopMsg)
 		self.lockedPhase = params.lockedPhase
 		self.samplingInterval = params.samplingInterval or 6 --TODO: stop hardcoding this
 		self.commandReceived = Event.new()
@@ -22,15 +18,11 @@ return class(..., function(i)
 	end
 
 	function i:sendCmd(cmd)
-		self.uploadStream:push(cmd)
+		self.connection:push(cmd)
 	end
 
 	function i:start()
-		local action = MOAIStickyAction.new()
-
-		local executionCoro = ActionUtils.newCoroutine(self, "executionCoroutine")
-		executionCoro:attach(action)
-
+		local action = ActionUtils.newCoroutine(self, "run")
 		self.action = action
 		return action
 	end
@@ -44,14 +36,12 @@ return class(..., function(i)
 	end
 
 	-- Private
-	function i:executionCoroutine()
+	function i:run()
 		local lockedPhase = self.lockedPhase
 		local connection = self.connection
 
 		self.playerId = StreamUtils.blockingPull(connection)
 		print("Got id: " .. self.playerId .. ". Starting game.")
-		local samplingCoro = ActionUtils.newLoopCoroutine(self, "samplingCoroutine")
-		samplingCoro:attach(self.action)
 
 		self.gameStarted:fire()
 
@@ -63,18 +53,13 @@ return class(..., function(i)
 			ActionUtils.skipFrames(self.samplingInterval - 1)
 
 			lockedPhase:pause(true)
-			turnNum = turnNum + 1
 			local commands = StreamUtils.blockingPull(connection)
+			turnNum = turnNum + 1
 			local interpretFunc = self.interpretFunc
 			for playerId, command in ipairs(commands) do
 				self.commandReceived:fire(turnNum, playerId, command)
 			end
 			lockedPhase:pause(false)
 		end
-	end
-
-	function i:samplingCoroutine()
-		ActionUtils.skipFrames(self.samplingInterval - 1)
-		self.connection:push(self.paddedUploadStream:pull())
 	end
 end)
