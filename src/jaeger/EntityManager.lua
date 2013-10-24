@@ -14,18 +14,34 @@ local Entity = class("jaeger.Entity", function(i)
 	function i:sendMessage(msg, ...)
 		-- TODO: would the order be indeterministic?
 		for _, component in pairs(self.components) do
-			local manager = component.manager
-			local messageHandler = manager[msg]
-			if messageHandler then
-				messageHandler(manager, component, self, ...)
+			local manager = component.__manager
+
+			if manager then
+				local messageHandler = manager[msg]
+				if messageHandler then
+					messageHandler(manager, component, self, ...)
+				end
+			else
+				local messageHandler = component[msg]
+				if messageHandler then
+					messageHandler(component, ...)
+				end
 			end
 		end
 
 		for _, component in pairs(self.components) do
-			local manager = component.manager
-			local messageHandler = manager.onMessage
-			if messageHandler then
-				messageHandler(manager, component, self, msg, ...)
+			local manager = component.__manager
+
+			if manager then
+				local messageHandler = manager.onMessage
+				if messageHandler then
+					messageHandler(manager, component, self, msg, ...)
+				end
+			else
+				local messageHandler = component.onMessage
+				if messageHandler then
+					messageHandler(component, msg, ...)
+				end
 			end
 		end
 	end
@@ -33,18 +49,18 @@ local Entity = class("jaeger.Entity", function(i)
 	-- Query an entity
 	function i:query(queryMsg, ...)
 		for _, component in pairs(self.components) do
-			local manager = component.manager
-			local queryHandler = manager[queryMsg]
-			if queryHandler then
-				return queryHandler(manager, component, self, ...)
-			end
-		end
+			local manager = component.__manager
 
-		for _, component in pairs(self.components) do
-			local manager = component.manager
-			local canAnswerQuery = manager.canAnswerQuery
-			if canAnswerQuery and canAnswerQuery(manager, component, queryMsg) then
-				return manager:onQuery(component, self, queryMsg, ...)
+			if manager then
+				local queryHandler = manager[queryMsg]
+				if queryHandler then
+					return queryHandler(manager, component, self, ...)
+				end
+			else
+				local queryHandler = component[queryMsg]
+				if queryHandler then
+					return queryHandler(component, ...)
+				end
 			end
 		end
 	end
@@ -64,7 +80,7 @@ end)
 -- Tasks:
 -- * cleanup: really destroy entities
 return class(..., function(i)
-	-- Register a component type
+	-- Register a (managed) component type
 	-- Params:
 	-- * name: FQN of the component
 	-- * manager: the system that will manage components of this type
@@ -82,13 +98,24 @@ return class(..., function(i)
 	function i:createEntity(spec)
 		local entity = Entity.new()
 		local componentFactories = self.componentFactories
+		local componentClasses = self.componentClasses
 
 		for _, componentSpec in ipairs(spec) do
 			local componentType = componentSpec[1]
-			local factory = assert(componentFactories[componentType], "Unknown component type: '"..tostring(componentType).."'")
-			local manager, methodName = unpack(factory)
-			local component = manager[methodName](manager, entity, componentSpec)
-			component.manager = manager
+			local factory = componentFactories[componentType]
+			local componentClass = componentClasses[componentType]
+			local component
+
+			if factory then
+				local manager, methodName = unpack(factory)
+				component = manager[methodName](manager, entity, componentSpec)
+				component.__manager = manager
+			elseif componentClass then
+				component = componentClass.new(componentSpec)
+				component.entity = entity
+			else
+				error("Unknown component type: "..tostring(componentType))
+			end
 			entity.components[componentType] = component
 		end
 		entity:sendMessage("msgActivate")
@@ -116,7 +143,16 @@ return class(..., function(i)
 		self.numDestroyedEntities = 0
 	end
 
-	function i:start(engine)
+	function i:start(engine, config)
+		local scriptShortcut = engine:getSystem("jaeger.ScriptShortcut")
+		scriptShortcut:enableShortcut(config.components)
+
+		local componentClasses = {}
+		for _, componentName in ipairs(config.components) do
+			componentClasses[componentName] = require(componentName)
+			print("Registered component type "..componentName)
+		end
+		self.componentClasses = componentClasses
 	end
 
 	function i:spawnCleanUp()
