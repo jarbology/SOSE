@@ -98,23 +98,21 @@ return class(..., function(i)
 	function i:createEntity(spec)
 		local entity = Entity.new()
 		local componentFactories = self.componentFactories
-		local componentClasses = self.componentClasses
 
 		for _, componentSpec in ipairs(spec) do
 			local componentType = componentSpec[1]
 			local factory = componentFactories[componentType]
-			local componentClass = componentClasses[componentType]
 			local component
 
 			if factory then
 				local manager, methodName = unpack(factory)
 				component = manager[methodName](manager, entity, componentSpec)
 				component.__manager = manager
-			elseif componentClass then
+			else
+				self.scriptShortcut:enableShortcut(componentType)
+				local componentClass = require(componentType)
 				component = componentClass.new(componentSpec)
 				component.entity = entity
-			else
-				error("Unknown component type: "..tostring(componentType))
 			end
 			entity.components[componentType] = component
 		end
@@ -144,15 +142,7 @@ return class(..., function(i)
 	end
 
 	function i:start(engine, config)
-		local scriptShortcut = engine:getSystem("jaeger.ScriptShortcut")
-		scriptShortcut:enableShortcut(config.components)
-
-		local componentClasses = {}
-		for _, componentName in ipairs(config.components) do
-			componentClasses[componentName] = require(componentName)
-			print("Registered component type "..componentName)
-		end
-		self.componentClasses = componentClasses
+		self.scriptShortcut = engine:getSystem("jaeger.ScriptShortcut")
 	end
 
 	function i:spawnCleanUp()

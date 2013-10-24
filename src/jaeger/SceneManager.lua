@@ -99,7 +99,7 @@ return class(..., function(i, c)
 			self.currentSceneData = data
 
 			print("Starting scene:", sceneName)
-			self.scriptShortcut:enableShortcut{sceneName}
+			self.scriptShortcut:enableShortcut(sceneName)
 			local sceneClass = require(sceneName)
 			local scene = assert(sceneClass.new(data))
 			self.currentScene = scene

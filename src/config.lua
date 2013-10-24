@@ -56,18 +56,6 @@ return {
 		"jaeger.TaskManager"
 	},
 
-	components = {
-		"jaeger.Sprite",
-		"jaeger.Tilemap",
-		"jaeger.Background",
-		"jaeger.InlineScript",
-
-		"Projectile",
-		"Building",
-		"MissileLauncher",
-		"Missile"
-	},
-
 	tasks = {
 		"jaeger.SceneManager/Update",
 		"jaeger.ActorManager/Update",

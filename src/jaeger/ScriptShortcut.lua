@@ -32,10 +32,8 @@ return class(..., function(i)
 		self.shortcutEnabled = {}
 	end
 
-	function i:enableShortcut(moduleNames)
-		for _, moduleName in ipairs(moduleNames) do
-			self.shortcutEnabled[moduleName] = true
-		end
+	function i:enableShortcut(moduleName)
+		self.shortcutEnabled[moduleName] = true
 	end
 
 	function i:onModuleLoaded(name, module)
