@@ -70,8 +70,12 @@ return class(..., function(i, c)
 	end
 
 	function i:msgAddUpdateFunc(component, entity, obj, methodName, ...)
-		local action = ActionUtils.newLoopCoroutine(obj, methodName, entity, ...)
+		local action = ActionUtils.newLoopCoroutine(obj, methodName, ...)
 		action:attach(component.updateAction)
+	end
+
+	function i:msgDestroy(component, entity)
+		component.updateAction:stop()
 	end
 
 	function c.spawnUpdateTree(treeConfig, updatePhases, rootTask)

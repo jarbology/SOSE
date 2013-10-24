@@ -50,10 +50,9 @@ return {
 		"jaeger.SceneManager",
 		"jaeger.ActorManager",
 		"jaeger.NameManager",
+		"jaeger.ScriptShortcut",
 		"jaeger.EntityManager",
 		"jaeger.RemoteConsole",
-		"jaeger.ScriptShortcut",
-		"jaeger.SimpleComponentManager",
 		"jaeger.TaskManager"
 	},
 
@@ -63,9 +62,10 @@ return {
 		"jaeger.Background",
 		"jaeger.InlineScript",
 
-		"GridWalker",
+		"Projectile",
 		"Building",
-		"MissileLauncher"
+		"MissileLauncher",
+		"Missile"
 	},
 
 	tasks = {

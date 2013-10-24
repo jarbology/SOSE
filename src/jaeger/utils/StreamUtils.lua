@@ -6,6 +6,7 @@ return class(..., function(i, c)
 	function c.blockingPull(stream)
 		local yield = coroutine.yield
 
+		stream:update(0)
 		while not stream:hasData() do
 			stream:update(0)
 			yield()

@@ -40,6 +40,7 @@ return class(..., function(i, c)
 			table.insert(renderTable, layer)
 			layerMap[layerName..suffix] = layer
 		end
+		self.layers = layerMap
 		self.refLayer = layerMap["ground"..suffix]--for object picking
 
 		self.camera = camera
@@ -102,11 +103,23 @@ return class(..., function(i, c)
 		}
 	end
 
+	function i:getSize()
+		return self.zoneWidth, self.zoneHeight
+	end
+
+	function i:getId()
+		return self.suffix
+	end
+
 	function i:wndToTile(wndX, wndY)
 		local worldX, worldY = self.refLayer:wndToWorld(wndX, wndY)
 		return self.refGrid:locToCoord(
 			self.groundProp:worldToModel(worldX, worldY)
 		)
+	end
+
+	function i:getLayer(name)
+		return name..self.suffix
 	end
 
 	function i:getTileLoc(x, y)
@@ -127,19 +140,19 @@ return class(..., function(i, c)
 		return self.buildingGrid:get(x, y)
 	end
 
-	function i:addGridWalker(gridName, x, y, obj)
+	function i:addProjectile(gridName, x, y, obj)
 		local grid = assert(self.objectGrids[gridName], "Unknown grid: "..gridName)
 		grid:get(x, y):add(obj)
 	end
 
-	function i:removeGridWalker(gridName, x, y, obj)
+	function i:removeProjectile(gridName, x, y, obj)
 		local grid = assert(self.objectGrids[gridName], "Unknown grid: "..gridName)
 		grid:get(x, y):remove(obj)
 	end
 
-	function i:moveGridWalker(gridName, oldX, oldY, newX, newY, obj)
-		self:removeGridWalker(gridName, oldX, oldY, obj)
-		self:addGridWalker(gridName, newX, newY, obj)
+	function i:moveProjectile(gridName, oldX, oldY, newX, newY, obj)
+		self:removeProjectile(gridName, oldX, oldY, obj)
+		self:addProjectile(gridName, newX, newY, obj)
 	end
 
 	function i:pickFirstObjectAt(gridName, x, y, predicate)
