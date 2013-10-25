@@ -13,7 +13,7 @@ local Entity = class("jaeger.Entity", function(i)
 	-- Send a message to this entity
 	function i:sendMessage(msg, ...)
 		-- TODO: would the order be indeterministic?
-		for _, component in pairs(self.components) do
+		for _, component in ipairs(self.components) do
 			local manager = component.__manager
 
 			if manager then
@@ -29,7 +29,7 @@ local Entity = class("jaeger.Entity", function(i)
 			end
 		end
 
-		for _, component in pairs(self.components) do
+		for _, component in ipairs(self.components) do
 			local manager = component.__manager
 
 			if manager then
@@ -48,7 +48,7 @@ local Entity = class("jaeger.Entity", function(i)
 
 	-- Query an entity
 	function i:query(queryMsg, ...)
-		for _, component in pairs(self.components) do
+		for _, component in ipairs(self.components) do
 			local manager = component.__manager
 
 			if manager then
@@ -99,7 +99,7 @@ return class(..., function(i)
 		local entity = Entity.new()
 		local componentFactories = self.componentFactories
 
-		for _, componentSpec in ipairs(spec) do
+		for index, componentSpec in ipairs(spec) do
 			local componentType = componentSpec[1]
 			local factory = componentFactories[componentType]
 			local component
@@ -114,6 +114,7 @@ return class(..., function(i)
 				component = componentClass.new(componentSpec)
 				component.entity = entity
 			end
+			entity.components[index] = component
 			entity.components[componentType] = component
 		end
 		entity:sendMessage("msgActivate")
@@ -125,6 +126,7 @@ return class(..., function(i)
 	-- An entity is only marked as destroyed. Its destruction is
 	-- deferred to the end of the frame
 	function i:destroyEntity(entity)
+		assert(entity.__class == Entity, "Wrong type")
 		if not entity.alive then return end
 
 		entity.alive = false
