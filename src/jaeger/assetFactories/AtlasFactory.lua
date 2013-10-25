@@ -28,10 +28,10 @@ return function(name, config, assetManager, oldInstance)
 		-- to frame.geomRect.  Origin is at x0,y0 of original sprite
 		local cr = frame.spriteColorRect
 		local r = {}
-		r.x0 = cr.x
-		r.y0 = cr.y
-		r.x1 = cr.x + cr.width
-		r.y1 = cr.y + cr.height
+        r.x0 = cr.x
+        r.y0 = -cr.y - cr.height
+        r.x1 = cr.x + cr.width
+        r.y1 = -cr.y
 
 		frames[frame.name] = { uvQuad = q, rect = r, size = frame.spriteSourceSize  }
 	end

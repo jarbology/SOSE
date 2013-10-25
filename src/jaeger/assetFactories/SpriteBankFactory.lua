@@ -53,9 +53,9 @@ return function(name, config, assetManager, oldInstance)
 			deck:setRect(
 				currentIndex,
 				geomRect.x0 - xOrigin,
-				geomRect.y0 - frameHeight + yOrigin,
+				geomRect.y0 + yOrigin,
 				geomRect.x1 - xOrigin,
-				geomRect.y1 - frameHeight + yOrigin
+				geomRect.y1 + yOrigin
 			)
 			currentIndex = currentIndex + 1
 		end
