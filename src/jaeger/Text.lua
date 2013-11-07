@@ -20,11 +20,15 @@ return class(..., function(i)
 		textbox:setAttrLink(MOAIProp2D.INHERIT_TRANSFORM, prop, MOAIProp2D.TRANSFORM_TRAIT)
 		textbox:setAttrLink(MOAIProp2D.INHERIT_COLOR, prop, MOAIProp2D.COLOR_TRAIT)
 		textbox:setAttrLink(MOAIProp2D.ATTR_PARTITION, prop, MOAIProp2D.ATTR_PARTITION)
+		textbox.entity = self.entity
 		prop.layer:insertProp(textbox)
 	end
 
 	function i:msgSetText(txt)
-		return self.textbox:setString(txt)
+		local textbox = self.textbox
+		textbox:setString(txt)
+		local xMin, xMax, yMin, yMax = textbox:getRect()
+		textbox:setBounds(xMin, yMin, 0, xMax, yMax, 1)
 	end
 
 	function i:getTextBox()
