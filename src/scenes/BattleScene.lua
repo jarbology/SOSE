@@ -90,9 +90,7 @@ return class(..., function(i, c)
 
 	function i:initSim()
 		MOAISim.clearLoopFlags()
-		MOAISim.setLoopFlags(MOAISim.SIM_LOOP_ALLOW_SPIN)
-		MOAISim.setLoopFlags(MOAISim.SIM_LOOP_NO_SURPLUS)
-		MOAISim.setLoopFlags(MOAISim.SIM_LOOP_NO_DEFICIT)
+		MOAISim.setLoopFlags(MOAISim.LOOP_FLAGS_FIXED)
 	end
 
 	function i:initNetwork(engine, sceneTask)
@@ -137,9 +135,39 @@ return class(..., function(i, c)
 
 		local inputSystem = engine:getSystem("jaeger.InputSystem")
 		inputSystem.mouseLeft:addListener(self, "onMouseLeft")
+		inputSystem.mouseWheel:addListener(self, "onMouseWheel")
+
+		if self.mode == "combo" then
+			self:cmdBuild(2, 26, 22)
+		end
+
+		self.cameras[1]:setScl(1.7, 1.7)
+		self.cameras[2]:setScl(1.7, 1.7)
+
+		MOAIDebugLines.showStyle(MOAIDebugLines.TEXT_BOX)
+		MOAIDebugLines.showStyle(MOAIDebugLines.TEXT_BOX_BASELINES)
+		MOAIDebugLines.showStyle(MOAIDebugLines.TEXT_BOX_LAYOUT)
+		createEntity{
+			{"jaeger.Renderable", layer="overlay", x=-1024/2 + 20, y=576/2},
+			{"jaeger.Text", rect={0, -30, 100, 0}, font="karmatic_arcade.ttf", text="2000", size=20},
+			{"jaeger.InlineScript",
+			}
+		}
 	end
 
 	function i:onGameStart()
+	end
+
+	function i:onMouseWheel(x, y, delta)
+		print(delta)
+		local zoneIndex
+		if x < (1024 / 2) then
+			zoneIndex = 1
+		else
+			zoneIndex = 2
+		end
+		local camera = self.cameras[zoneIndex]
+		camera:moveScl(-0.1, -0.1, 0.2)
 	end
 
 	function i:onMouseLeft(x, y, down)
@@ -192,9 +220,9 @@ return class(..., function(i, c)
 		   zone:getBuildingAt(x, y) == nil then
 			createEntity{
 				{"jaeger.Actor", phase="buildings"},
-				{"jaeger.Sprite", spriteName="test/coin", autoPlay=true},
+				{"jaeger.Sprite", spriteName="test/robot1", autoPlay=true},
 				{"jaeger.Renderable", layer = "building"..zoneIndex},
-				{"Building", zone = zoneIndex, x = x, y = y},
+				{"Building", zone = zoneIndex, x = x, y = y, hp = 4},
 				{"MissileLauncher", damage = 2}
 			}
 		end

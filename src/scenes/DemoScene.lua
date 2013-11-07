@@ -21,25 +21,12 @@ return class(..., function(i, c)
 			{"jaeger.Actor", phase="gui"},
 			{"jaeger.Renderable", layer="default", x=40},
 			{"jaeger.Sprite", spriteName="test/coin", autoPlay="true"},
+			{"jaeger.Text", rect={-40, -40, 40, 40}, font="karmatic_arcade.ttf", text="Test", size=20},
+			{"Button"},
 			{"jaeger.InlineScript",
-				msgPlayAnimation = function(self, entity)
-					print 'start playing anim'
-				end,
 				msgMouseLeft = function(self, entity, ...)
 					print('mouseLeft', ...)
 				end,
-				msgGUIHoverIn = function(self, entity)
-					entity:sendMessage(
-						"msgPlayGUIAnimation",
-						entity:query("getProp"):seekScl(1.2, 1.2, 0.3)
-					)
-				end,
-				msgGUIHoverOut = function(self, entity)
-					entity:sendMessage(
-						"msgPlayGUIAnimation",
-						entity:query("getProp"):seekScl(1.0, 1.0, 0.3)
-					)
-				end
 			}
 		}
 		entity:sendMessage("msgPerformWithDelay", 2.5, function() print('timer') end)
