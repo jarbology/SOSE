@@ -1,6 +1,22 @@
 return {
 	atlas = "test",
 	sprites = {
+		robot1 = {
+			time = 2.0,
+			frameFormat = "robotfront%1d.png",
+			mode = "loop",
+			numFrames = 3,
+			xOrigin = 32,
+			yOrigin = 48
+		},
+		rocket = {
+			time = 1.0,
+			frameFormat = "rocket.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 101,
+			yOrigin = 39
+		},
 		man1_down = {
 			time = 3.5,
 			frameFormat = "man1_fr%01d.png",

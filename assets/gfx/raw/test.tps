@@ -150,6 +150,12 @@
         <array>
             <filename>coin</filename>
             <filename>man1</filename>
+            <filename>rocket</filename>
+            <filename>core</filename>
+            <filename>robot1</filename>
+            <filename>robot2</filename>
+            <filename>rocketbase</filename>
+            <filename>interceptor</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
