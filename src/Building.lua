@@ -9,6 +9,7 @@ return class(..., function(i)
 		self.zone = zone
 		self.x = data.x
 		self.y = data.y
+		self.hp = data.hp or 0
 	end
 
 	function i:getTileLoc()
@@ -18,6 +19,13 @@ return class(..., function(i)
 	function i:msgActivate()
 		self.zone:addBuilding(self.x, self.y, self.entity)
 		self.entity:query("getProp"):setLoc(self.zone:getTileLoc(self.x, self.y))
+	end
+
+	function i:msgDealDamage(dmg)
+		self.hp = self.hp - dmg
+		if self.hp <= 0 then
+			destroyEntity(self.entity)
+		end
 	end
 
 	function i:msgDestroy()
