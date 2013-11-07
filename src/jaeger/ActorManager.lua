@@ -54,7 +54,9 @@ return class(..., function(i, c)
 
 	function i:onSceneEnd()
 		for name, updatePhase in pairs(self.updatePhases) do
-			updatePhase:clear()
+			if updatePhase.isLeaf then
+				updatePhase:clear()
+			end
 		end
 	end 
 
@@ -84,11 +86,13 @@ return class(..., function(i, c)
 			local updatePhase = MOAIStickyAction.new()
 			updatePhases[treeConfig] = updatePhase
 			updatePhase:attach(rootTask)
+			updatePhase.isLeaf = true
 		elseif treeConfigType == "table" then -- tree phase
 			local updatePhaseName, childPhases = unpack(treeConfig)
 			local updatePhase = MOAIStickyAction.new()
 			updatePhases[updatePhaseName] = updatePhase
 			updatePhase:attach(rootTask)
+			updatePhase.isLeaf = false
 
 			for _, childPhase in ipairs(childPhases) do
 				c.spawnUpdateTree(childPhase, updatePhases, updatePhase)
