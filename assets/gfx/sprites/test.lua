@@ -1,6 +1,46 @@
 return {
 	atlas = "test",
 	sprites = {
+		radialMenu = {
+			time = 1.0,
+			frameFormat = "ringmenu.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 122,
+			yOrigin = 122
+		},
+		radialMenuButton = {
+			time = 1.0,
+			frameFormat = "ringbutton.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 37,
+			yOrigin = 37
+		},
+		robotIcon = {
+			time = 1.0,
+			frameFormat = "robotfront%1d.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 32,
+			yOrigin = 32
+		},
+		coreIcon = {
+			time = 1.0,
+			frameFormat = "core%1d.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 32,
+			yOrigin = 32
+		},
+		core = {
+			time = 2.0,
+			frameFormat = "core%1d.png",
+			mode = "loop",
+			numFrames = 8,
+			xOrigin = 32,
+			yOrigin = 48
+		},
 		robot1 = {
 			time = 2.0,
 			frameFormat = "robotfront%1d.png",

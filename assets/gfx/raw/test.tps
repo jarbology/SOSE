@@ -156,6 +156,7 @@
             <filename>robot2</filename>
             <filename>rocketbase</filename>
             <filename>interceptor</filename>
+            <filename>gui</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

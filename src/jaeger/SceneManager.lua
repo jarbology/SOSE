@@ -65,7 +65,7 @@ return class(..., function(i, c)
 	function i:start(engine)
 		self.engine = engine
 		self.scriptShortcut = engine:getSystem("jaeger.ScriptShortcut")
-		engine:getSystem("jaeger.InputSystem").keyboard:addListener(self, "onKey")
+		engine:getSystem("jaeger.InputManager").keyboard:addListener(self, "onKey")
 		engine:getSystem("jaeger.EntityManager"):registerComponent("jaeger.Renderable", self, "createRenderable")
 	end
 
@@ -131,12 +131,22 @@ return class(..., function(i, c)
 
 		return {
 			prop = prop,
-			layerName = data.layer
+			layerName = assert(data.layer, "No layer specified")
 		}
 	end
 
 	function i:getProp(component, entity)
 		return component.prop
+	end
+
+	function i:msgLink(component, entity, child, linkSpec)
+		local childProp = assert(child:query("getProp"), "Need a prop to be linked")
+		local parent = component.prop
+
+		for _, linkPair in ipairs(linkSpec) do
+			local srcAttr, dstAttr = unpack(linkPair)
+			childProp:setAttrLink(srcAttr, parent, dstAttr)
+		end
 	end
 
 	function i:msgActivate(component, entity)
@@ -151,5 +161,9 @@ return class(..., function(i, c)
 		local layerName = component.layerName
 		local prop = component.prop
 		self.currentScene:getLayer(layerName):removeProp(prop)
+	end
+
+	function i:getLayerName(component)
+		return component.layerName
 	end
 end)

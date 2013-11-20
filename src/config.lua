@@ -1,8 +1,8 @@
 return {
 	graphics = {
 		title = "SoSE",
-		windowWidth = 800,
-		windowHeight = 480
+		windowWidth = 1024,
+		windowHeight = 576
 	},
 
 	assets = {
@@ -44,8 +44,8 @@ return {
 	},
 
 	systems = {
-		"jaeger.widget.WidgetManager",
-		"jaeger.InputSystem",
+		"jaeger.WidgetManager",
+		"jaeger.InputManager",
 		"jaeger.GraphicsSystem",
 		"jaeger.SceneManager",
 		"jaeger.ActorManager",

@@ -64,6 +64,22 @@ return class(..., function(i, c)
 		action:attach(component.updateAction)
 	end
 
+	function i:msgQueueAction(component, entity, actionFunc)
+		local queue = component.actionQueue
+
+		local function dequeue()
+			local action = actionFunc()
+			component.actionQueue = action
+			action:attach(component.updateAction)
+		end
+
+		if queue and queue:isActive() then
+			queue:setListener(MOAIAction.EVENT_STOP, dequeue)
+		else
+			dequeue()
+		end
+	end
+
 	function i:msgPerformWithDelay(component, entity, delay, func)
 		local timer = MOAITimer.new()
 		timer:setSpan(delay)
