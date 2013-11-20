@@ -16,8 +16,6 @@ return class(..., function(i, c)
 	-- * renderTable: the render table to populate
 	-- * layerMap: the layer map to populate
 	function i:__constructor(params)
-		self.tileClicked = Event.new()
-
 		local layerNames = {
 			"background",
 			"ground",
@@ -196,14 +194,6 @@ return class(..., function(i, c)
 	end
 
 	-- Private
-	
-	function i:onTileClicked(x, y)
-		local x, y = self.refGrid:locToCoord(
-			self.groundProp:worldToModel(x, y)
-		)
-		self.tileClicked:fire(self, x, y)
-	end
-	
 	function c.getMapSize(map)
 		return #(map[1]), #map
 	end
