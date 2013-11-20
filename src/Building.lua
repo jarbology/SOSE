@@ -1,4 +1,5 @@
 local class = require "jaeger.Class"
+local Property = require "jaeger.Property"
 
 return class(..., function(i)
 	function i:__constructor(data)
@@ -9,7 +10,8 @@ return class(..., function(i)
 		self.zone = zone
 		self.x = data.x
 		self.y = data.y
-		self.hp = data.hp or 0
+		self.hp = Property.new(data.hp or 1)
+		self.maxHP = Property.new(data.hp or 1)
 	end
 
 	function i:getTileLoc()
@@ -22,13 +24,22 @@ return class(..., function(i)
 	end
 
 	function i:msgDealDamage(dmg)
-		self.hp = self.hp - dmg
-		if self.hp <= 0 then
+		local hp = self.hp:get() - dmg
+		self.hp:set(hp)
+		if hp <= 0 then
 			destroyEntity(self.entity)
 		end
 	end
 
 	function i:msgDestroy()
 		self.zone:removeBuildingAt(self.x, self.y)
+	end
+
+	function i:getHP()
+		return self.hp
+	end
+
+	function i:getMaxHP()
+		return self.maxHP
 	end
 end)
