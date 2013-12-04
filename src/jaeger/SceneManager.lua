@@ -128,10 +128,11 @@ return class(..., function(i, c)
 		prop:setLoc(data.x or 0, data.y or 0)
 		prop:setScl(data.xScale or 1, data.yScale or 1)
 		prop:setRot(data.rotation or 0)
+		prop:setBlendMode(MOAIProp2D.GL_SRC_ALPHA, MOAIProp2D.GL_ONE_MINUS_SRC_ALPHA)
 
 		return {
 			prop = prop,
-			layerName = assert(data.layer, "No layer specified")
+			layer = assert(data.layer, "No layer specified")
 		}
 	end
 
@@ -139,7 +140,7 @@ return class(..., function(i, c)
 		return component.prop
 	end
 
-	function i:msgLink(component, entity, child, linkSpec)
+	function i:msgAttach(component, entity, child, linkSpec)
 		local childProp = assert(child:query("getProp"), "Need a prop to be linked")
 		local parent = component.prop
 
@@ -150,20 +151,21 @@ return class(..., function(i, c)
 	end
 
 	function i:msgActivate(component, entity)
-		local layerName = component.layerName
+		local layer = component.layer
 		local prop = component.prop
-		local layer = assert(self.currentScene:getLayer(component.layerName), "Cannot find layer '"..layerName.."' in current scene")
 		layer:insertProp(component.prop)
 		prop.layer = layer
 	end
 
 	function i:msgDestroy(component, entity)
-		local layerName = component.layerName
 		local prop = component.prop
-		self.currentScene:getLayer(layerName):removeProp(prop)
+		prop:clearAttrLink(MOAIProp2D.ATTR_PARTITION)
+		component.layer:removeProp(prop)
+		component.layer = nil
+		prop.layer = nil
 	end
 
-	function i:getLayerName(component)
-		return component.layerName
+	function i:getLayer(component)
+		return component.layer
 	end
 end)
