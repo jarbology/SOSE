@@ -3,7 +3,7 @@ local RenderUtil = require "jaeger.utils.RenderUtils"
 
 return class(..., function(i, c)
 	function i:__constructor()
-		local defaultLayer = RenderUtil.newFullScreenLayer()
+		local defaultLayer = RenderUtil.newLayer()
 		defaultLayer:setSortMode(MOAILayer2D.SORT_PRIORITY_ASCENDING)
 		self.renderTable = {
 			defaultLayer

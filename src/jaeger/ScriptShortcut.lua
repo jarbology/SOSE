@@ -7,6 +7,10 @@ return class(..., function(i)
 		local entityMgr = engine:getSystem("jaeger.EntityManager")
 		local sceneMgr = engine:getSystem("jaeger.SceneManager")
 		local shortcutEnv = {
+			getSystem = function(...)
+				return engine:getSystem(...)
+			end,
+
 			getAsset = function(...)
 				return assetMgr:getAsset(...)
 			end,

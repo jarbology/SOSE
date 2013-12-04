@@ -8,11 +8,7 @@ local MathUtils = require "jaeger.utils.MathUtils"
 -- * getZone(): get the zone this walker belongs to
 return class(..., function(i)
 	function i:__constructor(data)
-		local currentScene = getCurrentScene()
-		assert(currentScene.getZone, "Current scene does not contain zones")
-		local zone = assert(currentScene:getZone(data.zone), "Zone "..tostring(data.zone).." does not exists")
-
-		self.zone = zone
+		self.zone = data.zone
 		self.gridName = data.grid
 		self.x = data.x
 		self.y = data.y

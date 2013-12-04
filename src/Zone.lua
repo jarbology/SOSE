@@ -2,49 +2,44 @@ local class = require "jaeger.Class"
 local Event = require "jaeger.Event"
 local Grid = require "jaeger.Grid"
 local Set = require "jaeger.Set"
+local Property = require "jaeger.Property"
 
 -- A zone for a player
 return class(..., function(i, c)
 	local MAP_PADDING = 20
 	local TILE_WIDTH = 64
 	local TILE_HEIGHT = 64
+	local LAYERS = {
+		"background",
+		"ground",
+		"building",
+		"projectile",
+		"overlay",
+		"artificialFog",
+		"fog"
+	}
 
-	-- params is a table with the following keys:
-	-- * suffix: 1 or 2
-	-- * viewport: viewport for this zone
-	-- * map: an ascii map of this zone
-	-- * renderTable: the render table to populate
-	-- * layerMap: the layer map to populate
-	function i:__constructor(params)
-		local layerNames = {
-			"background",
-			"ground",
-			"building",
-			"projectile",
-			"artificialFog",
-			"fog"
-		}
-
-		local layerMap = params.layerMap
-		local renderTable = params.renderTable
-		local viewport = params.viewport
-		local suffix = params.suffix
+	--map: an ascii map of this zone
+	function i:__constructor(map, viewport)
+		local renderTable = {}
+		local layers = {}
 		local camera = MOAICamera2D.new()
-		for _, layerName in ipairs(layerNames) do
+
+		for index, layerName in ipairs(LAYERS) do
 			local layer = MOAILayer2D.new()
-			layer:setSortMode(MOAILayer2D.SORT_NONE)
 			layer:setViewport(viewport)
 			layer:setCamera(camera)
-			table.insert(renderTable, layer)
-			layerMap[layerName..suffix] = layer
+			layers[layerName] = layer
+			renderTable[index] = layer
 		end
-		self.layers = layerMap
-		self.refLayer = layerMap["ground"..suffix]--for object picking
 
+		self.resource = Property.new(2000)
+		self.layers = layers
+		self.renderTable = renderTable
+		self.refLayer = layers.ground -- for object picking
 		self.camera = camera
-		self.suffix = suffix
+		self.map = map
 
-		local map = params.map
 		local mapWidth, mapHeight = c.getMapSize(map)
 		local zoneWidth, zoneHeight = mapWidth + MAP_PADDING * 2, mapHeight + MAP_PADDING * 2
 		self.objectGrids = {
@@ -55,7 +50,6 @@ return class(..., function(i, c)
 		self.groundGrid = Grid.new(zoneWidth, zoneHeight)
 		self.zoneWidth = zoneWidth
 		self.zoneHeight = zoneHeight
-		self.map = map
 
 		c.forEachTileInMap(map, function(x, y, filled)
 			self.groundGrid:set(x, y, filled)
@@ -65,8 +59,8 @@ return class(..., function(i, c)
 	-- Initialize the tilemaps using an entity manager
 	function i:init(entityMgr)
 		local map = self.map
-		entityMgr:createEntity{
-			{"jaeger.Renderable", layer = "background"..self.suffix},
+		local background = entityMgr:createEntity{
+			{"jaeger.Renderable", layer = self.layers.background },
 			{"jaeger.Background", texture = "bg1.png", width = 4000, height = 4000}
 		}
 
@@ -75,38 +69,40 @@ return class(..., function(i, c)
 		grid:setSize(zoneWidth, zoneHeight, TILE_WIDTH, TILE_HEIGHT)
 		c.setGrid(grid, self.map, 5)
 		local centerX, centerY = grid:getTileLoc(self.zoneWidth / 2, self.zoneHeight / 2)
-		self.centerX = centerX
-		self.centerY = centerY
 		self.refGrid = grid -- for object picking
 
 		local ground = entityMgr:createEntity{
-			{"jaeger.Renderable", layer = "ground"..self.suffix,
-			                      x = -centerX,
-			                      y = -centerY},
+			{"jaeger.Renderable", layer = self.layers.ground, x = -centerX, y = -centerY},
 			{"jaeger.Tilemap", tileset = "ground", grid = grid}
 		}
 		self.groundProp = ground:query("getProp")
 
 		local grid = MOAIGrid.new()
-		local suffix = self.suffix
 		grid:setSize(zoneWidth, zoneHeight, TILE_WIDTH, TILE_HEIGHT)
 		--c.setGrid(grid, self.map, 2)
 		self.fogGrid = grid
 
-		local fog = entityMgr:createEntity{
-			{"jaeger.Renderable", layer = "fog"..self.suffix,
-			                      x = -centerX,
-			                      y = -centerY},
+		self.fog = entityMgr:createEntity{
+			{"jaeger.Renderable", layer = self.layers.fog, x = -centerX, y = -centerY},
 			{"jaeger.Tilemap", tileset = "fog",	grid = grid}
 		}
+	end
+
+	function i:getResource()
+		return self.resource
+	end
+
+	function i:changeResource(delta)
+		local res = self.resource
+		res:set(res:get() + delta)
 	end
 
 	function i:getSize()
 		return self.zoneWidth, self.zoneHeight
 	end
 
-	function i:getId()
-		return self.suffix
+	function i:getRenderTable()
+		return self.renderTable
 	end
 
 	function i:wndToTile(wndX, wndY)
@@ -117,12 +113,16 @@ return class(..., function(i, c)
 	end
 
 	function i:getLayer(name)
-		return name..self.suffix
+		return assert(self.layers[name], "Unknown layer "..tostring(name))
 	end
 
 	function i:getTileLoc(x, y)
 		local x, y = self.refGrid:getTileLoc(x, y)
-		return x - self.centerX, y - self.centerX
+		return self.groundProp:modelToWorld(x, y)
+	end
+
+	function i:worldToWnd(x, y)
+		return self.refLayer:worldToWnd(x, y)
 	end
 
 	function i:addBuilding(x, y, building)

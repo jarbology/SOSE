@@ -3,53 +3,50 @@ local RenderUtils = require "jaeger.utils.RenderUtils"
 local Networking = require "Networking"
 local NetworkCommands = require "NetworkCommands"
 local Zone = require "Zone"
+local StringUtils = require "jaeger.utils.StringUtils"
+local KeyCodes = require "jaeger.KeyCodes"
 
 return class(..., function(i, c)
+
 	-- Private
+	local TEST_MAP = {
+		'o____oooo_',
+		'oooooo____',
+		'o_o__ooooo',
+		'o_ooooooo_',
+		'o_oooo__o_',
+		'o_oooooooo'
+	}
+
+	local BUILD_MENU = {
+		{id = "buildMechBay", sprite = "test/robotIcon"},
+		{id = "buildRocketLauncher", sprite = "test/rocketLauncherIcon"},
+		{id = "buildInterceptor", sprite = "test/interceptorIcon"},
+		{id = "buildGenerator", sprite = "test/generatorIcon"},
+		{id = "buildFogGenerator", sprite = "test/coreIcon"},
+		{id = "buildWall", sprite = "test/coreIcon"}
+	}
+
 	function i:__constructor(mode)
 		self.mode = mode
-		self.renderTable = {}
-		self.layerMap = {}
+		self.currentZone = 1
 
-		local zoneParams = {
-			map = {
-				'o____o',
-				'oooooo',
-				'o_o__o',
-				'o_oooo',
-				'o_oooo',
-				'o_oooo'
-			},
-			renderTable = self.renderTable,
-			layerMap = self.layerMap
-		}
-
-		local width, height = MOAIGfxDevice.getViewSize()
-		width = width / 2
-
-		local leftViewport = MOAIViewport.new()
-		leftViewport:setSize(0, 0, width, height)
-		leftViewport:setScale(width, height)
-		zoneParams.suffix = 1
-		zoneParams.viewport = leftViewport
-		local leftZone = Zone.new(zoneParams)
-
-		local rightViewport = MOAIViewport.new()
-		rightViewport:setSize(width, 0, width * 2, height)
-		rightViewport:setScale(width, height)
-		zoneParams.suffix = 2
-		zoneParams.viewport = rightViewport
-		local rightZone = Zone.new(zoneParams)
-
+		local viewport = RenderUtils.newFullScreenViewport()
+		local leftZone = Zone.new(TEST_MAP, viewport)
+		local rightZone = Zone.new(TEST_MAP, viewport)
 		self.zones = { leftZone, rightZone }
-		self.cameras = { leftZone:getCamera(), rightZone:getCamera() }
 
-		self:newRenderPass("overlay", RenderUtils.newFullScreenLayer())
-	end
-
-	function i:newRenderPass(name, pass)
-		table.insert(self.renderTable, pass)
-		self.layerMap[name] = pass
+		local background = RenderUtils.newLayer(viewport)
+		local overlay = RenderUtils.newLayer(viewport)
+		self.renderTable = {
+			background,
+			leftZone:getRenderTable(),
+			overlay
+		}
+		self.layers = {
+			overlay = overlay,
+			background = background
+		}
 	end
 
 	function i:start(engine, sceneTask)
@@ -78,10 +75,6 @@ return class(..., function(i, c)
 
 	function i:getRenderTable()
 		return self.renderTable
-	end
-
-	function i:getLayer(name)
-		return self.layerMap[name]
 	end
 
 	function i:getZone(index)
@@ -133,24 +126,36 @@ return class(..., function(i, c)
 			zone:init(entityMgr)
 		end
 
-		local inputSystem = engine:getSystem("jaeger.InputSystem")
-		inputSystem.mouseLeft:addListener(self, "onMouseLeft")
-		inputSystem.mouseWheel:addListener(self, "onMouseWheel")
+		local inputMgr = engine:getSystem("jaeger.WidgetManager")
+		inputMgr.mouseLeft:addListener(self, "onMouseLeft")
+		engine:getSystem("jaeger.InputManager").mouseRight:addListener(self, "onMouseRight")
+		engine:getSystem("jaeger.InputManager").keyboard:addListener(self, "onKey")
 
 		if self.mode == "combo" then
-			self:cmdBuild(2, 26, 22)
+			self:cmdBuild(2, "rocketLauncher", 21, 26)
 		end
 
-		self.cameras[1]:setScl(1.7, 1.7)
-		self.cameras[2]:setScl(1.7, 1.7)
-
-		MOAIDebugLines.showStyle(MOAIDebugLines.TEXT_BOX)
-		MOAIDebugLines.showStyle(MOAIDebugLines.TEXT_BOX_BASELINES)
-		MOAIDebugLines.showStyle(MOAIDebugLines.TEXT_BOX_LAYOUT)
-		createEntity{
-			{"jaeger.Renderable", layer="overlay", x=-1024/2 + 20, y=576/2},
+		local resourceTxt = createEntity{
+			{"jaeger.Renderable", layer=self.layers.overlay, x=-1024/2 + 20, y=576/2},
 			{"jaeger.Text", rect={0, -30, 100, 0}, font="karmatic_arcade.ttf", text="2000", size=20},
+		}
+		self.zones[1]:getResource().changed:addListener(function(newValue)
+			resourceTxt:sendMessage("msgSetText", tostring(newValue))
+		end)
+
+		self.ringMenu = createEntity{
+			{"jaeger.Renderable", layer = self.layers.overlay },
+			{"jaeger.Sprite", spriteName = "test/radialMenu"},
+			{"RingMenu",
+				radius = 122,
+				itemRadius = 35,
+				backgroundSprite = "test/radialMenuButton",
+				message = "msgItemChosen"
+			},
 			{"jaeger.InlineScript",
+				msgItemChosen = function(component, entity, id)
+					self:onItemChosen(id)
+				end
 			}
 		}
 	end
@@ -158,45 +163,39 @@ return class(..., function(i, c)
 	function i:onGameStart()
 	end
 
-	function i:onMouseWheel(x, y, delta)
-		print(delta)
-		local zoneIndex
-		if x < (1024 / 2) then
-			zoneIndex = 1
-		else
-			zoneIndex = 2
-		end
-		local camera = self.cameras[zoneIndex]
-		camera:moveScl(-0.1, -0.1, 0.2)
-	end
-
 	function i:onMouseLeft(x, y, down)
 		if not down then
-			if x < (1024 / 2) then
-				self:onTileClicked(1, self.zones[1]:wndToTile(x, y))
-			else
-				self:onTileClicked(2, self.zones[2]:wndToTile(x, y))
-			end
+			local tileX, tileY = self.zones[1]:wndToTile(x, y)
+			self:onTileClicked(tileX, tileY, x, y)
 		end
 	end
 
-	function i:onTileClicked(zoneId, x, y)
-		if zoneId == 1 then
-			self:onMyTileClicked(x, y)
+	function i:onMouseRight(x, y, down)
+		if not down then
+			self.ringMenu:sendMessage("msgHide")
+		end
+	end
+
+	function i:onTileClicked(...)
+		if self.currentZone == 1 then
+			return self:onMyTileClicked(...)
 		else
-			self:onEnemyTileClicked(x, y)
+			return self:onEnemyTileClicked(...)
 		end
 	end
 
-	function i:onMyTileClicked(x, y)
+	function i:onMyTileClicked(tileX, tileY, wndX, wndY)
+		print("Tile:", tileX, tileY)
 		local zone = self.zones[1]
-		if zone:isTileGround(x, y) then
-			local building = zone:getBuildingAt(x, y)
-		    if building == nil then
-				self:sendCmd("cmdBuild", x, y)
-			else
-				self.selectedBuilding = zone:getBuildingAt(x, y)
-			end
+		self.currentTileX = tileX
+		self.currentTileY = tileY
+		if zone:isTileGround(tileX, tileY) then
+			local building = zone:getBuildingAt(tileX, tileY)
+			local tileWndX, tileWndY = zone:worldToWnd(zone:getTileLoc(tileX, tileY))
+			local worldX, worldY = self.layers.overlay:wndToWorld(tileWndX, tileWndY)
+			local menu = building == nil and BUILD_MENU or building:query("getMenu")
+			self.ringMenu:sendMessage("msgShow", worldX, worldY, menu)
+			self.currentBuilding = building
 		end
 	end
 
@@ -212,19 +211,45 @@ return class(..., function(i, c)
 		self.client:sendCmd{NetworkCommands.nameToCode(cmdName), ...}
 	end
 
-	function i:cmdBuild(playerId, x, y)
+	function i:cmdBuild(playerId, buildingType, x, y)
 		local zoneIndex = self:selectZone(playerId)
 		local zone = self.zones[zoneIndex]
+		print("Build", buildingType, x, y)
 
-		if zone:isTileGround(x, y) and
-		   zone:getBuildingAt(x, y) == nil then
+		if zone:isTileGround(x, y) and zone:getBuildingAt(x, y) == nil then
+			local building
+			if buildingType == "rocketLauncher" then
+				zone:changeResource(-100)
+				building = createEntity{
+					{"jaeger.Actor", phase = "buildings"},
+					{"jaeger.Renderable", layer = zone:getLayer("building") },
+					{"jaeger.Sprite", spriteName="test/core", autoPlay = true},
+					{"Building", zone = zone, x = x, y = y, hp = 5},
+					{"MissileLauncher", damage = 2}
+				}
+			elseif buildingType == "generator" then
+				zone:changeResource(-200)
+				building = createEntity{
+					{"jaeger.Actor", phase = "buildings"},
+					{"jaeger.Renderable", layer = zone:getLayer("building") },
+					{"jaeger.Sprite", spriteName="test/generator", autoPlay = true},
+					{"Building", zone = zone, x = x, y = y, hp = 5},
+					{"Generator", yield = 2, interval = 60}
+				}
+			end
+
 			createEntity{
-				{"jaeger.Actor", phase="buildings"},
-				{"jaeger.Sprite", spriteName="test/robot1", autoPlay=true},
-				{"jaeger.Renderable", layer = "building"..zoneIndex},
-				{"Building", zone = zoneIndex, x = x, y = y, hp = 4},
-				{"MissileLauncher", damage = 2}
+				{"jaeger.Renderable", layer = zone:getLayer("overlay")},
+				{"ProgressBar", width = 44, height = 6, backgroundColor = {1, 0, 0}, foregroundColor = {0, 1, 0}, borderThickness = 1},
+				{"HealthBar", subject = building}
 			}
+		end
+	end
+
+	function i:onKey(key, down)
+		if not down and key == KeyCodes.SPACE then
+			self.currentZone = 3 - self.currentZone
+			self.renderTable[2] = self.zones[self.currentZone]:getRenderTable()
 		end
 	end
 
@@ -238,16 +263,28 @@ return class(..., function(i, c)
 	end
 
 	function i:selectZone(playerId)
-		if playerId == self.client:getId() then
-			return 1
-		else
-			return 2
-		end
+		return playerId == self.client:getId() and 1 or 2
+	end
+
+	function i:onItemChosen(item)
+		local handler = assert(self[item], "Unsupported operation: "..item)
+		handler(self)
+	end
+
+	function i:buildRocketLauncher()
+		self:sendCmd("cmdBuild", "rocketLauncher", self.currentTileX, self.currentTileY)
+	end
+
+	function i:buildGenerator()
+		self:sendCmd("cmdBuild", "generator", self.currentTileX, self.currentTileY)
+	end
+
+	function i:attack()
+		self.selectedBuilding = self.currentBuilding
 	end
 
 	function i:onCommand(turnNum, playerId, cmd)
 		if cmd ~= NetworkCommands.nameToCode("noop") then
-			print("Cmd at:", turnNum)
 			return self:invoke(playerId, unpack(cmd))
 		end
 	end

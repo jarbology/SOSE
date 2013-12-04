@@ -7,6 +7,9 @@ return class(..., function(i)
 	function i:__constructor(data)
 		self.clickScale = data.clickScale or DEFAULT_CLICK_SCALE
 		self.animTime = data.animTime or DEFAULT_ANIM_TIME
+		self.receiver = data.receiver
+		self.message = data.message or "msgClicked"
+		self.id = data.id
 	end
 
 	function i:msgActivate()
@@ -24,6 +27,8 @@ return class(..., function(i)
 			self.entity:sendMessage("msgQueueAction", function()
 				return self.prop:seekScl(1, 1, self.animTime)
 			end)
+			local receiver = self.receiver or self.entity
+			receiver:sendMessage(self.message, self.id)
 		end
 	end
 end)
