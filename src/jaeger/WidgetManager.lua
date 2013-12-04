@@ -1,4 +1,5 @@
 local class = require "jaeger.Class"
+local Event = require "jaeger.Event"
 
 -- Manages jaeger.Widget
 -- Messages:
@@ -47,6 +48,11 @@ return class(..., function(i, c)
 	end
 
 	-- Private
+	function i:__constructor()
+		self.mouseLeft = Event.new()
+		self.mouseMoved = Event.new()
+	end
+	
 	function i:start(engine, config)
 		local inputMgr = engine:getSystem("jaeger.InputManager")
 		self:listen(inputMgr, "mouseMoved")
@@ -64,7 +70,10 @@ return class(..., function(i, c)
 	function i:listen(inputMgr, mouseEvent)
 		local msgName = "msg"..mouseEvent:gsub("^%l", string.upper)
 		inputMgr[mouseEvent]:addListener(function(...)
-			self:dispatchEventMsg(msgName, ...)
+			local captured = self:dispatchEventMsg(msgName, ...)
+			if not captured then
+				self[mouseEvent]:fire(...)
+			end
 		end)
 	end
 
@@ -72,14 +81,20 @@ return class(..., function(i, c)
 		local focusedEntity = self.focusedEntity
 		if focusedEntity ~= nil then
 			local layer = focusedEntity:query("getProp").layer
-			local worldX, worldY = layer:wndToWorld(wndX, wndY)
-			focusedEntity:sendMessage(msg, worldX, worldY, ...)
+			if layer then
+				local worldX, worldY = layer:wndToWorld(wndX, wndY)
+				focusedEntity:sendMessage(msg, worldX, worldY, ...)
+				return true
+			end
 		else
 			local entity, worldX, worldY = self.sceneMgr:pickFirstEntityAt(wndX, wndY, c.isWidget)
 			if entity then
 				entity:sendMessage(msg, worldX, worldY, ...)
+				return true
 			end
 		end
+
+		return false
 	end
 
 	function c.isWidget(entity)
