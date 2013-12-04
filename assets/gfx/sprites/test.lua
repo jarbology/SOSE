@@ -17,9 +17,49 @@ return {
 			xOrigin = 37,
 			yOrigin = 37
 		},
+		attackIcon = {
+			time = 1.0,
+			frameFormat = "attackIcon.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 32,
+			yOrigin = 32
+		},
+		upgradeIcon = {
+			time = 1.0,
+			frameFormat = "upgradeIcon.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 32,
+			yOrigin = 32
+		},
+		demolishIcon = {
+			time = 1.0,
+			frameFormat = "demolishIcon.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 32,
+			yOrigin = 32
+		},
+		rocketLauncherIcon = {
+			time = 1.0,
+			frameFormat = "rocketLauncher.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 32,
+			yOrigin = 32
+		},
+		interceptorIcon = {
+			time = 1.0,
+			frameFormat = "interceptor_active.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 32,
+			yOrigin = 32
+		},
 		robotIcon = {
 			time = 1.0,
-			frameFormat = "robotfront%1d.png",
+			frameFormat = "mech.png",
 			mode = "loop",
 			numFrames = 1,
 			xOrigin = 32,
@@ -27,11 +67,27 @@ return {
 		},
 		coreIcon = {
 			time = 1.0,
-			frameFormat = "core%1d.png",
+			frameFormat = "core.png",
 			mode = "loop",
 			numFrames = 1,
 			xOrigin = 32,
 			yOrigin = 32
+		},
+		generatorIcon = {
+			time = 1.0,
+			frameFormat = "generator.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 32,
+			yOrigin = 32
+		},
+		generator = {
+			time = 1.0,
+			frameFormat = "generator.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 32,
+			yOrigin = 48
 		},
 		core = {
 			time = 2.0,
@@ -54,8 +110,16 @@ return {
 			frameFormat = "rocket.png",
 			mode = "loop",
 			numFrames = 1,
-			xOrigin = 101,
-			yOrigin = 39
+			xOrigin = 49,
+			yOrigin = 10
+		},
+		rocketLauncher = {
+			time = 1.0,
+			frameFormat = "rocketLauncher.png",
+			mode = "loop",
+			numFrames = 1,
+			xOrigin = 32,
+			yOrigin = 48
 		},
 		man1_down = {
 			time = 3.5,
