@@ -65,6 +65,14 @@ local Entity = class("jaeger.Entity", function(i)
 		end
 	end
 
+	function i:link(entity)
+		local linkedEntities = entity.linkedEntities or {}
+		local numLinkedEntities = (entity.numLinkedEntities or 0) + 1
+		linkedEntities[numLinkedEntities] = self
+		entity.linkedEntities = linkedEntities
+		entity.numLinkedEntities = numLinkedEntities
+	end
+
 	function i:isAlive()
 		return self.alive
 	end
@@ -134,6 +142,13 @@ return class(..., function(i)
 		local numDestroyedEntities = self.numDestroyedEntities + 1
 		self.destroyedEntities[numDestroyedEntities] = entity
 		self.numDestroyedEntities = numDestroyedEntities
+
+		-- Also destroy linked entities
+		local linkedEntities = entity.linkedEntities
+		local numLinkedEntities = entity.numLinkedEntities or 0
+		for i = 1, numLinkedEntities do
+			self:destroyEntity(linkedEntities[i])
+		end
 	end
 
 	-- Private
