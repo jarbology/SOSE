@@ -9,20 +9,20 @@ local Event = require "jaeger.Event"
 --			          AssetManager will monitor this folder for
 --			          changes
 --		* various asset paths, categorized by type. Refer to
---			asset factory of that type for more information
---		* factories: a table which maps a asset type to a factory
---			         Each factory is a module with only one function:
+--			asset loader of that type for more information
+--		* loaders: a table which maps a asset type to a loader
+--			         Each loader is a module with only one function:
 --			         func(name, config, assetManager, oldInstance)
 --			          name: name of the asset
 --			          config: configuration table
 --			          oldInstance: the old instance of the asset if
 --			                          it was loaded before, used for reloading
 return class(..., function(i)
-	local moduleFactory
+	local moduleLoader
 	function i:__constructor(config)
 		self.config = config.assets
 		self.cache = {}
-		self.factories = {}
+		self.loaders = {}
 		self.resourceMap = {}
 		self.moduleLoaded = Event.new()
 	end
@@ -59,19 +59,19 @@ return class(..., function(i)
 			end
 		end
 
-		-- register module factory and override the require function
+		-- register module loader and override the require function
 		local oldRequire = require
 		_G.require = function(modName)
 			return self:getAsset("module:"..modName)
 		end
-		self.factories.module = function(name)
+		self.loaders.module = function(name)
 			package.loaded[name] = nil
 			return oldRequire(name)
 		end
 
-		-- register other factories
-		for assetType, assetFactoryName in pairs(self.config.factories) do
-			self.factories[assetType] = require(assetFactoryName)
+		-- register other loaders
+		for assetType, assetLoaderName in pairs(self.config.loaders) do
+			self.loaders[assetType] = require(assetLoaderName)
 		end
 
 		local function onFileChanged(watchId, directory, filename, action)
@@ -115,8 +115,8 @@ return class(..., function(i)
 	-- Force loading of an asset. Use if you want to force an asset to reload
 	function i:loadAsset(name)
 		local assetType, assetName = unpack(StringUtils.split(name, ":"))
-		local factory = assert(self.factories[assetType], "Unknown asset type "..assetType)
-		local asset, files = assert(factory(assetName, self.config, self, self.cache[name]))
+		local loader = assert(self.loaders[assetType], "Unknown asset type "..assetType)
+		local asset, files = assert(loader(assetName, self.config, self, self.cache[name]))
 		print("Loaded "..name)
 		self.cache[name] = asset
 

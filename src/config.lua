@@ -14,13 +14,13 @@ return {
 		fontPath = "../assets/fonts/",
 		tilesetPath = "../assets/gfx/tilesets/",
 
-		factories = {
-			texture = "jaeger.assetFactories.TextureFactory",
-			spriteBank = "jaeger.assetFactories.SpriteBankFactory",
-			sprite = "jaeger.assetFactories.SpriteFactory",
-			atlas = "jaeger.assetFactories.AtlasFactory",
-			font = "jaeger.assetFactories.FontFactory",
-			tileset = "jaeger.assetFactories.TilesetFactory"
+		loaders = {
+			texture = "jaeger.assetLoaders.TextureLoader",
+			spriteBank = "jaeger.assetLoaders.SpriteBankLoader",
+			sprite = "jaeger.assetLoaders.SpriteLoader",
+			atlas = "jaeger.assetLoaders.AtlasLoader",
+			font = "jaeger.assetLoaders.FontLoader",
+			tileset = "jaeger.assetLoaders.TilesetLoader"
 		}
 	},
 
