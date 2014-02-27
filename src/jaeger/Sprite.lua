@@ -22,8 +22,8 @@ return class(..., function(i)
 		local prop = self.prop
 		local anim = self.anim
 
-		prop:setDeck(sprite.bank)
-		prop:setIndex(sprite.firstFrame)
+		prop:setDeck(sprite)
+		prop:setIndex(1)
 		anim:setLink(1, sprite.animCurve, prop, MOAIProp2D.ATTR_INDEX)
 		anim:setMode(sprite.mode)
 		anim:setSpeed(1 / sprite.animTime)

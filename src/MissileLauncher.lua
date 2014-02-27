@@ -2,9 +2,9 @@ local class = require "jaeger.Class"
 
 return class(..., function(i)
 	local MENU = {
-		{id = "attack", sprite = "test/attackIcon"},
-		{id = "upgrade", sprite = "test/upgradeIcon"},
-		{id = "demolish", sprite = "test/demolishIcon"}
+		{id = "attack", sprite = "ui/radialMenu/attack"},
+		{id = "upgrade", sprite = "ui/radialMenu/upgrade"},
+		{id = "demolish", sprite = "ui/radialMenu/demolish"}
 	}
 
 	function i:msgUse(zone, x, y)
@@ -12,7 +12,7 @@ return class(..., function(i)
 		createEntity{
 			{"jaeger.Renderable", layer = zone:getLayer("projectile")},
 			{"jaeger.Actor", phase = "missiles"},
-			{"jaeger.Sprite", spriteName = "test/rocket"},
+			{"jaeger.Sprite", spriteName = "projectiles/rocket"},
 			{"Projectile", zone = zone, x = 1, y = y, grid = "missiles"},
 			{"Missile", damage = 2}
 		}

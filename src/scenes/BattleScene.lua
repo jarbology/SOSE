@@ -19,12 +19,12 @@ return class(..., function(i, c)
 	}
 
 	local BUILD_MENU = {
-		{id = "buildMechBay", sprite = "test/robotIcon"},
-		{id = "buildRocketLauncher", sprite = "test/rocketLauncherIcon"},
-		{id = "buildInterceptor", sprite = "test/interceptorIcon"},
-		{id = "buildGenerator", sprite = "test/generatorIcon"},
-		{id = "buildFogGenerator", sprite = "test/coreIcon"},
-		{id = "buildWall", sprite = "test/coreIcon"}
+		{id = "buildMechBay", sprite = "ui/radialMenu/mech"},
+		{id = "buildRocketLauncher", sprite = "ui/radialMenu/rocketLauncher"},
+		{id = "buildInterceptor", sprite = "ui/radialMenu/interceptor"},
+		{id = "buildGenerator", sprite = "ui/radialMenu/generator"},
+		{id = "buildFogGenerator", sprite = "ui/radialMenu/core"},
+		{id = "buildWall", sprite = "ui/radialMenu/core"}
 	}
 
 	function i:__constructor(mode)
@@ -145,11 +145,11 @@ return class(..., function(i, c)
 
 		self.ringMenu = createEntity{
 			{"jaeger.Renderable", layer = self.layers.overlay },
-			{"jaeger.Sprite", spriteName = "test/radialMenu"},
+			{"jaeger.Sprite", spriteName = "ui/radialMenu/ring"},
 			{"RingMenu",
 				radius = 122,
 				itemRadius = 35,
-				backgroundSprite = "test/radialMenuButton",
+				backgroundSprite = "ui/radialMenu/button",
 				message = "msgItemChosen"
 			},
 			{"jaeger.InlineScript",
@@ -223,7 +223,7 @@ return class(..., function(i, c)
 				building = createEntity{
 					{"jaeger.Actor", phase = "buildings"},
 					{"jaeger.Renderable", layer = zone:getLayer("building") },
-					{"jaeger.Sprite", spriteName="test/core", autoPlay = true},
+					{"jaeger.Sprite", spriteName="buildings/core", autoPlay = true},
 					{"Building", zone = zone, x = x, y = y, hp = 5},
 					{"MissileLauncher", damage = 2}
 				}
@@ -232,7 +232,7 @@ return class(..., function(i, c)
 				building = createEntity{
 					{"jaeger.Actor", phase = "buildings"},
 					{"jaeger.Renderable", layer = zone:getLayer("building") },
-					{"jaeger.Sprite", spriteName="test/generator", autoPlay = true},
+					{"jaeger.Sprite", spriteName="buildings/generator", autoPlay = true},
 					{"Building", zone = zone, x = x, y = y, hp = 5},
 					{"Generator", yield = 2, interval = 60}
 				}

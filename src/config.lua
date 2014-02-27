@@ -16,7 +16,6 @@ return {
 
 		loaders = {
 			texture = "jaeger.assetLoaders.TextureLoader",
-			spriteBank = "jaeger.assetLoaders.SpriteBankLoader",
 			sprite = "jaeger.assetLoaders.SpriteLoader",
 			atlas = "jaeger.assetLoaders.AtlasLoader",
 			font = "jaeger.assetLoaders.FontLoader",
