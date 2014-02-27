@@ -224,7 +224,8 @@ return class(..., function(i, c)
 					{"jaeger.Actor", phase = "buildings"},
 					{"jaeger.Renderable", layer = zone:getLayer("building") },
 					{"jaeger.Sprite", spriteName="buildings/core", autoPlay = true},
-					{"Building", zone = zone, x = x, y = y, hp = 5},
+					{"Destructible",  hp = 5},
+					{"Building", zone = zone, x = x, y = y},
 					{"MissileLauncher", damage = 2}
 				}
 			elseif buildingType == "generator" then
@@ -233,7 +234,8 @@ return class(..., function(i, c)
 					{"jaeger.Actor", phase = "buildings"},
 					{"jaeger.Renderable", layer = zone:getLayer("building") },
 					{"jaeger.Sprite", spriteName="buildings/generator", autoPlay = true},
-					{"Building", zone = zone, x = x, y = y, hp = 5},
+					{"Destructible",  hp = 5},
+					{"Building", zone = zone, x = x, y = y},
 					{"Generator", yield = 2, interval = 60}
 				}
 			end

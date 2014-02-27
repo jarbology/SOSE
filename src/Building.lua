@@ -6,8 +6,6 @@ return class(..., function(i)
 		self.zone = data.zone
 		self.x = data.x
 		self.y = data.y
-		self.hp = Property.new(data.hp or 1)
-		self.maxHP = Property.new(data.hp or 1)
 	end
 
 	function i:getTileLoc()
@@ -19,27 +17,11 @@ return class(..., function(i)
 		self.entity:query("getProp"):setLoc(self.zone:getTileLoc(self.x, self.y))
 	end
 
-	function i:msgDealDamage(dmg)
-		local hp = self.hp:get() - dmg
-		self.hp:set(hp)
-		if hp <= 0 then
-			destroyEntity(self.entity)
-		end
-	end
-
 	function i:msgDestroy()
 		self.zone:removeBuildingAt(self.x, self.y)
 	end
 
 	function i:getZone()
 		return self.zone
-	end
-
-	function i:getHP()
-		return self.hp
-	end
-
-	function i:getMaxHP()
-		return self.maxHP
 	end
 end)
