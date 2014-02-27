@@ -32,58 +32,30 @@ return class(..., function(i, c)
 
 		local sceneController = entityMgr:createEntity{
 			{"jaeger.InlineScript",
-				msgHostGame = function()
-					sceneMgr:changeScene("scenes.HostGame")
-				end,
-				msgJoinGame = function()
-					sceneMgr:changeScene("scenes.JoinGame")
-				end,
-				msgQuitGame = function()
+				msgBack = function()
+					sceneMgr:changeScene("scenes.MainMenu")
 				end
 			}
-		}
-
-		local menu = entityMgr:createEntity{
-			{"jaeger.Renderable", layer=self.layers.GUI, y = -10 },
-			{"jaeger.VerticalContainer", gap=20 }
 		}
 
 		local buttonTemplate = {
 			{"jaeger.Renderable", layer=self.layers.GUI},
 			{"jaeger.Widget"},
 			{"Button", receiver = sceneController},
-			{"jaeger.Text", rect={-250, -50, 250, 0},
+			{"jaeger.Text", rect={0, -50, 250, 0},
 			                font="karmatic_arcade.ttf",
-			                alignment = {MOAITextBox.CENTER_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
-			                size=40},
+			                alignment = {MOAITextBox.LEFT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
+			                size=40}
 		}
 
-		local btnHostGame = entityMgr:createEntity(
+		entityMgr:createEntity(
 			buttonTemplate,
 			{
-				["jaeger.Text"] = { text="Host game" },
-				["Button"] = { message = "msgHostGame" }
+				["jaeger.Renderable"] = { x=-1024/2, y=576/2},
+				["jaeger.Text"] = { text="Back" },
+				["Button"] = { message = "msgBack" }
 			}
 		)
-		menu:sendMessage("msgAddItem", btnHostGame)
-
-		local btnJoinGame = entityMgr:createEntity(
-			buttonTemplate,
-			{
-				["jaeger.Text"] = { text="Join game" },
-				["Button"] = { message = "msgJoinGame" }
-			}
-		)
-		menu:sendMessage("msgAddItem", btnJoinGame)
-
-		local btnQuitGame = entityMgr:createEntity(
-			buttonTemplate,
-			{
-				["jaeger.Text"] = { text="Quit" },
-				["Button"] = { message = "msgQuitGame" }
-			}
-		)
-		menu:sendMessage("msgAddItem", btnQuitGame)
 	end
 
 	function i:stop()
