@@ -1,6 +1,8 @@
 local class = require "jaeger.Class"
 
 return class(..., function(i)
+	local DEFAULT_ALIGNMENT = {MOAITextBox.LEFT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY}
+
 	function i:__constructor(data)
 		local textbox = MOAITextBox.new()
 		local style = MOAITextStyle.new()
@@ -10,7 +12,8 @@ return class(..., function(i)
 		textbox:setYFlip(true)
 		textbox:setRect(unpack(data.rect))
 		textbox:setString(data.text)
-		textbox:setAlignment(MOAITextBox.LEFT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY)
+		local alignment = data.alignment or DEFAULT_ALIGNMENT
+		textbox:setAlignment(unpack(alignment))
 		self.textbox = textbox
 	end
 
@@ -20,15 +23,20 @@ return class(..., function(i)
 		textbox:setAttrLink(MOAIProp2D.INHERIT_TRANSFORM, prop, MOAIProp2D.TRANSFORM_TRAIT)
 		textbox:setAttrLink(MOAIProp2D.INHERIT_COLOR, prop, MOAIProp2D.COLOR_TRAIT)
 		textbox:setAttrLink(MOAIProp2D.ATTR_PARTITION, prop, MOAIProp2D.ATTR_PARTITION)
+		local xMin, yMin, xMax, yMax = textbox:getRect()
+		textbox:setBounds(xMin, yMin, 0, xMax, yMax, 1)
+		prop:setBounds(xMin, yMin, 0, xMax, yMax, 1)
 		textbox.entity = self.entity
-		prop.layer:insertProp(textbox)
+
+		self.prop = prop
 	end
 
 	function i:msgSetText(txt)
 		local textbox = self.textbox
 		textbox:setString(txt)
-		local xMin, xMax, yMin, yMax = textbox:getRect()
+		local xMin, yMin, xMax, yMax = textbox:getRect()
 		textbox:setBounds(xMin, yMin, 0, xMax, yMax, 1)
+		self.prop:setBounds(xMin, yMin, 0, xMax, yMax, 1)
 	end
 
 	function i:getTextBox()

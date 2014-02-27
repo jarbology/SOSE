@@ -103,12 +103,18 @@ return class(..., function(i)
 	end
 
 	-- Create an entity using a specification (table)
-	function i:createEntity(spec)
+	function i:createEntity(spec, overrides)
 		local entity = Entity.new()
+		overrides = overrides or {}
 		local componentFactories = self.componentFactories
 
 		for index, componentSpec in ipairs(spec) do
 			local componentType = componentSpec[1]
+			local componentSpecOverride = overrides[componentType] or {}
+			for k, v in pairs(componentSpecOverride) do
+				componentSpec[k] = v
+			end
+
 			local factory = componentFactories[componentType]
 			local component
 
