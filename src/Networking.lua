@@ -12,7 +12,9 @@ local MemoryStream = require "jaeger.streams.MemoryStream"
 local StableStream = require "jaeger.streams.StableStream"
 local VoidStream = require "jaeger.streams.VoidStream"
 
+-- Common functions for setting up networking
 return class(..., function(i, c)
+	-- Make this game instance the "host"
 	function c.initHost(lockedPhase, noopMsg)
 		-- A host must run both client and server components
 		-- "Connect" to the local server using a virtual connection
@@ -37,6 +39,7 @@ return class(..., function(i, c)
 		return client, server, serverSkt
 	end
 
+	-- Make this game instance join the game
 	function c.initJoin(lockedPhase, noopMsg)
 		local socketConnection = assert(socket.tcp())
 		assert(socketConnection:connect("localhost", 9001))
@@ -52,6 +55,7 @@ return class(..., function(i, c)
 		return client
 	end
 
+	-- Make this instance both the host and the client 
 	function c.initCombo(lockedPhase, noopMsg)
 		-- Run 2 clients and server
 		local commandStream = MemoryStream.new()

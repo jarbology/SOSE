@@ -1,5 +1,13 @@
 local class = require "jaeger.Class"
 
+-- A menu which arranges its entries in a circle
+-- Parameters:
+-- * radius: radius of the menu
+-- * itemRadius: radius of each item
+-- * receiver: the entity which receives click event, default to the owner of this component
+-- * message: the message to send when an item is chosen, default to "msgItemClicked"
+-- * id: arbitrary value to identify this menu
+-- * backgroundSprite: what to draw in the background
 return class(..., function(i, c)
 	function i:__constructor(data)
 		self.radius = data.radius
@@ -26,6 +34,10 @@ return class(..., function(i, c)
 		{ MOAIProp2D.INHERIT_VISIBLE,   MOAIProp2D.ATTR_VISIBLE }
 	}
 
+	-- Make the menu display a list of items
+	-- itemDescs(table): Description of each item
+	--     * id: arbitrary value to identify an entry
+	--     * sprite: icon for the entry
 	function i:msgSetItems(itemDescs)
 		local layer = self.entity:query("getLayer")
 		local numItems = #itemDescs
@@ -71,6 +83,7 @@ return class(..., function(i, c)
 		self.numItems = numItems
 	end
 
+	-- Show the menu at a given coordinate
 	function i:msgShow(x, y, items)
 		if items ~= nil then self:msgSetItems(items) end
 
@@ -84,6 +97,7 @@ return class(..., function(i, c)
 		self.entity:sendMessage("msgPerformAction", self.prop:seekScl(1, 1, 0.4))
 	end
 
+	-- Hide the menu
 	function i:msgHide()
 		self.entity:sendMessage("msgPerformAction", self.prop:seekColor(1, 1, 1, 0, 0.4))
 		local action = self.prop:seekScl(0, 0, 0.4)

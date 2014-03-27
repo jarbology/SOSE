@@ -1,5 +1,8 @@
 local class = require "jaeger.Class"
 
+-- Travels in a straight line and deal damage to a target
+-- Parameters:
+-- * damage: how much damage to do
 return class(..., function(i)
 	function i:__constructor(data)
 		self.damage = data.damage

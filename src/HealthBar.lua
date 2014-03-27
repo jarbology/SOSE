@@ -1,5 +1,8 @@
 local class = require "jaeger.Class"
 
+-- A health bar for a "Destructible" entity
+-- Parameters:
+-- * subject: the entity with a Destructible component
 return class(..., function(i)
 	function i:__constructor(data)
 		self.subject = data.subject

@@ -1,5 +1,15 @@
 local class = require "jaeger.Class"
 
+-- A progress bar
+-- Parameters:
+-- * width
+-- * height
+-- * foregroundColor
+-- * backgroundColor
+-- * borderThickness
+-- * progress: 1-100
+-- Messages:
+-- msgSetProgress(number): set progress for this bar
 return class(..., function(i)
 	function i:__constructor(data)
 		self.width = data.width

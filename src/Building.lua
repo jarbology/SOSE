@@ -1,6 +1,9 @@
 local class = require "jaeger.Class"
 local Property = require "jaeger.Property"
 
+-- Occupies a tile in the Zone's building grid
+-- Parameters:
+-- * x, y: _grid_ coordinate
 return class(..., function(i)
 	function i:__constructor(data)
 		self.zone = data.zone

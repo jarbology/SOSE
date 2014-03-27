@@ -15,7 +15,6 @@ return class(..., function(i, c)
 		"building",
 		"projectile",
 		"overlay",
-		"artificialFog",
 		"fog"
 	}
 
@@ -88,23 +87,28 @@ return class(..., function(i, c)
 		}
 	end
 
+	-- Return how much resources this zone have
 	function i:getResource()
 		return self.resource
 	end
 
+	-- Add or remove resource
 	function i:changeResource(delta)
 		local res = self.resource
 		res:set(res:get() + delta)
 	end
 
+	-- Return (width, height) of the zone
 	function i:getSize()
 		return self.zoneWidth, self.zoneHeight
 	end
 
+	-- Return the zone's render table
 	function i:getRenderTable()
 		return self.renderTable
 	end
 
+	-- Convert window coordinate to tile coordinate
 	function i:wndToTile(wndX, wndY)
 		local worldX, worldY = self.refLayer:wndToWorld(wndX, wndY)
 		return self.refGrid:locToCoord(
@@ -116,43 +120,56 @@ return class(..., function(i, c)
 		return assert(self.layers[name], "Unknown layer "..tostring(name))
 	end
 
+	-- Convert tile coordinate to world coordinate
 	function i:getTileLoc(x, y)
 		local x, y = self.refGrid:getTileLoc(x, y)
 		return self.groundProp:modelToWorld(x, y)
 	end
 
+	-- Convert world coordinate to window coordinate
 	function i:worldToWnd(x, y)
 		return self.refLayer:worldToWnd(x, y)
 	end
 
+	-- Add a building at a given location
 	function i:addBuilding(x, y, building)
 		assert(self.buildingGrid:get(x, y) == nil, "There is already a building at ("..x..","..y..")")
 		self.buildingGrid:set(x, y, building)
 	end
 
+	-- Remove a building at a given location
 	function i:removeBuildingAt(x, y)
 		self.buildingGrid:set(x, y)
 	end
 
+	-- Return a building at a given location (or nil)
 	function i:getBuildingAt(x, y)
 		return self.buildingGrid:get(x, y)
 	end
 
+	-- Add a projectile to a given grid
+	-- Valid values for gridName: missiles, bots
 	function i:addProjectile(gridName, x, y, obj)
 		local grid = assert(self.objectGrids[gridName], "Unknown grid: "..gridName)
 		grid:get(x, y):add(obj)
 	end
 
+	-- Remove a projectile from a grid
 	function i:removeProjectile(gridName, x, y, obj)
 		local grid = assert(self.objectGrids[gridName], "Unknown grid: "..gridName)
 		grid:get(x, y):remove(obj)
 	end
 
+	-- Move a projectile in a grid
 	function i:moveProjectile(gridName, oldX, oldY, newX, newY, obj)
 		self:removeProjectile(gridName, oldX, oldY, obj)
 		self:addProjectile(gridName, newX, newY, obj)
 	end
 
+	-- Return the firt object at a grid which satisfies a predicate
+	-- gridName: "bots" | "projectile"
+	-- x, y: coordinate to pick
+	-- predicate: function(obj) -> boolean
 	function i:pickFirstObjectAt(gridName, x, y, predicate)
 		local set = self.objectGrids[gridName]:get(x, y)
 		set:beginIteration()
@@ -164,15 +181,17 @@ return class(..., function(i, c)
 		set:endIteration()
 	end
 
+	-- Check whether a tile is visible
 	function i:isTileVisible(x, y)
 		return self.fogGrid:getTile(x, y) == 0
 	end
 
+	-- Check whether a tile is ground (or space)
 	function i:isTileGround(x, y)
 		return self.groundGrid:get(x, y) == true
 	end
 
-	-- Remove fog around an area
+	-- Remove fog around an area and reveal all buildings
 	function i:reveal(xMin, xMax, yMin, yMax)
 		local fog = self.fogGrid
 		for x = xMin, xMax do

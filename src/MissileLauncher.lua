@@ -1,11 +1,17 @@
 local class = require "jaeger.Class"
 
+-- Launch a missile at the opposing Zone
+-- Parameters:
+-- * zone: home zone
 return class(..., function(i)
 	local MENU = {
-		{id = "attack", sprite = "ui/radialMenu/attack"},
 		{id = "upgrade", sprite = "ui/radialMenu/upgrade"},
 		{id = "demolish", sprite = "ui/radialMenu/demolish"}
 	}
+
+	function i:msgActivate()
+		self.zone = self.entity:query("getZone")
+	end
 
 	function i:msgUse(zone, x, y)
 		local worldX, worldY = zone:getTileLoc(x, y)

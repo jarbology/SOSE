@@ -2,10 +2,15 @@ local class = require "jaeger.Class"
 local ActionUtils = require "jaeger.utils.ActionUtils"
 local MathUtils = require "jaeger.utils.MathUtils"
 
+-- Moves at a fixed velocity through the grid
+-- Paramters:
+-- * zone: the zone to move through
+-- * grid
+-- * x, y: starting position
 -- Messages:
--- * msgMoveToCell(x, y): move the walker to a new position
+-- * msgMoveToCell(x, y): move the projectile to a new position
 -- Queries:
--- * getZone(): get the zone this walker belongs to
+-- * getZone(): get the zone this projectile belongs to
 return class(..., function(i)
 	function i:__constructor(data)
 		self.zone = data.zone

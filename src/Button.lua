@@ -1,6 +1,10 @@
 local class = require "jaeger.Class"
 local WidgetManager = getSystem("jaeger.WidgetManager")
 
+-- A button which can be clicked
+-- Parameters:
+-- * receiver: the entity to receive click notification, default to owner of this component
+-- * message: what to send when the button is clicked, default to "msgOnClick"
 return class(..., function(i)
 	local DEFAULT_CLICK_SCALE = { 1.1, 1.1 }
 	local DEFAULT_ANIM_TIME = 0.3
