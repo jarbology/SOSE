@@ -2,16 +2,6 @@ local class = require "jaeger.Class"
 local Event = require "jaeger.Event"
 
 -- Manages jaeger.Widget
--- Messages:
---
--- Passive:
--- * msgPlayGUIAnimation(anim): Attach an animation to the entity's updateAction.
---   If there is already an animation playing, it will be cancelled. Useful for GUI effects.
---
--- Active:
--- * msgGUIHoverIn(x, y): Delivered when mouse hovers into this widget. x and y are mouse position
---   in world coordinate
--- * msgGUIHoverOut(x, y): Delivered when mouse hovers out of this widget.
 return class(..., function(i, c)
 	-- Deliver subsequent mouse events to this entity regardless of mouse position
 	-- Returns whether the grab is successful (focus grabbing will fail if another 
@@ -59,12 +49,6 @@ return class(..., function(i, c)
 		self:listen(inputMgr, "mouseLeft")
 
 		self.sceneMgr = engine:getSystem("jaeger.SceneManager")
-
-		engine:getSystem("jaeger.EntityManager"):registerComponent("jaeger.Widget", self, "createWidget")
-	end
-
-	function i:createWidget(entity, data)
-		return {}
 	end
 
 	function i:listen(inputMgr, mouseEvent)
