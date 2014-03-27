@@ -1,6 +1,6 @@
 return {
-	atlas = "test",
-	frameFormat = "interceptor_active.png",
-	xOrigin = 32,
-	yOrigin = 32
+	atlas = "gameScene",
+	frameFormat = "interceptor_%02d.png",
+	xOrigin = 20,
+	yOrigin = 24
 }

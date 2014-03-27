@@ -1,5 +1,5 @@
 return {
-	atlas = "test",
+	atlas = "gameScene",
 	frameFormat = "upgradeIcon.png",
 	xOrigin = 32,
 	yOrigin = 32

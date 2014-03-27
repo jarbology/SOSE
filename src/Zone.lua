@@ -33,6 +33,7 @@ return class(..., function(i, c)
 			local layer = MOAILayer2D.new()
 			layer:setViewport(viewport)
 			layer:setCamera(camera)
+			layer:setSortMode(MOAILayer2D.SORT_Y_DESCENDING)
 			layers[layerName] = layer
 			renderTable[index] = layer
 		end

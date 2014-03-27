@@ -1,6 +1,6 @@
 return {
-	atlas = "test",
-	frameFormat = "generator.png",
-	xOrigin = 32,
-	yOrigin = 32
+	atlas = "gameScene",
+	frameFormat = "generator_%02d.png",
+	xOrigin = 17,
+	yOrigin = 31
 }

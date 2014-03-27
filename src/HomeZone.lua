@@ -8,8 +8,8 @@ return class(..., function(i, c)
 		{id = "mechBay", sprite = "ui/radialMenu/mech"},
 		{id = "rocketLauncher", sprite = "ui/radialMenu/rocketLauncher"},
 		{id = "interceptor", sprite = "ui/radialMenu/interceptor"},
-		{id = "generator", sprite = "ui/radialMenu/generator"},
-		{id = "wall", sprite = "ui/radialMenu/core"}
+		{id = "turret", sprite = "ui/radialMenu/turret"},
+		{id = "generator", sprite = "ui/radialMenu/generator"}
 	}
 
 	function i:__constructor(data)

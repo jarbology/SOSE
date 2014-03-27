@@ -5,7 +5,6 @@ return {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
 			{"jaeger.Sprite", spriteName="buildings/core", autoPlay=true},
-			{"jaeger.Widget"},
 			{"Destructible", hp=5},
 			{"Building"},
 			{"Core"}
@@ -18,8 +17,7 @@ return {
 		entitySpec = {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
-			{"jaeger.Sprite", spriteName="buildings/core", autoPlay=true},
-			{"jaeger.Widget"},
+			{"jaeger.Sprite", spriteName="buildings/rocket", autoPlay=true},
 			{"Destructible", hp=5},
 			{"Building"},
 			{"MissileLauncher", damage=2}
@@ -33,7 +31,6 @@ return {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
 			{"jaeger.Sprite", spriteName="buildings/generator", autoPlay=true},
-			{"jaeger.Widget"},
 			{"Destructible", hp=5},
 			{"Building"},
 			{"Generator", yield=2, interval=60}

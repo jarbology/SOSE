@@ -1,9 +1,9 @@
 return {
-	atlas = "test",
-	time = 1.0,
-	frameFormat = "rocketLauncher.png",
+	atlas = "gameScene",
+	time = 2.0,
+	frameFormat = "rocketBase_%02d.png",
 	mode = "loop",
-	numFrames = 1,
-	xOrigin = 32,
-	yOrigin = 48
+	numFrames = 15,
+	xOrigin = 18,
+	yOrigin = 30
 }

@@ -1,9 +1,9 @@
 return {
-	atlas = "test",
+	atlas = "gameScene",
 	time = 2.0,
-	frameFormat = "core%1d.png",
+	frameFormat = "base_%02d.png",
 	mode = "loop",
-	numFrames = 8,
-	xOrigin = 32,
-	yOrigin = 48
+	numFrames = 11,
+	xOrigin = 17,
+	yOrigin = 32
 }
