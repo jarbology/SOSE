@@ -39,19 +39,7 @@ return class(..., function(i, c)
 		local renderTable = self.renderTable
 		if not renderTable then return end
 
-		for _, renderPass in ipairs(renderTable) do
-			-- if the render pass is a layer
-			if renderPass.wndToWorld then
-				local localX, localY = renderPass:wndToWorld(windowX, windowY)
-				local partition = renderPass:getPartition()
-				if partition then
-					local entity = c.pickFirstProp(predicate, partition:propListForPoint(localX, localY))
-					if entity then
-						return entity, localX, localY
-					end
-				end
-			end
-		end
+		return self:pickEntityInRenderTable(renderTable, windowX, windowY, predicate)
 	end
 
 	-- Private
@@ -108,6 +96,26 @@ return class(..., function(i, c)
 			self.renderTable = renderTable -- save for entity picking
 			scene:start(self.engine, self.updateTask)
 			self.sceneBegin:fire(scene)
+		end
+	end
+
+
+	function i:pickEntityInRenderTable(renderTable, windowX, windowY, predicate)
+		for _, renderPass in ipairs(renderTable) do
+			-- if the render pass is a layer
+			if renderPass.wndToWorld then
+				local localX, localY = renderPass:wndToWorld(windowX, windowY)
+				local partition = renderPass:getPartition()
+				if partition then
+					local entity = c.pickFirstProp(predicate, partition:propListForPoint(localX, localY))
+					if entity then
+						return entity, localX, localY
+					end
+				end
+			elseif getmetatable(renderPass) == nil then--if renderPass is a table
+				local entity, localX, localY = self:pickEntityInRenderTable(renderPass, windowX, windowY, predicate)
+				if entity ~= nil then return entity, localX, localY end
+			end
 		end
 	end
 
