@@ -5,6 +5,7 @@ local NetworkCommand = require "NetworkCommand"
 local StringUtils = require "jaeger.utils.StringUtils"
 local KeyCodes = require "jaeger.KeyCodes"
 local RingMenuUtils = require "RingMenuUtils"
+local Property = require "jaeger.Property"
 
 return class(..., function(i, c)
 
@@ -133,11 +134,18 @@ return class(..., function(i, c)
 		--Create GUI
 		RingMenuUtils.create(engine:getSystem("jaeger.EntityManager"), self.layers.GUI)
 
-		--Resource count
-		createEntity{
-			{"jaeger.Renderable", layer=self.layers.GUI, x=-512, y=288},
-			{"jaeger.Sprite", spriteName="ui/resourceBar"}
+		local leftBar = createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-512, y=288 },
+			{"jaeger.VerticalContainer", gap=0 }
 		}
+
+		--Resource count
+		leftBar:sendMessage("msgAddItem",
+			createEntity{
+				{"jaeger.Renderable", layer=self.layers.GUI, x=-512, y=288},
+				{"jaeger.Sprite", spriteName="ui/resourceBar"}
+			}
+		)
 
 		createEntity{
 			{"jaeger.Renderable", layer=self.layers.GUI, x=-480, y=279 },
@@ -148,6 +156,94 @@ return class(..., function(i, c)
 			                size=18},
 			{"jaeger.TextDisplay", property=homeZone:query("getResource"), format="%03d"}
 		}
+		
+		--Weapon buttons
+		for i = 1, 4 do
+			leftBar:sendMessage("msgAddItem",
+				createEntity{
+					{"jaeger.Renderable", layer=self.layers.GUI},
+					{"jaeger.Sprite", spriteName="ui/weaponBar"}
+				}
+			)
+		end
+
+		local dummyProperty = Property.new(0)
+		createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=224 },
+			{"jaeger.Text", text="01",
+			                rect={0, -25, 35, 0},
+			                font="karmatic_arcade.ttf",
+			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
+			                size=11},
+			{"jaeger.TextDisplay", property=dummyProperty, format="%02d"}
+		}
+		createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=174 },
+			{"jaeger.Text", text="01",
+			                rect={0, -25, 35, 0},
+			                font="karmatic_arcade.ttf",
+			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
+			                size=11},
+			{"jaeger.TextDisplay", property=dummyProperty, format="%02d"}
+		}
+		createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=124 },
+			{"jaeger.Text", text="01",
+			                rect={0, -25, 35, 0},
+			                font="karmatic_arcade.ttf",
+			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
+			                size=11},
+			{"jaeger.TextDisplay", property=dummyProperty, format="%02d"}
+		}
+		createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=74 },
+			{"jaeger.Text", text="01",
+			                rect={0, -25, 35, 0},
+			                font="karmatic_arcade.ttf",
+			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
+			                size=11},
+			{"jaeger.TextDisplay", property=dummyProperty, format="%02d"}
+		}
+
+		--Friendly bar
+		leftBar:sendMessage("msgAddItem",
+			createEntity{
+				{"jaeger.Renderable", layer=self.layers.GUI},
+				{"jaeger.Sprite", spriteName="ui/friendlyBar"}
+			}
+		)
+		createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-474, y=30 },
+			{"jaeger.Text", text="01",
+			                rect={0, -25, 35, 0},
+			                font="karmatic_arcade.ttf",
+			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
+			                size=11},
+			{"jaeger.TextDisplay", property=dummyProperty, format="%01d"}
+		}
+		--Enemy bar
+		leftBar:sendMessage("msgAddItem",
+			createEntity{
+				{"jaeger.Renderable", layer=self.layers.GUI},
+				{"jaeger.Sprite", spriteName="ui/enemyBar"}
+			}
+		)
+		createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-474, y=-19 },
+			{"jaeger.Text", text="01",
+			                rect={0, -25, 35, 0},
+			                font="karmatic_arcade.ttf",
+			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
+			                size=11},
+			{"jaeger.TextDisplay", property=dummyProperty, format="%01d"}
+		}
+		--Switch button
+		leftBar:sendMessage("msgAddItem",
+			createEntity{
+				{"jaeger.Renderable", layer=self.layers.GUI},
+				{"jaeger.Sprite", spriteName="ui/friendlyBar"}
+			}
+		)
 	end
 
 	function i:onGameStart()
