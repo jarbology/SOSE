@@ -135,13 +135,18 @@ return class(..., function(i, c)
 
 		--Resource count
 		createEntity{
-			{"jaeger.Renderable", layer = self.layers.GUI },
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-512, y=288},
+			{"jaeger.Sprite", spriteName="ui/resourceBar"}
+		}
+
+		createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-480, y=279 },
 			{"jaeger.Text", text="01",
-			                rect={-250, -60, 250, 0},
+			                rect={0, -25, 75, 0},
 			                font="karmatic_arcade.ttf",
-			                alignment={MOAITextBox.CENTER_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
-			                size=20},
-			{"jaeger.TextDisplay", property=homeZone:query("getResource")}
+			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
+			                size=18},
+			{"jaeger.TextDisplay", property=homeZone:query("getResource"), format="%03d"}
 		}
 	end
 
