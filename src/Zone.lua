@@ -6,6 +6,7 @@ local Property = require "jaeger.Property"
 local NetworkCommand = require "NetworkCommand"
 local BuildingType = require "BuildingType"
 local BuildingSpecs = require "buildingSpecs"
+local WeaponQueue = require "WeaponQueue"
 
 -- A zone for a player
 return class(..., function(i, c)
@@ -59,6 +60,14 @@ return class(..., function(i, c)
 		c.forEachTileInMap(map, function(x, y, filled)
 			self.groundGrid:set(x, y, filled)
 		end)
+
+		--Weapon queues
+		self.weaponQueues = {
+			rocket = WeaponQueue.new(),
+			rocket2 = WeaponQueue.new(),
+			robot = WeaponQueue.new(),
+			robot2 = WeaponQueue.new()
+		}
 	end
 
 	function i:msgLinkZone(opposingZone)
@@ -94,6 +103,10 @@ return class(..., function(i, c)
 		local cmdName = NetworkCommand.codeToName(cmdCode)
 		local handler = assert(self[cmdName], "Unknown command "..tostring(cmdCode))
 		return handler(self, ...)
+	end
+
+	function i:getWeaponQueue(name)
+		return self.weaponQueues[name]
 	end
 
 	-- Return how much resources this zone have

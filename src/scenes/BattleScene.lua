@@ -132,6 +132,7 @@ return class(..., function(i, c)
 		}
 
 		--Create GUI
+		local sceneGUI = createEntity{{"BattleSceneGUI"}}
 		RingMenuUtils.create(engine:getSystem("jaeger.EntityManager"), self.layers.GUI)
 
 		local leftBar = createEntity{
@@ -175,7 +176,7 @@ return class(..., function(i, c)
 			                font="karmatic_arcade.ttf",
 			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
 			                size=11},
-			{"jaeger.TextDisplay", property=dummyProperty, format="%02d"}
+			{"jaeger.TextDisplay", property=homeZone:query("getWeaponQueue", "rocket"):getSize(), format="%02d"}
 		}
 		createEntity{
 			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=174 },
@@ -241,7 +242,9 @@ return class(..., function(i, c)
 		leftBar:sendMessage("msgAddItem",
 			createEntity{
 				{"jaeger.Renderable", layer=self.layers.GUI},
-				{"jaeger.Sprite", spriteName="ui/friendlyBar"}
+				{"jaeger.Sprite", spriteName="ui/friendlyBar"},
+				{"jaeger.Widget", receiver=sceneGUI},
+				{"Button", message="msgSwitchZone"}
 			}
 		)
 	end

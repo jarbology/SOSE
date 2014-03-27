@@ -20,16 +20,7 @@ return class(..., function(i)
 	end
 
 	function i:msgMouseLeft(x, y, down)
-		if down then
-			WidgetManager:grabFocus(self.entity)
-			self.entity:sendMessage("msgQueueAction", function()
-				return self.prop:seekScl(self.clickScale[1], self.clickScale[2], self.animTime)
-			end)
-		else
-			WidgetManager:releaseFocus(self.entity)
-			self.entity:sendMessage("msgQueueAction", function()
-				return self.prop:seekScl(1, 1, self.animTime)
-			end)
+		if not down then
 			self.entity:sendMessage("msgDispatchGUIEvent", self.message, self.id)
 		end
 	end

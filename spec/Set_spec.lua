@@ -200,14 +200,37 @@ describe("Set", function()
 		for i = 1, 10000 do
 			set:remove(i)
 		end
+		for i = 1, 10000 do
+			set:add(i)
+		end
 		set:beginIteration()
 		for index, item in set:iterator() do
-			sest:add(item)
+			set:add(item)
 			set:remove(item)
-			sest:add(item)
+			set:add(item)
 		end
 		set:endIteration()
 		local finish = os.clock()
-		assert.is_true(finish - start < 0.1)
+		assert.is_true(finish - start < 0.2)
+	end)
+
+	it("allows re-addition", function()
+		set:add(a)
+		set:add(b)
+		set:add(c)
+		set:remove(a)
+		set:add(a)
+
+		local expectedOrder = {c, b, a}
+
+		local size
+		set:beginIteration()
+		for index, item in set:iterator() do
+			size = index
+			assert.is.equal(expectedOrder[index], item)
+		end
+		set:endIteration()
+
+		assert.is.equal(3, size)
 	end)
 end)

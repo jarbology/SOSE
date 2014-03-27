@@ -10,7 +10,17 @@ return class(..., function(i)
 	}
 
 	function i:msgActivate()
-		self.zone = self.entity:query("getZone")
+		local zone = self.entity:query("getZone") 
+		self.zone = zone
+
+		local weaponQueue = zone:getWeaponQueue("rocket")
+		self.weaponQueue = weaponQueue
+
+		weaponQueue:enqueue(self.entity)
+	end
+
+	function i:msgDestroy()
+		self.weaponQueue:remove(self.entity)
 	end
 
 	function i:msgUse(zone, x, y)
