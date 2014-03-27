@@ -11,4 +11,8 @@ return class(..., function(i)
 		prop:setDeck(self.tileset)
 		prop:setGrid(self.grid)
 	end
+
+	function i:getGrid()
+		return self.grid
+	end
 end)

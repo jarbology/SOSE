@@ -23,11 +23,6 @@ return {
 		}
 	},
 
-	console = {
-		port = 9001, --over 9000
-		setupScript = "setupConsole.lua"
-	},
-
 	updatePhases = {
 		"gui",
 		{"gamelogic", {
@@ -51,7 +46,6 @@ return {
 		"jaeger.NameManager",
 		"jaeger.ScriptShortcut",
 		"jaeger.EntityManager",
-		"jaeger.RemoteConsole",
 		"jaeger.TaskManager"
 	},
 

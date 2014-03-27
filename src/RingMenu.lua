@@ -4,7 +4,6 @@ local class = require "jaeger.Class"
 -- Parameters:
 -- * radius: radius of the menu
 -- * itemRadius: radius of each item
--- * receiver: the entity which receives click event, default to the owner of this component
 -- * message: the message to send when an item is chosen, default to "msgItemClicked"
 -- * id: arbitrary value to identify this menu
 -- * backgroundSprite: what to draw in the background
@@ -12,7 +11,6 @@ return class(..., function(i, c)
 	function i:__constructor(data)
 		self.radius = data.radius
 		self.itemRadius = data.itemRadius
-		self.receiver = data.receiver
 		self.message = data.message
 		self.id = data.id
 		self.backgrounds = {}
@@ -62,8 +60,8 @@ return class(..., function(i, c)
 				{"jaeger.Actor", phase = "gui"},
 				{"jaeger.Renderable", layer = layer, x = x, y = y},
 				{"jaeger.Sprite", spriteName = self.backgroundSprite},
-				{"jaeger.Widget"},
-				{"Button", id = itemDesc.id, receiver = self.entity, message = "msgItemClicked"}
+				{"jaeger.Widget", receiver=self.entity},
+				{"Button", id=itemDesc.id, message="msgItemClicked"}
 			}
 			itemBackground:query("getProp"):setPriority(3)
 			self.entity:sendMessage("msgAttach", itemBackground, LINK_SPEC)
@@ -85,20 +83,28 @@ return class(..., function(i, c)
 
 	-- Show the menu at a given coordinate
 	function i:msgShow(x, y, items)
-		if items ~= nil then self:msgSetItems(items) end
+		if self.shown then
+			self:msgHide()
+		else
+			self.shown = true
+			if items ~= nil then self:msgSetItems(items) end
 
-		local prop = self.prop
-		prop:setLoc(x, y)
-		prop:setColor(1, 1, 1, 0)
-		prop:setScl(0)
-		prop:setVisible(true)
+			local prop = self.prop
+			prop:setLoc(x, y)
+			prop:setColor(1, 1, 1, 0)
+			prop:setScl(0)
+			prop:setVisible(true)
 
-		self.entity:sendMessage("msgPerformAction", self.prop:seekColor(1, 1, 1, 1, 0.4))
-		self.entity:sendMessage("msgPerformAction", self.prop:seekScl(1, 1, 0.4))
+			self.entity:sendMessage("msgPerformAction", self.prop:seekColor(1, 1, 1, 1, 0.4))
+			self.entity:sendMessage("msgPerformAction", self.prop:seekScl(1, 1, 0.4))
+		end
 	end
 
 	-- Hide the menu
 	function i:msgHide()
+		if not self.shown then return end
+
+		self.shown = false
 		self.entity:sendMessage("msgPerformAction", self.prop:seekColor(1, 1, 1, 0, 0.4))
 		local action = self.prop:seekScl(0, 0, 0.4)
 		self.entity:sendMessage("msgPerformAction", action)
@@ -109,9 +115,12 @@ return class(..., function(i, c)
 			end)
 	end
 
+	function i:msgMouseLeft()
+		self:msgHide()
+	end
+
 	function i:msgItemClicked(id)
-		local receiver = self.receiver or self.entity
-		receiver:sendMessage(self.message, id, self.id)
+		self.entity:sendMessage("msgDispatchGUIEvent", self.message, id, self.id)
 		self:msgHide()
 	end
 end)

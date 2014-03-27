@@ -3,6 +3,9 @@ local Event = require "jaeger.Event"
 local Grid = require "jaeger.Grid"
 local Set = require "jaeger.Set"
 local Property = require "jaeger.Property"
+local NetworkCommand = require "NetworkCommand"
+local BuildingType = require "BuildingType"
+local BuildingSpecs = require "buildingSpecs"
 
 -- A zone for a player
 return class(..., function(i, c)
@@ -10,7 +13,6 @@ return class(..., function(i, c)
 	local TILE_WIDTH = 64
 	local TILE_HEIGHT = 64
 	local LAYERS = {
-		"background",
 		"ground",
 		"building",
 		"projectile",
@@ -19,7 +21,10 @@ return class(..., function(i, c)
 	}
 
 	--map: an ascii map of this zone
-	function i:__constructor(map, viewport)
+	function i:__constructor(data)
+		local viewport = data.viewport
+		local map = data.map
+
 		local renderTable = {}
 		local layers = {}
 		local camera = MOAICamera2D.new()
@@ -55,13 +60,9 @@ return class(..., function(i, c)
 		end)
 	end
 
-	-- Initialize the tilemaps using an entity manager
-	function i:init(entityMgr)
+	function i:msgLinkZone(opposingZone)
+		self.opposingZone = opposingZone
 		local map = self.map
-		local background = entityMgr:createEntity{
-			{"jaeger.Renderable", layer = self.layers.background },
-			{"jaeger.Background", texture = "bg1.png", width = 4000, height = 4000}
-		}
 
 		local zoneWidth, zoneHeight = self.zoneWidth, self.zoneHeight
 		local grid = MOAIGrid.new()
@@ -70,21 +71,28 @@ return class(..., function(i, c)
 		local centerX, centerY = grid:getTileLoc(self.zoneWidth / 2, self.zoneHeight / 2)
 		self.refGrid = grid -- for object picking
 
-		local ground = entityMgr:createEntity{
-			{"jaeger.Renderable", layer = self.layers.ground, x = -centerX, y = -centerY},
-			{"jaeger.Tilemap", tileset = "ground", grid = grid}
+		local ground = createEntity{
+			{"jaeger.Renderable", layer=self.layers.ground, x=-centerX, y=-centerY},
+			{"jaeger.Tilemap", tileset="ground", grid=grid},
+			{"jaeger.Widget"},
+			{"Ground", zone=self.entity}
 		}
 		self.groundProp = ground:query("getProp")
 
 		local grid = MOAIGrid.new()
 		grid:setSize(zoneWidth, zoneHeight, TILE_WIDTH, TILE_HEIGHT)
 		--c.setGrid(grid, self.map, 2)
-		self.fogGrid = grid
-
-		self.fog = entityMgr:createEntity{
-			{"jaeger.Renderable", layer = self.layers.fog, x = -centerX, y = -centerY},
-			{"jaeger.Tilemap", tileset = "fog",	grid = grid}
+		self.fog = createEntity{
+			{"jaeger.Renderable", layer=self.layers.fog, x=-centerX, y=-centerY},
+			{"jaeger.Tilemap", tileset="fog", grid=grid},
+			{"Fog", zone=self.entity}
 		}
+	end
+
+	function i:msgNetworkCommand(cmdCode, ...)
+		local cmdName = NetworkCommand.codeToName(cmdCode)
+		local handler = assert(self[cmdName], "Unknown command "..tostring(cmdCode))
+		return handler(self, ...)
 	end
 
 	-- Return how much resources this zone have
@@ -213,6 +221,33 @@ return class(..., function(i, c)
 	end
 
 	-- Private
+	-- Network commands
+	function i:cmdBuild(buildingCode, tileX, tileY)
+		local buildingName = BuildingType.codeToName(buildingCode)
+		local buildingSpec = BuildingSpecs[buildingName]
+		print("Build", buildingName, tileX, tileY)
+
+		local hasEnoughResource = self.resource:get() >= buildingSpec.cost
+		local isGround = self:isTileGround(tileX, tileY)
+		local tileEmpty = self:getBuildingAt(tileX, tileY) == nil
+
+		if hasEnoughResource and isGround and tileEmpty then
+			self:changeResource(-buildingSpec.cost)
+			local building = createEntity(buildingSpec.entitySpec, {
+				["jaeger.Renderable"] = {layer=self.layers.building},
+				["Building"] = {zone=self, x=tileX, y=tileY}
+			})
+
+			--Create health bar for building
+			createEntity{
+				{"jaeger.Renderable", layer=self.layers.overlay},
+				{"ProgressBar", width=44, height=6, backgroundColor={1, 0, 0}, foregroundColor={0, 1, 0}, borderThickness=1},
+				{"HealthBar", subject=building}
+			}
+		end
+	end
+
+	-- Static
 	function c.getMapSize(map)
 		return #(map[1]), #map
 	end

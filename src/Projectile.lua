@@ -49,9 +49,6 @@ return class(..., function(i)
 		end
 	end
 
-	function i:msgSyncProp()
-	end
-
 	function i:getGridLoc()
 		return self.x, self.y
 	end

@@ -3,7 +3,6 @@ local WidgetManager = getSystem("jaeger.WidgetManager")
 
 -- A button which can be clicked
 -- Parameters:
--- * receiver: the entity to receive click notification, default to owner of this component
 -- * message: what to send when the button is clicked, default to "msgOnClick"
 return class(..., function(i)
 	local DEFAULT_CLICK_SCALE = { 1.1, 1.1 }
@@ -12,7 +11,6 @@ return class(..., function(i)
 	function i:__constructor(data)
 		self.clickScale = data.clickScale or DEFAULT_CLICK_SCALE
 		self.animTime = data.animTime or DEFAULT_ANIM_TIME
-		self.receiver = data.receiver
 		self.message = data.message or "msgOnClick"
 		self.id = data.id
 	end
@@ -32,8 +30,7 @@ return class(..., function(i)
 			self.entity:sendMessage("msgQueueAction", function()
 				return self.prop:seekScl(1, 1, self.animTime)
 			end)
-			local receiver = self.receiver or self.entity
-			receiver:sendMessage(self.message, self.id)
+			self.entity:sendMessage("msgDispatchGUIEvent", self.message, self.id)
 		end
 	end
 end)
