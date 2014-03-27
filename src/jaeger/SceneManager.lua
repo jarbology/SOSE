@@ -101,7 +101,9 @@ return class(..., function(i, c)
 
 
 	function i:pickEntityInRenderTable(renderTable, windowX, windowY, predicate)
-		for _, renderPass in ipairs(renderTable) do
+		local numEntries = #renderTable
+		for entryIndex = numEntries, 1, -1 do
+			local renderPass = renderTable[entryIndex]
 			-- if the render pass is a layer
 			if renderPass.wndToWorld then
 				local localX, localY = renderPass:wndToWorld(windowX, windowY)
