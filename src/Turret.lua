@@ -10,11 +10,11 @@ return class(..., function(i, c)
 
 	function i:update()
 		local zone = self.zone
-		local obj = zone:pickFirstObjectIn("missiles", self.x - 1, self.x + 1, self.y - 1, self.y + 1, c.isAlive)
+		local obj = zone:pickFirstObjectIn("bots", self.x - 1, self.x + 1, self.y - 1, self.y + 1, c.isAlive)
 		if obj then
-			obj:sendMessage("msgDealDamage", 5)
+			obj:sendMessage("msgDealDamage", 3)
 			zone:msgReveal(self.x, self.y, self.x, self.y)
-			ActionUtils.skipFrames(60 * 3)
+			ActionUtils.skipFrames(60)
 		end
 	end
 

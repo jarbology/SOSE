@@ -6,5 +6,5 @@ return enum(..., {
 	"rocketLauncher",
 	"interceptor",
 	"generator",
-	"wall"
+	"turret"
 })

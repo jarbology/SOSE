@@ -279,6 +279,7 @@ return class(..., function(i, c)
 		--Test
 		if self.mode == "combo" then
 			self.client2:sendCmd{NetworkCommand.nameToCode("cmdBuild"), BuildingType.nameToCode("interceptor"), 21, 21}
+			self.client2:sendCmd{NetworkCommand.nameToCode("cmdBuild"), BuildingType.nameToCode("turret"), 21, 22}
 		end
 	end
 

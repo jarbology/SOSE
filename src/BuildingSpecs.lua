@@ -55,5 +55,14 @@ return {
 		}
 	},
 	turret = {
+		cost = 200,
+		entitySpec = {
+			{"jaeger.Actor", phase="buildings"},
+			{"jaeger.Renderable"},
+			{"jaeger.Sprite", spriteName="buildings/turret", autoPlay=true},
+			{"Destructible", hp=5},
+			{"Building"},
+			{"Turret"}
+		}
 	}
 }
