@@ -22,14 +22,22 @@ return class(..., function(i, c)
 		local zoneWidth, zoneHeight = self.entity:query("getSize")
 		self.entity:sendMessage("msgReveal", 1, zoneWidth, 1, zoneHeight)
 		self.currentWeapon = "rocket"
+		self.numBases = self.entity:query("getNumBases")
+		self.battleStarted = false
 	end
 
 	function i:msgTileClicked(tileX, tileY, worldX, worldY)
 		local isGround = self.entity:query("isTileGround", tileX, tileY)
 		if isGround then
-			local wndX, wndY = self.entity:query("worldToWnd", worldX, worldY)
-			RingMenuUtils.show(BUILD_MENU, wndX, wndY, self.entity)
-			self.tileX, self.tileY = tileX, tileY
+			if not self.battleStarted then
+				if self.numBases:get() < 3 then
+					self:build("core", tileX, tileY)
+				end
+			else
+				local wndX, wndY = self.entity:query("worldToWnd", worldX, worldY)
+				RingMenuUtils.show(BUILD_MENU, wndX, wndY, self.entity)
+				self.tileX, self.tileY = tileX, tileY
+			end
 		else
 			RingMenuUtils.hide()
 		end
@@ -41,9 +49,17 @@ return class(..., function(i, c)
 	end
 
 	function i:msgItemChosen(item)
+		self:build(item, self.tileX, self.tileY)
+	end
+
+	function i:msgBattleStart()
+		self.battleStarted = true
+	end
+
+	function i:build(item, x, y)
 		local commandCode = NetworkCommand.nameToCode("cmdBuild")
 		local buildingCode = BuildingType.nameToCode(item)
-		self.client:sendCmd{commandCode, buildingCode, self.tileX, self.tileY}
+		self.client:sendCmd{commandCode, buildingCode, x, y}
 	end
 
 	function i:msgAttack(targetX, targetY, quadrant)

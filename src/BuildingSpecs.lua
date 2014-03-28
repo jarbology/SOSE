@@ -5,8 +5,9 @@ return {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
 			{"jaeger.Sprite", spriteName="buildings/core", autoPlay=true},
-			{"Destructible", hp=5},
+			{"Destructible", hp=20},
 			{"Building"},
+			{"Generator", yield=1, interval=120},
 			{"Core"}
 		}
 	},

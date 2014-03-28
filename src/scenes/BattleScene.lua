@@ -121,6 +121,9 @@ return class(..., function(i, c)
 		}
 		homeZone:sendMessage("msgLinkZone", enemyZone)
 		enemyZone:sendMessage("msgLinkZone", homeZone)
+		homeZone:query("getNumBases").changed:addListener(self, "onNumBasesChanged")
+		enemyZone:query("getNumBases").changed:addListener(self, "onNumBasesChanged")
+		self.numReadyZones = 0
 		self.zoneRenderTables = { homeZone:query("getRenderTable"), enemyZone:query("getRenderTable") }
 		self.homeZone = homeZone
 		self.enemyZone = enemyZone
@@ -242,7 +245,7 @@ return class(..., function(i, c)
 			                font="karmatic_arcade.ttf",
 			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
 			                size=11},
-			{"jaeger.TextDisplay", property=dummyProperty, format="%01d"}
+			{"jaeger.TextDisplay", property=homeZone:query("getNumBases"), format="%01d"}
 		}
 		--Enemy bar
 		leftBar:sendMessage("msgAddItem",
@@ -258,7 +261,7 @@ return class(..., function(i, c)
 			                font="karmatic_arcade.ttf",
 			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
 			                size=11},
-			{"jaeger.TextDisplay", property=dummyProperty, format="%01d"}
+			{"jaeger.TextDisplay", property=enemyZone:query("getNumBases"), format="%01d"}
 		}
 		--Switch button
 		leftBar:sendMessage("msgAddItem",
@@ -271,6 +274,15 @@ return class(..., function(i, c)
 		)
 	end
 
+	function i:onNumBasesChanged(num)
+		if num == 3 then
+			self.numReadyZones = self.numReadyZones + 1
+			if self.numReadyZones == 2 then
+				self.homeZone:sendMessage("msgBattleStart")
+			end
+		end
+	end
+
 	function i:onGameStart()
 		local myId = self.client:getId()
 		self.zones[myId] = self.homeZone
@@ -280,6 +292,9 @@ return class(..., function(i, c)
 		if self.mode == "combo" then
 			self.client2:sendCmd{NetworkCommand.nameToCode("cmdBuild"), BuildingType.nameToCode("interceptor"), 21, 21}
 			self.client2:sendCmd{NetworkCommand.nameToCode("cmdBuild"), BuildingType.nameToCode("turret"), 21, 22}
+			self.client2:sendCmd{NetworkCommand.nameToCode("cmdBuild"), BuildingType.nameToCode("core"), 21, 24}
+			self.client2:sendCmd{NetworkCommand.nameToCode("cmdBuild"), BuildingType.nameToCode("core"), 24, 24}
+			self.client2:sendCmd{NetworkCommand.nameToCode("cmdBuild"), BuildingType.nameToCode("core"), 26, 24}
 		end
 	end
 

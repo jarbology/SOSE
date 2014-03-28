@@ -70,6 +70,8 @@ return class(..., function(i, c)
 			robot = WeaponQueue.new(),
 			robot2 = WeaponQueue.new()
 		}
+
+		self.numBases = Property.new(0)
 	end
 
 	function i:msgLinkZone(opposingZone)
@@ -250,6 +252,10 @@ return class(..., function(i, c)
 
 	function i:getCamera()
 		return self.camera
+	end
+
+	function i:getNumBases()
+		return self.numBases
 	end
 
 	-- Private

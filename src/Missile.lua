@@ -15,7 +15,6 @@ return class(..., function(i)
 	end
 
 	function i:msgTileChanged(x, y)
-		self.entity:query("getProp"):setVisible(true)
 		if x == self.targetX and y == self.targetY then
 			local zone = self.entity:query("getZone")
 			local building = zone:getBuildingAt(x, y)
