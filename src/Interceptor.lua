@@ -15,7 +15,7 @@ return class(..., function(i, c)
 		if obj then
 			obj:sendMessage("msgDealDamage", 5)
 			zone:msgReveal(self.x, self.y, self.x, self.y)
-			ActionUtils.skipFrames(60 * 2)
+			ActionUtils.skipFrames(60 * 3)
 		end
 	end
 

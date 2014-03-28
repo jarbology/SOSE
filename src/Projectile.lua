@@ -96,7 +96,7 @@ return class(..., function(i)
 				xLessThanTargetX = propX < targetX
 				yLessThanTargetY = propY < targetY
 
-				if nextX < 1 or nextY < 1 or nextX > zoneWidth or nextY > zoneHeight then
+				if nextX <= 1 or nextY <= 1 or nextX >= zoneWidth or nextY >= zoneHeight then
 					return entity:sendMessage("msgHitZoneBorder")
 				end
 			end

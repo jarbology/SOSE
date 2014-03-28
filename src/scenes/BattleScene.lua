@@ -161,14 +161,34 @@ return class(..., function(i, c)
 		}
 		
 		--Weapon buttons
-		for i = 1, 4 do
-			leftBar:sendMessage("msgAddItem",
-				createEntity{
-					{"jaeger.Renderable", layer=self.layers.GUI},
-					{"jaeger.Sprite", spriteName="ui/weaponBar"}
-				}
-			)
-		end
+		leftBar:sendMessage("msgAddItem",
+			createEntity{
+				{"jaeger.Renderable", layer=self.layers.GUI},
+				{"jaeger.Sprite", spriteName="ui/weaponBar"},
+				{"jaeger.Widget", receiver=homeZone},
+				{"Button", id="rocket", message="msgSwitchWeapon"},
+			}
+		)
+		leftBar:sendMessage("msgAddItem",
+			createEntity{
+				{"jaeger.Renderable", layer=self.layers.GUI},
+				{"jaeger.Sprite", spriteName="ui/weaponBar"},
+				{"jaeger.Widget", receiver=homeZone},
+				{"Button", id="robot", message="msgSwitchWeapon"},
+			}
+		)
+		leftBar:sendMessage("msgAddItem",
+			createEntity{
+				{"jaeger.Renderable", layer=self.layers.GUI},
+				{"jaeger.Sprite", spriteName="ui/weaponBar"}
+			}
+		)
+		leftBar:sendMessage("msgAddItem",
+			createEntity{
+				{"jaeger.Renderable", layer=self.layers.GUI},
+				{"jaeger.Sprite", spriteName="ui/weaponBar"}
+			}
+		)
 
 		local dummyProperty = Property.new(0)
 		createEntity{
@@ -187,7 +207,7 @@ return class(..., function(i, c)
 			                font="karmatic_arcade.ttf",
 			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
 			                size=11},
-			{"jaeger.TextDisplay", property=dummyProperty, format="%02d"}
+			{"jaeger.TextDisplay", property=homeZone:query("getWeaponQueue", "robot"):getSize(), format="%02d"}
 		}
 		createEntity{
 			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=124 },

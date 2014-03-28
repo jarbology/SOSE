@@ -35,6 +35,11 @@ return class(..., function(i, c)
 		end
 	end
 
+	function i:msgSwitchWeapon(weapon)
+		print("switch weapon", weapon)
+		self.currentWeapon = weapon
+	end
+
 	function i:msgItemChosen(item)
 		local commandCode = NetworkCommand.nameToCode("cmdBuild")
 		local buildingCode = BuildingType.nameToCode(item)

@@ -11,6 +11,15 @@ return {
 		}
 	},
 	mechBay = {
+		cost = 200,
+		entitySpec = {
+			{"jaeger.Actor", phase="buildings"},
+			{"jaeger.Renderable"},
+			{"jaeger.Sprite", spriteName="buildings/mech", autoPlay=true},
+			{"Destructible", hp=5},
+			{"Building"},
+			{"RobotBase", damage=2}
+		}
 	},
 	rocketLauncher = {
 		cost = 100,

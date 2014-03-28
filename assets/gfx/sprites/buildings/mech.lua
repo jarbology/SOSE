@@ -4,6 +4,6 @@ return {
 	frameFormat = "robotBase_%02d.png",
 	mode = "loop",
 	numFrames = 4,
-	xOrigin = 32,
-	yOrigin = 48
+	xOrigin = 20,
+	yOrigin = 20
 }
