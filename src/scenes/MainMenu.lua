@@ -50,8 +50,8 @@ return class(..., function(i, c)
 
 		local buttonTemplate = {
 			{"jaeger.Renderable", layer=self.layers.GUI},
-			{"jaeger.Widget"},
-			{"Button", receiver = sceneController},
+			{"jaeger.Widget", receiver = sceneController},
+			{"Button"},
 			{"jaeger.Text", rect={-250, -50, 250, 0},
 			                font="karmatic_arcade.ttf",
 			                alignment = {MOAITextBox.CENTER_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},

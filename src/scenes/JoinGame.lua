@@ -1,5 +1,6 @@
 local class = require "jaeger.Class"
 local RenderUtils = require "jaeger.utils.RenderUtils"
+local GameSearcher = require "GameSearcher"
 
 return class(..., function(i, c)
 	function i:__constructor()
@@ -25,6 +26,12 @@ return class(..., function(i, c)
 		local entityMgr = engine:getSystem("jaeger.EntityManager")
 		local sceneMgr = engine:getSystem("jaeger.SceneManager")
 
+		local searcher = GameSearcher.new(9001)
+		searcher:start(sceneTask)
+		searcher.searchStart:addListener(self, "onSearchStart")
+		searcher.gameDiscovered:addListener(self, "onGameDiscovered")
+		self.searcher = searcher
+
 		entityMgr:createEntity{
 			{"jaeger.Renderable", layer = self.layers.background },
 			{"jaeger.Background", texture = "bg1.png", width = 4000, height = 4000}
@@ -40,8 +47,8 @@ return class(..., function(i, c)
 
 		local buttonTemplate = {
 			{"jaeger.Renderable", layer=self.layers.GUI},
-			{"jaeger.Widget"},
-			{"Button", receiver = sceneController},
+			{"jaeger.Widget", receiver = sceneController},
+			{"Button"},
 			{"jaeger.Text", rect={0, -50, 250, 0},
 			                font="karmatic_arcade.ttf",
 			                alignment = {MOAITextBox.LEFT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
@@ -56,8 +63,38 @@ return class(..., function(i, c)
 				["Button"] = { message = "msgBack" }
 			}
 		)
+
+		self.gameList = entityMgr:createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, y = -10 },
+			{"jaeger.VerticalContainer", gap=20 }
+		}
+		self.sceneController = sceneController
 	end
 
 	function i:stop()
+		self.searcher:stop()
+	end
+
+	function i:onGameDiscovered(name, ip, port)
+		self.gameList:sendMessage("msgAddItem",
+			createEntity{
+				{"jaeger.Renderable", layer=self.layers.GUI},
+				{"jaeger.Widget", receiver = self.sceneController},
+				{"Button", id = {name, ip, port}, message="msgJoinGame"},
+				{"jaeger.Text", text=name.."@"..ip..":"..tostring(port),
+								rect={-250, -50, 250, 0},
+								font="karmatic_arcade.ttf",
+								alignment = {MOAITextBox.CENTER_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
+								size=20}
+			}
+		)
+	end
+
+	function i:onSearchStart()
+		destroyEntity(self.gameList)
+		self.gameList = createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, y = -10 },
+			{"jaeger.VerticalContainer", gap=20 }
+		}	
 	end
 end)

@@ -1,5 +1,6 @@
 local class = require "jaeger.Class"
 local RenderUtils = require "jaeger.utils.RenderUtils"
+local GameAnnouncer = require "GameAnnouncer"
 
 return class(..., function(i, c)
 	function i:__constructor()
@@ -25,6 +26,10 @@ return class(..., function(i, c)
 		local entityMgr = engine:getSystem("jaeger.EntityManager")
 		local sceneMgr = engine:getSystem("jaeger.SceneManager")
 
+		local announcer = GameAnnouncer.new(9001)
+		announcer:start(sceneTask, "SmallMap")
+		self.announcer = announcer
+
 		entityMgr:createEntity{
 			{"jaeger.Renderable", layer = self.layers.background },
 			{"jaeger.Background", texture = "bg1.png", width = 4000, height = 4000}
@@ -40,8 +45,8 @@ return class(..., function(i, c)
 
 		local buttonTemplate = {
 			{"jaeger.Renderable", layer=self.layers.GUI},
-			{"jaeger.Widget"},
-			{"Button", receiver = sceneController},
+			{"jaeger.Widget", receiver = sceneController},
+			{"Button"},
 			{"jaeger.Text", rect={0, -50, 250, 0},
 			                font="karmatic_arcade.ttf",
 			                alignment = {MOAITextBox.LEFT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
@@ -59,5 +64,6 @@ return class(..., function(i, c)
 	end
 
 	function i:stop()
+		self.announcer:stop()
 	end
 end)
