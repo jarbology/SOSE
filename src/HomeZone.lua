@@ -2,6 +2,8 @@ local class = require "jaeger.Class"
 local RingMenuUtils = require "RingMenuUtils"
 local NetworkCommand = require "NetworkCommand"
 local BuildingType = require "BuildingType"
+local WeaponType = require "WeaponType"
+local Quadrant = require "Quadrant"
 
 return class(..., function(i, c)
 	local BUILD_MENU = {
@@ -13,12 +15,13 @@ return class(..., function(i, c)
 	}
 
 	function i:__constructor(data)
-		print(data.client)
 		self.client = data.client
 	end
 
 	function i:msgLinkZone(zone)
-		self.enemyZone = zone
+		local zoneWidth, zoneHeight = self.entity:query("getSize")
+		self.entity:sendMessage("msgReveal", 1, zoneWidth, 1, zoneHeight)
+		self.currentWeapon = "rocket"
 	end
 
 	function i:msgTileClicked(tileX, tileY, worldX, worldY)
@@ -36,5 +39,12 @@ return class(..., function(i, c)
 		local commandCode = NetworkCommand.nameToCode("cmdBuild")
 		local buildingCode = BuildingType.nameToCode(item)
 		self.client:sendCmd{commandCode, buildingCode, self.tileX, self.tileY}
+	end
+
+	function i:msgAttack(targetX, targetY, quadrant)
+		local commandCode = NetworkCommand.nameToCode("cmdAttack")
+		local weaponCode = WeaponType.nameToCode(self.currentWeapon)
+		local quadrantCode = Quadrant.nameToCode(quadrant)
+		self.client:sendCmd{commandCode, weaponCode, targetX, targetY, quadrantCode}
 	end
 end)

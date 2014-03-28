@@ -4,6 +4,6 @@ return {
 	frameFormat = "rocket_%02d.png",
 	mode = "loop",
 	numFrames = 5,
-	xOrigin = 49,
-	yOrigin = 10
+	xOrigin = 7,
+	yOrigin = 0
 }

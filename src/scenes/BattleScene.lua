@@ -115,7 +115,7 @@ return class(..., function(i, c)
 		}
 		local enemyZone = createEntity{
 			{"Zone", map=TEST_MAP, viewport=self.viewport},
-			--{"EnemyZone"}
+			{"EnemyZone"}
 		}
 		homeZone:sendMessage("msgLinkZone", enemyZone)
 		enemyZone:sendMessage("msgLinkZone", homeZone)

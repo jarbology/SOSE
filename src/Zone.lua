@@ -7,6 +7,8 @@ local NetworkCommand = require "NetworkCommand"
 local BuildingType = require "BuildingType"
 local BuildingSpecs = require "buildingSpecs"
 local WeaponQueue = require "WeaponQueue"
+local WeaponType = require "WeaponType"
+local Quadrant = require "Quadrant"
 
 -- A zone for a player
 return class(..., function(i, c)
@@ -16,9 +18,9 @@ return class(..., function(i, c)
 	local LAYERS = {
 		"ground",
 		"building",
-		"projectile",
 		"overlay",
-		"fog"
+		"fog",
+		"projectile"
 	}
 
 	--map: an ascii map of this zone
@@ -71,7 +73,7 @@ return class(..., function(i, c)
 	end
 
 	function i:msgLinkZone(opposingZone)
-		self.opposingZone = opposingZone
+		self.opposingZone = opposingZone:query("getZoneComponent")
 		local map = self.map
 
 		local zoneWidth, zoneHeight = self.zoneWidth, self.zoneHeight
@@ -91,12 +93,13 @@ return class(..., function(i, c)
 
 		local grid = MOAIGrid.new()
 		grid:setSize(zoneWidth, zoneHeight, TILE_WIDTH, TILE_HEIGHT)
-		--c.setGrid(grid, self.map, 2)
+		c.setGrid(grid, self.map, 2)
 		self.fog = createEntity{
 			{"jaeger.Renderable", layer=self.layers.fog, x=-centerX, y=-centerY},
 			{"jaeger.Tilemap", tileset="fog", grid=grid},
 			{"Fog", zone=self.entity}
 		}
+		self.fogGrid = grid
 	end
 
 	function i:msgNetworkCommand(cmdCode, ...)
@@ -214,7 +217,7 @@ return class(..., function(i, c)
 	end
 
 	-- Remove fog around an area and reveal all buildings
-	function i:reveal(xMin, xMax, yMin, yMax)
+	function i:msgReveal(xMin, xMax, yMin, yMax)
 		local fog = self.fogGrid
 		for x = xMin, xMax do
 			for y = yMin, yMax do
@@ -228,6 +231,10 @@ return class(..., function(i, c)
 				end
 			end
 		end
+	end
+
+	function i:getZoneComponent()
+		return self
 	end
 
 	function i:getCamera()
@@ -258,6 +265,16 @@ return class(..., function(i, c)
 				{"ProgressBar", width=44, height=6, backgroundColor={1, 0, 0}, foregroundColor={0, 1, 0}, borderThickness=1},
 				{"HealthBar", subject=building}
 			}
+		end
+	end
+
+	function i:cmdAttack(weaponCode, targetX, targetY, quadrantCode)
+		local queueName = WeaponType.codeToName(weaponCode)
+		local weaponQueue = self.weaponQueues[queueName]
+		local quadrant = Quadrant.codeToName(quadrantCode)
+		if weaponQueue:getSize():get() > 0 then--enough weapon
+			local building = weaponQueue:dequeue()
+			building:sendMessage("msgAttack", self.opposingZone, targetX, targetY, quadrant)
 		end
 	end
 

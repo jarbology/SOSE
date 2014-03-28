@@ -9,6 +9,8 @@ return class(..., function(i)
 		{id = "demolish", sprite = "ui/radialMenu/demolish"}
 	}
 
+	local SPEED = 5
+
 	function i:msgActivate()
 		local zone = self.entity:query("getZone") 
 		self.zone = zone
@@ -23,15 +25,54 @@ return class(..., function(i)
 		self.weaponQueue:remove(self.entity)
 	end
 
-	function i:msgUse(zone, x, y)
-		local worldX, worldY = zone:getTileLoc(x, y)
+	function i:msgAttack(targetZone, targetX, targetY, quadrant)
+		local zone = self.zone
+		local vx, vy
+		local startX, startY
+		local zoneWidth, zoneHeight = zone:getSize()
+		local rotation
+
+		if quadrant == "left" then--left to right
+			startX = 1
+			startY = targetY
+			vx = SPEED
+			vy = 0
+			rotation = 270
+		elseif quadrant == "top" then--top to bottom
+			startX = targetX
+			startY = zoneHeight
+			vx = 0
+			vy = -SPEED
+			rotation = 180
+		elseif quadrant == "right" then--right to left
+			startX = zoneWidth
+			startY = targetY
+			vx = -SPEED
+			vy = 0
+			rotation = 90
+		else--bottom to top
+			startX = targetX
+			startY = 1
+			vx = 0
+			vy = SPEED
+			rotation = 0
+		end
+
 		createEntity{
-			{"jaeger.Renderable", layer = zone:getLayer("projectile")},
-			{"jaeger.Actor", phase = "missiles"},
-			{"jaeger.Sprite", spriteName = "projectiles/rocket"},
-			{"Projectile", zone = zone, x = 1, y = y, grid = "missiles"},
-			{"Missile", damage = 2}
+			{"jaeger.Renderable", layer=targetZone:getLayer("projectile"), rotation=rotation},
+			{"jaeger.Actor", phase="missiles"},
+			{"jaeger.Sprite", spriteName = "projectiles/rocket", autoPlay=true},
+			{"Projectile", x=startX, y=startY,
+			               zone=targetZone, grid="missiles"},
+			{"Missile", vx=vx, vy=vy,
+			            targetX=targetX, targetY=targetY,
+			            damage=10}
+
 		}
+
+		self.entity:sendMessage("msgPerformWithDelay", 10, function()
+			self.weaponQueue:enqueue(self.entity)
+		end)
 	end
 
 	function i:getMenu()
