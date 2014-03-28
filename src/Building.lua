@@ -16,12 +16,21 @@ return class(..., function(i)
 	end
 
 	function i:msgActivate()
-		self.zone:addBuilding(self.x, self.y, self.entity)
-		self.entity:query("getProp"):setLoc(self.zone:getTileLoc(self.x, self.y))
+		local zone = self.zone
+		zone:addBuilding(self.x, self.y, self.entity)
+		
+		local prop = self.entity:query("getProp")
+		prop:setLoc(zone:getTileLoc(self.x, self.y))
+		prop:setVisible(zone:isTileVisible(self.x, self.y))
+		self.prop = prop
 	end
 
 	function i:msgDestroy()
 		self.zone:removeBuildingAt(self.x, self.y)
+	end
+
+	function i:msgReveal()
+		self.prop:setVisible(true)
 	end
 
 	function i:getZone()
