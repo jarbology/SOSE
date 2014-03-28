@@ -64,6 +64,7 @@ return class(..., function(i)
 			{"jaeger.Sprite", spriteName = "projectiles/rocket", autoPlay=true},
 			{"Projectile", x=startX, y=startY,
 			               zone=targetZone, grid="missiles"},
+			{"Destructible", hp=5},
 			{"Missile", vx=vx, vy=vy,
 			            targetX=targetX, targetY=targetY,
 			            damage=10}

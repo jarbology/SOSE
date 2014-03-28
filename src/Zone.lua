@@ -187,6 +187,7 @@ return class(..., function(i, c)
 
 	-- Move a projectile in a grid
 	function i:moveProjectile(gridName, oldX, oldY, newX, newY, obj)
+		local function returnTrue() return true end
 		self:removeProjectile(gridName, oldX, oldY, obj)
 		self:addProjectile(gridName, newX, newY, obj)
 	end
@@ -200,10 +201,20 @@ return class(..., function(i, c)
 		set:beginIteration()
 		for _, object in set:iterator() do
 			if predicate(object) then
+				set:endIteration()
 				return object
 			end
 		end
 		set:endIteration()
+	end
+
+	function i:pickFirstObjectIn(gridName, xMin, xMax, yMin, yMax, predicate)
+		for x = xMin, xMax do
+			for y = yMin, yMax do
+				local obj = self:pickFirstObjectAt(gridName, x, y, predicate)
+				if obj ~= nil then return obj end
+			end
+		end
 	end
 
 	-- Check whether a tile is visible

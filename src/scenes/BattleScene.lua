@@ -6,6 +6,8 @@ local StringUtils = require "jaeger.utils.StringUtils"
 local KeyCodes = require "jaeger.KeyCodes"
 local RingMenuUtils = require "RingMenuUtils"
 local Property = require "jaeger.Property"
+local NetworkCommand = require "NetworkCommand"
+local BuildingType = require "BuildingType"
 
 return class(..., function(i, c)
 
@@ -253,6 +255,11 @@ return class(..., function(i, c)
 		local myId = self.client:getId()
 		self.zones[myId] = self.homeZone
 		self.zones[3 - myId] = self.enemyZone
+
+		--Test
+		if self.mode == "combo" then
+			self.client2:sendCmd{NetworkCommand.nameToCode("cmdBuild"), BuildingType.nameToCode("interceptor"), 21, 21}
+		end
 	end
 
 	function i:switchZone(index)

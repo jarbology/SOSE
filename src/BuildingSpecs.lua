@@ -24,6 +24,15 @@ return {
 		}
 	},
 	interceptor = {
+		cost = 50,
+		entitySpec = {
+			{"jaeger.Actor", phase="buildings"},
+			{"jaeger.Renderable"},
+			{"jaeger.Sprite", spriteName="buildings/interceptor", autoPlay=true},
+			{"Destructible", hp=15},
+			{"Building"},
+			{"Interceptor"}
+		}
 	},
 	generator = {
 		cost = 200,
@@ -36,6 +45,6 @@ return {
 			{"Generator", yield=2, interval=60}
 		}
 	},
-	wall = {
+	turret = {
 	}
 }

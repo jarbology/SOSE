@@ -233,4 +233,42 @@ describe("Set", function()
 
 		assert.is.equal(3, size)
 	end)
+
+	it("works after removal", function()
+		for i = 1, 1000 do
+			set:add(i)
+			set:remove(i)
+		end
+
+		set:add(c)
+		for i = 1, 100 do
+			set:beginIteration()
+			for index, item in set:iterator() do
+				assert.is.equal(c, item)
+			end
+			set:endIteration()
+		end
+	end)
+
+	it("works with one item", function()
+		set:add(b)
+		local size = 0
+		set:beginIteration()
+		for index, item in set:iterator() do
+			size = index
+		end
+		set:endIteration()
+		assert.is.equal(1, size)
+
+		set:remove(b)
+
+		local size = 0
+		set:beginIteration()
+		for index, item in set:iterator() do
+			size = index
+		end
+		set:endIteration()
+		assert.is.equal(0, size)
+
+	end)
 end)
