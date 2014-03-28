@@ -62,12 +62,16 @@ return class(..., function(i)
 	end
 
 	function i:msgRobotReturned()
-		self.weaponQueue:enqueue(self.entity)
+		if self.entity:isAlive() then
+			self.weaponQueue:enqueue(self.entity)
+		end
 	end
 
 	function i:msgRobotDestroyed()
-		self.entity:sendMessage("msgPerformWithDelay", 10, function()
-			self.weaponQueue:enqueue(self.entity)
-		end)
+		if self.entity:isAlive() then
+			self.entity:sendMessage("msgPerformWithDelay", 10, function()
+				self.weaponQueue:enqueue(self.entity)
+			end)
+		end
 	end
 end)
