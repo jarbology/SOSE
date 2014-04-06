@@ -9,7 +9,9 @@ local StringUtils = require "jaeger.utils.StringUtils"
 --		  The method must return a MOAIAction
 return class(..., function(i)
 	function i:__constructor(config)
-		self.root = MOAIStickyAction.new()
+		local root = MOAIAction.new()
+		root:setAutoStop(false)
+		self.root = root
 		self.tasks = {}
 	end
 

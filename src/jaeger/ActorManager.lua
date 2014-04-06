@@ -36,14 +36,16 @@ return class(..., function(i, c)
 			self.updatePhases[data.phase],
 			"Unknown update phase '"..tostring(data.phase).."'"
 		)
-		local updateAction = MOAIStickyAction.new()
+		local updateAction = MOAIAction.new()
+		updateAction:setAutoStop(false)
 		updateAction:attach(updatePhase)
 		return { updateAction = updateAction }
 	end
 
 	function i:spawnUpdate()
 		local updatePhases = {}
-		local rootTask = MOAIStickyAction.new()
+		local rootTask = MOAIAction.new()
+		rootTask:setAutoStop(false)
 		for _, updatePhase in ipairs(self.updateTreeConfig) do
 			c.spawnUpdateTree(updatePhase, updatePhases, rootTask)
 		end
@@ -99,13 +101,15 @@ return class(..., function(i, c)
 	function c.spawnUpdateTree(treeConfig, updatePhases, rootTask)
 		local treeConfigType = type(treeConfig)
 		if treeConfigType == "string" then --simple phase
-			local updatePhase = MOAIStickyAction.new()
+			local updatePhase = MOAIAction.new()
+			updatePhase:setAutoStop(false)
 			updatePhases[treeConfig] = updatePhase
 			updatePhase:attach(rootTask)
 			updatePhase.isLeaf = true
 		elseif treeConfigType == "table" then -- tree phase
 			local updatePhaseName, childPhases = unpack(treeConfig)
-			local updatePhase = MOAIStickyAction.new()
+			local updatePhase = MOAIAction.new()
+			updatePhase:setAutoStop(false)
 			updatePhases[updatePhaseName] = updatePhase
 			updatePhase:attach(rootTask)
 			updatePhase.isLeaf = false
