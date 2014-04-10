@@ -4,14 +4,6 @@ local KeyCodes = require "jaeger.KeyCodes"
 local ActionUtils = require "jaeger.utils.ActionUtils"
 
 -- Manage scenes
--- Manage jaeger.Renderable
--- Creation parameters:
--- * layer: name of the layer this entity will be rendered in
--- * x (optional)
--- * y (optional)
--- * xScale (optional)
--- * yScale (optional)
--- * rotation (optional)
 -- Events:
 -- * sceneBegin(scene): fired at the beginning of a scene.
 -- * sceneEnd(scene): fired at the end of a scene
@@ -24,7 +16,6 @@ return class(..., function(i, c)
 	-- start(engine, task): initialize the scene. task is the scene manager's update task.
 	--                      The scene can use it as parent for its own update task(s)
 	-- getRenderTable(): returns a Moai render table (see MOAIRenderMgr)
-	-- getLayer(name): return the layer with the given name or nil
 	function i:changeScene(sceneName, data)
 		self.nextScene = sceneName
 		self.nextSceneData = data
@@ -54,7 +45,6 @@ return class(..., function(i, c)
 		self.engine = engine
 		self.scriptShortcut = engine:getSystem("jaeger.ScriptShortcut")
 		engine:getSystem("jaeger.InputManager").keyboard:addListener(self, "onKey")
-		engine:getSystem("jaeger.EntityManager"):registerComponent("jaeger.Renderable", self, "createRenderable")
 	end
 
 	function i:onKey(keycode, down)
@@ -129,53 +119,5 @@ return class(..., function(i, c)
 				return c.pickFirstProp(predicate, ...)
 			end
 		end
-	end
-
-	-- jaeger.Renderable
-	function i:createRenderable(entity, data)
-		local prop = MOAIProp2D.new()
-		prop.entity = entity
-		prop:setLoc(data.x or 0, data.y or 0)
-		prop:setScl(data.xScale or 1, data.yScale or 1)
-		prop:setRot(data.rotation or 0)
-		prop:setBlendMode(MOAIProp2D.GL_SRC_ALPHA, MOAIProp2D.GL_ONE_MINUS_SRC_ALPHA)
-
-		return {
-			prop = prop,
-			layer = assert(data.layer, "No layer specified")
-		}
-	end
-
-	function i:getProp(component, entity)
-		return component.prop
-	end
-
-	function i:msgAttach(component, entity, child, linkSpec)
-		local childProp = assert(child:query("getProp"), "Need a prop to be linked")
-		local parent = component.prop
-
-		for _, linkPair in ipairs(linkSpec) do
-			local srcAttr, dstAttr = unpack(linkPair)
-			childProp:setAttrLink(srcAttr, parent, dstAttr)
-		end
-	end
-
-	function i:msgActivate(component, entity)
-		local layer = component.layer
-		local prop = component.prop
-		layer:insertProp(component.prop)
-		prop.layer = layer
-	end
-
-	function i:msgDestroy(component, entity)
-		local prop = component.prop
-		prop:clearAttrLink(MOAIProp2D.ATTR_PARTITION)
-		component.layer:removeProp(prop)
-		component.layer = nil
-		prop.layer = nil
-	end
-
-	function i:getLayer(component)
-		return component.layer
 	end
 end)
