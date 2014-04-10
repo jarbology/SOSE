@@ -13,13 +13,15 @@ return {
 		atlasPath = "../assets/gfx/atlases/",
 		fontPath = "../assets/fonts/",
 		tilesetPath = "../assets/gfx/tilesets/",
+		stretchPatchPath = "../assets/gfx/stretchPatches/",
 
 		loaders = {
 			texture = "jaeger.assetLoaders.TextureLoader",
 			sprite = "jaeger.assetLoaders.SpriteLoader",
 			atlas = "jaeger.assetLoaders.AtlasLoader",
 			font = "jaeger.assetLoaders.FontLoader",
-			tileset = "jaeger.assetLoaders.TilesetLoader"
+			tileset = "jaeger.assetLoaders.TilesetLoader",
+			stretchPatch = "jaeger.assetLoaders.StretchPatchLoader"
 		}
 	},
 

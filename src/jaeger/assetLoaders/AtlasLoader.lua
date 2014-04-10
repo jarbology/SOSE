@@ -33,7 +33,13 @@ return function(name, config, assetManager, oldInstance)
         r.x1 = cr.x + cr.width
         r.y1 = -cr.y
 
-		frames[frame.name] = { uvQuad = q, rect = r, size = frame.spriteSourceSize  }
+		frames[frame.name] = {
+			uvQuad = q,
+			rect = r,
+			size = frame.spriteSourceSize,
+			uvRect = uv,
+			textureRotated = frame.textureRotated
+		}
 	end
 
 	local asset = oldInstance or {}

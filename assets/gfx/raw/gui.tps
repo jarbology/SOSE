@@ -6,7 +6,7 @@
         <key>texturePackerVersion</key>
         <string>3.3.2</string>
         <key>fileName</key>
-        <string>D:/Projects/SoSE/assets/gfx/raw/gameScene.tps</string>
+        <string>D:/Projects/SoSE/assets/gfx/raw/gui.tps</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -28,7 +28,7 @@
             </struct>
         </array>
         <key>allowRotation</key>
-        <true/>
+        <false/>
         <key>premultiplyAlpha</key>
         <false/>
         <key>shapeDebug</key>
@@ -38,7 +38,7 @@
         <key>dataFormat</key>
         <string>moai</string>
         <key>textureFileName</key>
-        <filename>../textures/gameScene.png</filename>
+        <filename>../textures/gui.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>ditherType</key>
@@ -131,7 +131,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>../atlases/gameScene.lua</filename>
+                <filename>../atlases/gui.lua</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -172,15 +172,7 @@
         </struct>
         <key>fileList</key>
         <array>
-            <filename>base</filename>
-            <filename>rocketBase</filename>
-            <filename>interceptor</filename>
-            <filename>rocket</filename>
-            <filename>rocket2</filename>
-            <filename>generator</filename>
-            <filename>robotBase</filename>
-            <filename>robot</filename>
-            <filename>turret</filename>
+            <filename>gui</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

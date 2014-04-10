@@ -33,7 +33,6 @@ return function(name, config, assetManager, oldInstance)
 			uvQuad.x3,
 			uvQuad.y3
 		)
-		local frameHeight = frameDef.size.height
 		local geomRect = frameDef.rect
 		deck:setRect(
 			frameIndex,
