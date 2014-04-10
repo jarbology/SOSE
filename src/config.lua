@@ -45,7 +45,6 @@ return {
 		"jaeger.GraphicsSystem",
 		"jaeger.SceneManager",
 		"jaeger.ActorManager",
-		"jaeger.NameManager",
 		"jaeger.ScriptShortcut",
 		"jaeger.EntityManager",
 		"jaeger.TaskManager"
