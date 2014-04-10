@@ -5,9 +5,4 @@ return class(..., function(i, c)
 		self.currentZone = 1
 		self.homeZone = data.homeZone
 	end
-
-	function i:msgSwitchZone()
-		self.currentZone = 3 - self.currentZone
-		getCurrentScene():switchZone(self.currentZone)
-	end
 end)

@@ -94,19 +94,26 @@ return class(..., function(i, c)
 		local numEntries = #renderTable
 		for entryIndex = numEntries, 1, -1 do
 			local renderPass = renderTable[entryIndex]
-			-- if the render pass is a layer
-			if renderPass.wndToWorld then
-				local localX, localY = renderPass:wndToWorld(windowX, windowY)
-				local partition = renderPass:getPartition()
-				if partition then
-					local entity = c.pickFirstProp(predicate, partition:propListForPoint(localX, localY))
-					if entity then
-						return entity, localX, localY
+			local hit = true
+			local hitTest = renderPass.hitTest
+			if hitTest then
+				hit = hitTest(renderPass, windowX, windowY)
+			end
+			if hit then
+				-- if the render pass is a layer
+				if renderPass.wndToWorld then
+					local localX, localY = renderPass:wndToWorld(windowX, windowY)
+					local partition = renderPass:getPartition()
+					if partition then
+						local entity = c.pickFirstProp(predicate, partition:propListForPoint(localX, localY))
+						if entity then
+							return entity, localX, localY
+						end
 					end
+				elseif getmetatable(renderPass) == nil then--if renderPass is a table
+					local entity, localX, localY = self:pickEntityInRenderTable(renderPass, windowX, windowY, predicate)
+					if entity ~= nil then return entity, localX, localY end
 				end
-			elseif getmetatable(renderPass) == nil then--if renderPass is a table
-				local entity, localX, localY = self:pickEntityInRenderTable(renderPass, windowX, windowY, predicate)
-				if entity ~= nil then return entity, localX, localY end
 			end
 		end
 	end

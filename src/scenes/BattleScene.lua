@@ -28,6 +28,7 @@ return class(..., function(i, c)
 		self.renderTable = {
 			background,
 			{},
+			{},
 			GUI
 		}
 		self.layers = {
@@ -111,25 +112,44 @@ return class(..., function(i, c)
 
 	function i:initScene(engine, sceneTask)
 		--Create zones
+		local viewWidth, viewHeight = MOAIGfxDevice.getViewSize()
+
+		local leftHalf = MOAIViewport.new()
+		leftHalf:setSize(viewWidth/2, viewHeight)
+		leftHalf:setScale(viewWidth/2, viewHeight)
 		local homeZone = createEntity{
-			{"Zone", map=TEST_MAP, viewport=self.viewport},
+			{"Zone", map=TEST_MAP, viewport=leftHalf},
 			{"HomeZone", client=self.client}
 		}
+		local homeZoneRenderTable = homeZone:query("getRenderTable")
+		function homeZoneRenderTable:hitTest(windowX, windowY)
+			return windowX < viewWidth / 2
+		end
+
+		local rightHalf = MOAIViewport.new()
+		rightHalf:setSize(viewWidth/2, 0, viewWidth, viewHeight)
+		rightHalf:setScale(viewWidth/2, viewHeight)
 		local enemyZone = createEntity{
-			{"Zone", map=TEST_MAP, viewport=self.viewport},
+			{"Zone", map=TEST_MAP, viewport=rightHalf},
 			{"EnemyZone"}
 		}
+		local enemyZoneRenderTable = enemyZone:query("getRenderTable")
+		function enemyZoneRenderTable:hitTest(windowX, windowY)
+			return windowX > viewWidth / 2
+		end
+
+		self.renderTable[2] = homeZoneRenderTable
+		self.renderTable[3] = enemyZoneRenderTable
+
 		homeZone:sendMessage("msgLinkZone", enemyZone)
 		enemyZone:sendMessage("msgLinkZone", homeZone)
 		homeZone:query("getNumBases").changed:addListener(self, "onNumBasesChanged")
 		enemyZone:query("getNumBases").changed:addListener(self, "onNumBasesChanged")
 		self.numReadyZones = 0
-		self.zoneRenderTables = { homeZone:query("getRenderTable"), enemyZone:query("getRenderTable") }
 		self.homeZone = homeZone
 		self.enemyZone = enemyZone
 		self.zones = {}
-		self:switchZone(1)
-
+		
 		--Create Background
 		createEntity{
 			{"jaeger.Renderable", layer = self.layers.background },
@@ -296,10 +316,6 @@ return class(..., function(i, c)
 			self.client2:sendCmd{NetworkCommand.nameToCode("cmdBuild"), BuildingType.nameToCode("core"), 24, 24}
 			self.client2:sendCmd{NetworkCommand.nameToCode("cmdBuild"), BuildingType.nameToCode("core"), 26, 24}
 		end
-	end
-
-	function i:switchZone(index)
-		self.renderTable[2] = self.zoneRenderTables[index]
 	end
 
 	function i:onCommand(turnNum, playerId, cmd)
