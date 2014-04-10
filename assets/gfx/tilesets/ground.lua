@@ -1,5 +1,5 @@
 return {
-	source = "texture:spaceStation.png",
-	width = 5,
-	height = 5
+	source = "texture:groundTiles.png",
+	width = 2,
+	height = 1
 }

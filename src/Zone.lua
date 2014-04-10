@@ -13,8 +13,8 @@ local Quadrant = require "Quadrant"
 -- A zone for a player
 return class(..., function(i, c)
 	local MAP_PADDING = 20
-	local TILE_WIDTH = 64
-	local TILE_HEIGHT = 64
+	local TILE_WIDTH = 40
+	local TILE_HEIGHT = 40
 	local LAYERS = {
 		"ground",
 		"building",
@@ -81,7 +81,7 @@ return class(..., function(i, c)
 		local zoneWidth, zoneHeight = self.zoneWidth, self.zoneHeight
 		local grid = MOAIGrid.new()
 		grid:setSize(zoneWidth, zoneHeight, TILE_WIDTH, TILE_HEIGHT)
-		c.setGrid(grid, self.map, 5)
+		c.setGrid(grid, self.map, 1)
 		local centerX, centerY = grid:getTileLoc(self.zoneWidth / 2, self.zoneHeight / 2)
 		self.refGrid = grid -- for object picking
 
