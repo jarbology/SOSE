@@ -215,7 +215,7 @@ return class(..., function(i, c)
 
 		local dummyProperty = Property.new(0)
 		createEntity{
-			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=224 },
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=225 },
 			{"jaeger.Text", text="01",
 			                rect={0, -25, 35, 0},
 			                font="karmatic_arcade.ttf",
@@ -224,7 +224,7 @@ return class(..., function(i, c)
 			{"jaeger.TextDisplay", property=homeZone:query("getWeaponQueue", "rocket"):getSize(), format="%02d"}
 		}
 		createEntity{
-			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=174 },
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=171 },
 			{"jaeger.Text", text="01",
 			                rect={0, -25, 35, 0},
 			                font="karmatic_arcade.ttf",
@@ -233,7 +233,7 @@ return class(..., function(i, c)
 			{"jaeger.TextDisplay", property=homeZone:query("getWeaponQueue", "robot"):getSize(), format="%02d"}
 		}
 		createEntity{
-			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=124 },
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=118 },
 			{"jaeger.Text", text="01",
 			                rect={0, -25, 35, 0},
 			                font="karmatic_arcade.ttf",
@@ -242,7 +242,7 @@ return class(..., function(i, c)
 			{"jaeger.TextDisplay", property=dummyProperty, format="%02d"}
 		}
 		createEntity{
-			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=74 },
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=63 },
 			{"jaeger.Text", text="01",
 			                rect={0, -25, 35, 0},
 			                font="karmatic_arcade.ttf",
@@ -259,7 +259,7 @@ return class(..., function(i, c)
 			}
 		)
 		createEntity{
-			{"jaeger.Renderable", layer=self.layers.GUI, x=-474, y=30 },
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-475, y=15 },
 			{"jaeger.Text", text="01",
 			                rect={0, -25, 35, 0},
 			                font="karmatic_arcade.ttf",
@@ -275,7 +275,7 @@ return class(..., function(i, c)
 			}
 		)
 		createEntity{
-			{"jaeger.Renderable", layer=self.layers.GUI, x=-474, y=-19 },
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-475, y=-37 },
 			{"jaeger.Text", text="01",
 			                rect={0, -25, 35, 0},
 			                font="karmatic_arcade.ttf",
@@ -283,15 +283,6 @@ return class(..., function(i, c)
 			                size=11},
 			{"jaeger.TextDisplay", property=enemyZone:query("getNumBases"), format="%01d"}
 		}
-		--Switch button
-		leftBar:sendMessage("msgAddItem",
-			createEntity{
-				{"jaeger.Renderable", layer=self.layers.GUI},
-				{"jaeger.Sprite", spriteName="ui/friendlyBar"},
-				{"jaeger.Widget", receiver=sceneGUI},
-				{"Button", message="msgSwitchZone"}
-			}
-		)
 	end
 
 	function i:onNumBasesChanged(num)
