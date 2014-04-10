@@ -20,7 +20,6 @@ return class(..., function(i, c)
 			{"jaeger.Renderable", layer=self.layers.default},
 			{"jaeger.StretchPatch", name="dialog"}
 		}
-		patch:query("getProp"):setScl(3, 1.5)
 	end
 
 	function i:stop()
