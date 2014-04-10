@@ -1,21 +1,8 @@
 local class = require "jaeger.Class"
-local ActionUtils = require "jaeger.utils.ActionUtils"
 
 -- Manage entities which gets updated every frame
 -- Relevant config keys:
 -- * updatePhases: an array of update phase names
--- Managed component: jaeger.Actor
--- Creation paramter: name of update phase
---
--- Messages:
--- * msgPerformAction(action): perform an action every frame
--- * msgPerformWithDelay(delay, func): call functions after <delay> number of seconds
---	                                   This is in entity's time which means if the entity's update phase is paused,
---	                                   the timer is also paused
--- * msgAddUpdateFunc(obj, methodName, ...): call obj:<methodName>(entity, ...) every frame
---
--- Queries:
--- getUpdateAction(): returns the action that updates the entity
 return class(..., function(i, c)
 	function i:getUpdatePhase(name)
 		return self.updatePhases[name]
@@ -27,19 +14,7 @@ return class(..., function(i, c)
 	end
 
 	function i:start(engine)
-		engine:getSystem("jaeger.EntityManager"):registerComponent("jaeger.Actor", self, "createActor")
 		engine:getSystem("jaeger.SceneManager").sceneEnd:addListener(self, "onSceneEnd")
-	end
-
-	function i:createActor(entity, data)
-		local updatePhase = assert(
-			self.updatePhases[data.phase],
-			"Unknown update phase '"..tostring(data.phase).."'"
-		)
-		local updateAction = MOAIAction.new()
-		updateAction:setAutoStop(false)
-		updateAction:attach(updatePhase)
-		return { updateAction = updateAction }
 	end
 
 	function i:spawnUpdate()
@@ -62,42 +37,6 @@ return class(..., function(i, c)
 		end
 	end 
 
-	function i:msgPerformAction(component, entity, action)
-		action:attach(component.updateAction)
-	end
-
-	function i:msgQueueAction(component, entity, actionFunc)
-		local queue = component.actionQueue
-
-		local function dequeue()
-			local action = actionFunc()
-			component.actionQueue = action
-			action:attach(component.updateAction)
-		end
-
-		if queue and queue:isActive() then
-			queue:setListener(MOAIAction.EVENT_STOP, dequeue)
-		else
-			dequeue()
-		end
-	end
-
-	function i:msgPerformWithDelay(component, entity, delay, func)
-		local timer = MOAITimer.new()
-		timer:setSpan(delay)
-		timer:setListener(MOAITimer.EVENT_TIMER_END_SPAN, func)
-		timer:attach(component.updateAction)
-	end
-
-	function i:msgAddUpdateFunc(component, entity, obj, methodName, ...)
-		local action = ActionUtils.newLoopCoroutine(obj, methodName, ...)
-		action:attach(component.updateAction)
-	end
-
-	function i:msgDestroy(component, entity)
-		component.updateAction:stop()
-	end
-
 	function c.spawnUpdateTree(treeConfig, updatePhases, rootTask)
 		local treeConfigType = type(treeConfig)
 		if treeConfigType == "string" then --simple phase
@@ -119,5 +58,4 @@ return class(..., function(i, c)
 			end
 		end
 	end
-
 end)
