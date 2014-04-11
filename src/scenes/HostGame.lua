@@ -45,13 +45,21 @@ return class(..., function(i, c)
 					self.lblGameName:sendMessage("msgSetText", self.gameName)
 				end,
 				msgChangeMap = function(state, entity, id)
-					print(id)
 					local mapButtons = self.mapButtons
 					for _, btn in ipairs(mapButtons) do
 						btn:sendMessage("msgChangeSprite", "ui/weaponBar")
 					end
 
 					self.mapButtons[id]:sendMessage("msgChangeSprite", "ui/weaponBarActive")
+					self.mapId = id
+				end,
+				msgStart = function()
+					local params = {
+						mode = "host",
+						gameName = self.gameName,
+						map = self.mapId
+					}
+					changeScene("scenes.BattleScene", params)
 				end
 			}
 		}

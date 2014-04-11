@@ -1,4 +1,5 @@
 local class = require "jaeger.Class"
+local msgpack = require "msgpack"
 local RenderUtils = require "jaeger.utils.RenderUtils"
 local Networking = require "Networking"
 local NetworkCommand = require "NetworkCommand"
@@ -7,6 +8,7 @@ local KeyCodes = require "jaeger.KeyCodes"
 local RingMenuUtils = require "RingMenuUtils"
 local Property = require "jaeger.Property"
 local NetworkCommand = require "NetworkCommand"
+local GameAnnouncer = require "GameAnnouncer"
 local BuildingType = require "BuildingType"
 
 return class(..., function(i, c)
@@ -21,10 +23,11 @@ return class(..., function(i, c)
 		'o_oooooooo'
 	}
 
-	function i:__constructor(mode)
+	function i:__constructor(data)
 		local viewport = RenderUtils.newFullScreenViewport()
 		local GUI = RenderUtils.newLayer(viewport)
 		local background = RenderUtils.newLayer(viewport)
+		local altGUI = RenderUtils.newLayer(viewport)
 		self.renderTable = {
 			background,
 			{},
@@ -33,11 +36,33 @@ return class(..., function(i, c)
 		}
 		self.layers = {
 			background = background,
-			GUI = GUI
+			GUI = GUI,
+			altGUI = altGUI
 		}
 		self.viewport = viewport
 
-		self.mode = mode
+
+		if type(data) == "string" then
+			self.mode = data
+
+			if mode == "host" then
+				local map = 1
+				self.announceData = msgpack.pack({"Test game", 1})
+			else
+				self.hostIP = "localhost"
+			end
+		else
+			local mode = data.mode
+			self.mode = mode
+			
+			if mode == "host" then
+				local map = data.map
+				self.announceData = msgpack.pack({data.gameName, data.map})
+				print(self.announceData)
+			else
+				self.hostIP = data.ip
+			end
+		end
 	end
 
 	function i:start(engine, sceneTask)
@@ -47,6 +72,10 @@ return class(..., function(i, c)
 	end
 
 	function i:stop()
+		if self.announcer then
+			self.announcer:stop()
+		end
+
 		if self.server then
 			self.server:stop()
 		end
@@ -91,8 +120,10 @@ return class(..., function(i, c)
 			self.client = client
 			self.server = server
 			self.serverSkt = serverSkt
+			self.announcer = GameAnnouncer.new(9001)
+			self.announcer:start(sceneTask, self.announceData)
 		elseif self.mode == "join" then
-			local client = Networking.initJoin(lockedPhase, noopMsg)
+			local client = Networking.initJoin(self.hostIP, lockedPhase, noopMsg)
 			client.gameStarted:addListener(self, "onGameStart")
 			client.commandReceived:addListener(self, "onCommand")
 			client:start():attach(sceneTask)

@@ -40,9 +40,9 @@ return class(..., function(i, c)
 	end
 
 	-- Make this game instance join the game
-	function c.initJoin(lockedPhase, noopMsg)
+	function c.initJoin(hostIP, lockedPhase, noopMsg)
 		local socketConnection = assert(socket.tcp())
-		assert(socketConnection:connect("localhost", 9001))
+		assert(socketConnection:connect(hostIP, 9001))
 
 		local commandStream = MemoryStream.new()
 		local client = Client.new{

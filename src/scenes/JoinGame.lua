@@ -1,4 +1,5 @@
 local class = require "jaeger.Class"
+local msgpack = require "msgpack"
 local RenderUtils = require "jaeger.utils.RenderUtils"
 local GameSearcher = require "GameSearcher"
 
@@ -41,6 +42,13 @@ return class(..., function(i, c)
 			{"jaeger.InlineScript",
 				msgBack = function()
 					sceneMgr:changeScene("scenes.MainMenu")
+				end,
+				msgJoinGame = function(state, entity, gameData)
+					local params = {
+						mode = "join",
+						ip = gameData[2]
+					}
+					changeScene("scenes.BattleScene", params)
 				end
 			}
 		}
@@ -75,19 +83,23 @@ return class(..., function(i, c)
 		self.searcher:stop()
 	end
 
-	function i:onGameDiscovered(name, ip, port)
-		self.gameList:sendMessage("msgAddItem",
-			createEntity{
-				{"jaeger.Renderable", layer=self.layers.GUI},
-				{"jaeger.Widget", receiver = self.sceneController},
-				{"Button", id = {name, ip, port}, message="msgJoinGame"},
-				{"jaeger.Text", text=name.."@"..ip..":"..tostring(port),
-								rect={-250, -50, 250, 0},
-								font="karmatic_arcade.ttf",
-								alignment = {MOAITextBox.CENTER_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
-								size=20}
-			}
-		)
+	function i:onGameDiscovered(dataBin, ip, port)
+		local success, size, data = pcall(msgpack.unpack, dataBin)
+		if success then
+			local gameName = data[1]
+			self.gameList:sendMessage("msgAddItem",
+				createEntity{
+					{"jaeger.Renderable", layer=self.layers.GUI},
+					{"jaeger.Widget", receiver = self.sceneController},
+					{"Button", id = {gameName, ip, port}, message="msgJoinGame"},
+					{"jaeger.Text", text=gameName.."-"..ip..":"..tostring(port),
+									rect={-250, -50, 250, 0},
+									font="karmatic_arcade.ttf",
+									alignment = {MOAITextBox.CENTER_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
+									size=20}
+				}
+			)
+		end
 	end
 
 	function i:onSearchStart()
