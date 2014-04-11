@@ -18,8 +18,8 @@ return class(..., function(i, c)
 	local LAYERS = {
 		"ground",
 		"building",
-		"overlay",
 		"fog",
+		"overlay",
 		"projectile"
 	}
 
@@ -102,6 +102,14 @@ return class(..., function(i, c)
 			{"Fog", zone=self.entity}
 		}
 		self.fogGrid = grid
+
+		local selector = createEntity{
+			{"jaeger.Renderable", layer=self.layers.overlay},
+			{"jaeger.Sprite", spriteName="ui/selector", autoPlay="true"}
+		}
+		local selectorProp = selector:query("getProp")
+		selectorProp:setVisible(false)
+		self.selectorProp = selectorProp
 	end
 
 	function i:msgNetworkCommand(cmdCode, ...)
@@ -258,7 +266,7 @@ return class(..., function(i, c)
 		return self.numBases
 	end
 
-	function i:msgTileHovered(tileX, tileY)
+	function i:msgTileHovered(tileX, tileY, x, y)
 		local building = self:getBuildingAt(tileX, tileY)
 		local focusedBuilding = self.focusedBuilding
 		if focusedBuilding ~= building and focusedBuilding ~= nil then
@@ -270,6 +278,14 @@ return class(..., function(i, c)
 		end
 
 		self.focusedBuilding = building
+
+		local selectorProp = self.selectorProp
+		if self:isTileGround(tileX, tileY) then
+			selectorProp:setVisible(true)
+			selectorProp:setLoc(self:getTileLoc(tileX, tileY))
+		else
+			selectorProp:setVisible(false)
+		end
 	end
 
 	-- Private
