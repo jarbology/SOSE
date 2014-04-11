@@ -9,6 +9,7 @@ return class(..., function(i)
 		self.zone = data.zone
 		self.x = data.x
 		self.y = data.y
+		self.healthBarLayer = data.healthBarLayer
 	end
 
 	function i:getTileLoc()
@@ -23,6 +24,14 @@ return class(..., function(i)
 		prop:setLoc(zone:getTileLoc(self.x, self.y))
 		prop:setVisible(zone:isTileVisible(self.x, self.y))
 		self.prop = prop
+
+		local healthBar = createEntity{
+			{"jaeger.Renderable", layer=self.healthBarLayer, y=-15},
+			{"ProgressBar", width=35, height=6, backgroundColor={1, 0, 0}, foregroundColor={0, 1, 0}, borderThickness=1},
+			{"HealthBar", subject=self.entity}
+		}
+		self.healthBarProp = healthBar:query("getProp")
+		self.healthBarProp:setVisible(false)
 	end
 
 	function i:msgDestroy()
@@ -31,6 +40,14 @@ return class(..., function(i)
 
 	function i:msgReveal()
 		self.prop:setVisible(true)
+	end
+
+	function i:msgFocus()
+		self.healthBarProp:setVisible(true)
+	end
+
+	function i:msgUnfocus()
+		self.healthBarProp:setVisible(false)
 	end
 
 	function i:getZone()

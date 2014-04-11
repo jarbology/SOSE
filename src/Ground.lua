@@ -41,6 +41,9 @@ return class(..., function(i, c)
 			self.camera:addLoc(self.oldX - x, y - self.oldY)
 			self.oldX = x
 			self.oldY = y
+		else
+			local tileX, tileY = self:worldToTile(x, y)
+			self.zone:sendMessage("msgTileHovered", tileX, tileY, x, y)
 		end
 	end
 

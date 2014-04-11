@@ -4,6 +4,10 @@ local class = require "jaeger.Class"
 -- Parameters:
 -- * subject: the entity with a Destructible component
 return class(..., function(i)
+	local LINK_SPEC = {
+		{ MOAIProp2D.INHERIT_LOC, MOAIProp2D.TRANSFORM_TRAIT },
+		{ MOAIProp2D.INHERIT_VISIBLE, MOAIProp2D.ATTR_VISIBLE }
+	}
 	function i:__constructor(data)
 		self.subject = data.subject
 	end
@@ -16,9 +20,8 @@ return class(..., function(i)
 
 		local prop = self.entity:query("getProp")
 		local subjectX, subjectY = subject:query("getProp"):getLoc()
-		--prop:setVisible(false)
-		prop:setLoc(subjectX, subjectY - 20)
 		self.prop = prop
+		subject:sendMessage("msgAttach", self.entity, LINK_SPEC)
 	end
 
 	function i:adjustBar(hp)

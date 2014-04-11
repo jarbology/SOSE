@@ -258,6 +258,20 @@ return class(..., function(i, c)
 		return self.numBases
 	end
 
+	function i:msgTileHovered(tileX, tileY)
+		local building = self:getBuildingAt(tileX, tileY)
+		local focusedBuilding = self.focusedBuilding
+		if focusedBuilding ~= building and focusedBuilding ~= nil then
+			focusedBuilding:sendMessage("msgUnfocus")
+		end
+
+		if building then
+			building:sendMessage("msgFocus")
+		end
+
+		self.focusedBuilding = building
+	end
+
 	-- Private
 	-- Network commands
 	function i:cmdBuild(buildingCode, tileX, tileY)
@@ -273,15 +287,8 @@ return class(..., function(i, c)
 			self:changeResource(-buildingSpec.cost)
 			local building = createEntity(buildingSpec.entitySpec, {
 				["jaeger.Renderable"] = {layer=self.layers.building},
-				["Building"] = {zone=self, x=tileX, y=tileY}
+				["Building"] = {zone=self, x=tileX, y=tileY, healthBarLayer=self.layers.overlay}
 			})
-
-			--Create health bar for building
-			createEntity{
-				{"jaeger.Renderable", layer=self.layers.overlay},
-				{"ProgressBar", width=44, height=6, backgroundColor={1, 0, 0}, foregroundColor={0, 1, 0}, borderThickness=1},
-				{"HealthBar", subject=building}
-			}
 		end
 	end
 
