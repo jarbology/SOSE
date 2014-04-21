@@ -105,7 +105,8 @@ return class(..., function(i, c)
 
 		local selector = createEntity{
 			{"jaeger.Renderable", layer=self.layers.overlay},
-			{"jaeger.Sprite", spriteName="ui/selector", autoPlay="true"}
+			{"jaeger.Sprite", spriteName="ui/selector", autoPlay="true"},
+			{"jaeger.Actor", phase="visual"}
 		}
 		local selectorProp = selector:query("getProp")
 		selectorProp:setVisible(false)

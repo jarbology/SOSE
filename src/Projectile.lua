@@ -25,10 +25,22 @@ return class(..., function(i)
 		local entity = self.entity
 		local prop = entity:query("getProp")
 		prop:setLoc(self.zone:getTileLoc(self.x, self.y))
+		self.prop = prop
+		self.layer = prop.layer
 	end
 
 	function i:msgDestroy()
 		self.zone:removeProjectile(self.gridName, self.x, self.y, self.entity)
+
+		local x, y = self.prop:getLoc()
+		local explosion = createEntity{
+			{"jaeger.Renderable", x=x, y=y, layer=self.layer},
+			{"jaeger.Sprite", spriteName="fx/explosionMid", autoPlay=true},
+			{"jaeger.Actor", phase="visual"}
+		}
+		explosion:sendMessage("msgPerformWithDelay", 1.3, function()
+			destroyEntity(explosion)
+		end)
 	end
 
 	function i:msgMove(vx, vy)

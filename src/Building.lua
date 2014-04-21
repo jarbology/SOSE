@@ -32,10 +32,21 @@ return class(..., function(i)
 		}
 		self.healthBarProp = healthBar:query("getProp")
 		self.healthBarProp:setVisible(false)
+		self.layer = prop.layer
 	end
 
 	function i:msgDestroy()
 		self.zone:removeBuildingAt(self.x, self.y)
+
+		local x, y = self.prop:getLoc()
+		local explosion = createEntity{
+			{"jaeger.Renderable", x=x, y=y, layer=self.layer},
+			{"jaeger.Sprite", spriteName="fx/explosionBig", autoPlay=true},
+			{"jaeger.Actor", phase="visual"}
+		}
+		explosion:sendMessage("msgPerformWithDelay", 1.3, function()
+			destroyEntity(explosion)
+		end)
 	end
 
 	function i:msgReveal()

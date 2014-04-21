@@ -43,6 +43,7 @@ return class(..., function(i, c)
 
 
 		if type(data) == "string" then
+			local mode = data
 			self.mode = data
 
 			if mode == "host" then

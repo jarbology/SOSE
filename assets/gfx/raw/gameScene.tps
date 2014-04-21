@@ -181,6 +181,7 @@
             <filename>robotBase</filename>
             <filename>robot</filename>
             <filename>turret</filename>
+            <filename>explosion</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
