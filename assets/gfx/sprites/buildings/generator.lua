@@ -2,7 +2,7 @@ return {
 	atlas = "gameScene",
 	frameFormat = "Agenerator%01d.png",
 	numFrames = 3,
-	mode = "loop",
+	mode = "pingpong",
 	xOrigin = 17,
-	yOrigin = 49
+	yOrigin = 40
 }

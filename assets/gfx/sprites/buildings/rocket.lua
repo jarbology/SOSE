@@ -5,5 +5,5 @@ return {
 	mode = "loop",
 	numFrames = 4,
 	xOrigin = 18,
-	yOrigin = 30
+	yOrigin = 24
 }

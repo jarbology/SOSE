@@ -1,9 +1,9 @@
 return {
 	atlas = "gameScene",
-	time = 2.0,
+	time = 1.5,
 	frameFormat = "Abase%01d.png",
-	mode = "loop",
+	mode = "pingpong",
 	numFrames = 4,
 	xOrigin = 17,
-	yOrigin = 32
+	yOrigin = 23
 }
