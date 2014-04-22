@@ -12,6 +12,8 @@ return function(name, config, assetManager, oldInstance)
 
 	local xOrigin = spriteDef.xOrigin or 0
 	local yOrigin = spriteDef.yOrigin or 0
+	local xScale = spriteDef.xScale or 1
+	local yScale = spriteDef.yScale or 1
 	local frameFormat = assert(spriteDef.frameFormat, "Sprite "..name.." does not provide frame format")
 	assert(type(frameFormat) == "string", "Sprite "..name.. " has invalid frame format")
 
@@ -36,10 +38,10 @@ return function(name, config, assetManager, oldInstance)
 		local geomRect = frameDef.rect
 		deck:setRect(
 			frameIndex,
-			geomRect.x0 - xOrigin,
-			geomRect.y0 + yOrigin,
-			geomRect.x1 - xOrigin,
-			geomRect.y1 + yOrigin
+			(geomRect.x0 - xOrigin) * xScale,
+			(geomRect.y0 + yOrigin) * yScale,
+			(geomRect.x1 - xOrigin) * xScale,
+			(geomRect.y1 + yOrigin) * yScale
 		)
 	end
 

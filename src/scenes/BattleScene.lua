@@ -216,34 +216,30 @@ return class(..., function(i, c)
 		}
 		
 		--Weapon buttons
-		leftBar:sendMessage("msgAddItem",
-			createEntity{
+		local LINK_SPEC = {
+			{ MOAIProp2D.INHERIT_LOC, MOAIProp2D.TRANSFORM_TRAIT }
+		}
+
+		local function createWeaponButton(id, iconSprite)
+			local button = createEntity{
 				{"jaeger.Renderable", layer=self.layers.GUI},
 				{"jaeger.Sprite", spriteName="ui/weaponBar"},
 				{"jaeger.Widget", receiver=homeZone},
-				{"Button", id="rocket", message="msgSwitchWeapon"},
+				{"Button", id=id, message="msgSwitchWeapon"},
 			}
-		)
-		leftBar:sendMessage("msgAddItem",
-			createEntity{
+			local icon = createEntity{
 				{"jaeger.Renderable", layer=self.layers.GUI},
-				{"jaeger.Sprite", spriteName="ui/weaponBar"},
-				{"jaeger.Widget", receiver=homeZone},
-				{"Button", id="robot", message="msgSwitchWeapon"},
+				{"jaeger.Sprite", spriteName=iconSprite}
 			}
-		)
-		leftBar:sendMessage("msgAddItem",
-			createEntity{
-				{"jaeger.Renderable", layer=self.layers.GUI},
-				{"jaeger.Sprite", spriteName="ui/weaponBar"}
-			}
-		)
-		leftBar:sendMessage("msgAddItem",
-			createEntity{
-				{"jaeger.Renderable", layer=self.layers.GUI},
-				{"jaeger.Sprite", spriteName="ui/weaponBar"}
-			}
-		)
+			icon:query("getProp"):setLoc(58, -7)
+			button:sendMessage("msgAttach", icon, LINK_SPEC)
+			leftBar:sendMessage("msgAddItem", button)
+		end
+
+		createWeaponButton("rocket", "ui/weaponIcons/rocket")
+		createWeaponButton("robot", "ui/weaponIcons/robot")
+		createWeaponButton("upgradedRocket", "ui/weaponIcons/upgradedRocket")
+		createWeaponButton("upgradedRobot", "ui/weaponIcons/upgradedRobot")
 
 		local dummyProperty = Property.new(0)
 		createEntity{
