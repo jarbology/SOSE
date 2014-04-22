@@ -11,6 +11,10 @@ return class(..., function(i)
 		self.maxHP = Property.new(data.hp or 1)
 	end
 
+	function i:msgActivate()
+		self.prop = self.entity:query("getProp")
+	end
+
 	-- Get current hp
 	function i:getHP()
 		return self.hp
@@ -23,6 +27,20 @@ return class(..., function(i)
 
 	-- Deal damage and destroy the entity if hp <= 0
 	function i:msgDealDamage(dmg)
+		if self.prop then
+			local damageText = createEntity{
+				{"jaeger.Actor", phase="visual"},
+				{"jaeger.Renderable", color={1, 0, 0, 1}, layer=self.prop.layer},
+				{"jaeger.Text", rect={-13, -13, 13, 13},
+				                text="-"..dmg,
+				                font="karmatic_arcade.ttf",
+				                alignment={MOAITextBox.CENTER_JUSTIFY, MOAITextBox.CENTER_JUSTIFY},
+				                size=12},
+				{"DamageText"}
+			}
+			damageText:query("getProp"):setLoc(self.prop:getLoc())
+		end
+
 		local hp = self.hp:get() - dmg
 		self.hp:set(hp)
 		if hp <= 0 then

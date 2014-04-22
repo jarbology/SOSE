@@ -31,6 +31,11 @@ return {
 			{"Destructible", hp=5},
 			{"Building"},
 			{"MissileLauncher", damage=2}
+		},
+		attachmentSpec = {
+			{"jaeger.Actor", phase="visual"},
+			{"jaeger.Renderable"},
+			{"jaeger.Sprite", spriteName="buildings/rocket", autoPlay=true}
 		}
 	},
 	interceptor = {
@@ -42,6 +47,11 @@ return {
 			{"Destructible", hp=15},
 			{"Building"},
 			{"Interceptor"}
+		},
+		attachmentSpec = {
+			{"jaeger.Actor", phase="visual"},
+			{"jaeger.Renderable"},
+			{"jaeger.Sprite", spriteName="buildings/rocket", autoPlay=true}
 		}
 	},
 	generator = {

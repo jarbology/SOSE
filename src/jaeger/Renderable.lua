@@ -8,8 +8,11 @@ local class = require "jaeger.Class"
 -- * yScale (optional)
 -- * rotation (optional)
 return class(..., function(i, c)
+	local WHITE = { 1, 1, 1, 1}
+
 	function i:__constructor(data)
 		local prop = MOAIProp2D.new()
+		prop:setColor(unpack(data.color or WHITE))
 		prop:setLoc(data.x or 0, data.y or 0)
 		prop:setScl(data.xScale or 1, data.yScale or 1)
 		prop:setRot(data.rotation or 0)
