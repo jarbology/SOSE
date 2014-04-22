@@ -1,6 +1,6 @@
 return {
 	atlas = "gameScene",
-	frameFormat = "turret.png",
+	frameFormat = "A-turret.png",
 	xOrigin = 25,
 	yOrigin = 27
 }

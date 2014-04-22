@@ -1,9 +1,9 @@
 return {
 	atlas = "gameScene",
 	time = 2.0,
-	frameFormat = "base_%02d.png",
+	frameFormat = "Abase%01d.png",
 	mode = "loop",
-	numFrames = 11,
+	numFrames = 4,
 	xOrigin = 17,
 	yOrigin = 32
 }

@@ -1,6 +1,6 @@
 return {
 	atlas = "gameScene",
-	frameFormat = "interceptor_%02d.png",
+	frameFormat = "Ainterceptor%01d.png",
 	xOrigin = 20,
 	yOrigin = 24
 }

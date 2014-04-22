@@ -1,6 +1,6 @@
 return {
 	atlas = "gameScene",
-	frameFormat = "generator_%02d.png",
+	frameFormat = "Agenerator%01d.png",
 	numFrames = 3,
 	mode = "loop",
 	xOrigin = 17,

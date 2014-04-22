@@ -1,7 +1,7 @@
 return {
 	atlas = "gameScene",
 	time = 1.0,
-	frameFormat = "rocket_%02d.png",
+	frameFormat = "Asmallrocket%01d.png",
 	mode = "loop",
 	numFrames = 5,
 	xOrigin = 7,

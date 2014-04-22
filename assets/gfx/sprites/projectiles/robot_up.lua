@@ -1,6 +1,6 @@
 return {
 	atlas = "gameScene",
-	frameFormat = "robot_up.png",
+	frameFormat = "Arobotback1.png",
 	xOrigin = 26,
 	yOrigin = 22
 }
