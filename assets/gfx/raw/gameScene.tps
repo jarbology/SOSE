@@ -172,16 +172,9 @@
         </struct>
         <key>fileList</key>
         <array>
-            <filename>base</filename>
-            <filename>rocketBase</filename>
-            <filename>interceptor</filename>
-            <filename>rocket</filename>
-            <filename>rocket2</filename>
-            <filename>generator</filename>
-            <filename>robotBase</filename>
-            <filename>robot</filename>
-            <filename>turret</filename>
             <filename>explosion</filename>
+            <filename>ABase</filename>
+            <filename>BBase</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

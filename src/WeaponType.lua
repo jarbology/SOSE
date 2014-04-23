@@ -2,7 +2,7 @@ local enum = require "jaeger.Enum"
 
 return enum(..., {
 	"rocket",
-	"rocket2",
+	"upgradedRocket",
 	"robot",
-	"robot2"
+	"upgradedRobot"
 })

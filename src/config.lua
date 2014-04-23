@@ -13,6 +13,7 @@ return {
 		atlasPath = "../assets/gfx/atlases/",
 		fontPath = "../assets/fonts/",
 		tilesetPath = "../assets/gfx/tilesets/",
+		audioPath = "../assets/sfx/",
 		stretchPatchPath = "../assets/gfx/stretchPatches/",
 
 		loaders = {
@@ -21,6 +22,7 @@ return {
 			atlas = "jaeger.assetLoaders.AtlasLoader",
 			font = "jaeger.assetLoaders.FontLoader",
 			tileset = "jaeger.assetLoaders.TilesetLoader",
+			audio = "jaeger.assetLoaders.AudioLoader",
 			stretchPatch = "jaeger.assetLoaders.StretchPatchLoader"
 		}
 	},
@@ -47,7 +49,8 @@ return {
 		"jaeger.ActorManager",
 		"jaeger.ScriptShortcut",
 		"jaeger.EntityManager",
-		"jaeger.TaskManager"
+		"jaeger.TaskManager",
+		"jaeger.AudioSystem"
 	},
 
 	tasks = {

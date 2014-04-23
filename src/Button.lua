@@ -1,5 +1,6 @@
 local class = require "jaeger.Class"
 local WidgetManager = getSystem("jaeger.WidgetManager")
+local AudioSystem = getSystem "jaeger.AudioSystem"
 
 -- A button which can be clicked
 -- Parameters:
@@ -22,6 +23,7 @@ return class(..., function(i)
 	function i:msgMouseLeft(x, y, down)
 		if not down then
 			self.entity:sendMessage("msgDispatchGUIEvent", self.message, self.id)
+			AudioSystem:playOnce("button_selected.wav")
 		end
 	end
 end)

@@ -43,8 +43,15 @@ return class(..., function(i)
 
 		local hp = self.hp:get() - dmg
 		self.hp:set(hp)
+		local hitAudio
 		if hp <= 0 then
+			hitAudio = getAsset("audio:building_destroyed.wav")
 			destroyEntity(self.entity)
+		else
+			hitAudio = getAsset("audio:building_hit.wav")
+		end
+		if not hitAudio:isPlaying() then
+			hitAudio:play()
 		end
 	end
 end)

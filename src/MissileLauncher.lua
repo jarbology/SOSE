@@ -1,4 +1,5 @@
 local class = require "jaeger.Class"
+local AudioSystem = getSystem "jaeger.AudioSystem"
 
 -- Launch a missile at the opposing Zone
 -- Parameters:
@@ -31,6 +32,7 @@ return class(..., function(i)
 		local startX, startY
 		local zoneWidth, zoneHeight = zone:getSize()
 		local rotation
+		AudioSystem:playOnce("gun1.wav")
 
 		if quadrant == "left" then--left to right
 			startX = 1
