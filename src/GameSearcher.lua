@@ -33,7 +33,7 @@ return class(..., function(i)
 			self.gameDiscovered:fire(data, ip, port)
 		end
 		socket:sendto("?", "255.255.255.255", self.port)
-		ActionUtils.skipFrames(120)
+		ActionUtils.skipFrames(60)
 		self.searchStart:fire()
 	end
 end)

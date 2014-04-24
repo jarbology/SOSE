@@ -10,6 +10,12 @@ return class(..., function(i)
 		{id = "demolish", sprite = "ui/radialMenu/demolish"}
 	}
 
+	local LINK_SPEC = {
+		{ MOAIProp2D.INHERIT_LOC,    MOAIProp2D.TRANSFORM_TRAIT },
+		{ MOAIColor.INHERIT_COLOR,  MOAIColor.COLOR_TRAIT },
+		{ MOAIProp2D.INHERIT_VISIBLE,   MOAIProp2D.ATTR_VISIBLE }
+	}
+
 	local SPEED = 5
 
 	function i:msgActivate()
@@ -20,6 +26,15 @@ return class(..., function(i)
 		self.weaponQueue = weaponQueue
 
 		weaponQueue:enqueue(self.entity)
+
+		local layer = zone:getLayer("projectile")
+		local missile = createEntity{
+			{"jaeger.Renderable", layer=layer},
+			{"jaeger.Sprite", spriteName="projectiles/rocket_stationary"}
+		}
+		self.entity:sendMessage("msgAttach", missile, LINK_SPEC)
+		self.missile = missile
+		missile:link(self.entity)
 	end
 
 	function i:msgDestroy()
@@ -70,11 +85,21 @@ return class(..., function(i)
 			{"Missile", vx=vx, vy=vy,
 			            targetX=targetX, targetY=targetY,
 			            damage=10}
-
 		}
+
+		local missile = self.missile
+		local missileProp = missile:query("getProp")
+		missileProp:seekLoc(0, 1000, 1.7, MOAIEaseType.SOFT_EASE_OUT)
+		missile:sendMessage("msgChangeSprite", "projectiles/rocket_launched")
+		missile:sendMessage("msgPlayAnimation")
 
 		self.entity:sendMessage("msgPerformWithDelay", 10, function()
 			self.weaponQueue:enqueue(self.entity)
+
+			missile:sendMessage("msgChangeSprite", "projectiles/rocket_stationary")
+			missileProp:setLoc(0, 0)
+			missileProp:setColor(1, 1, 1, 0)
+			missileProp:seekColor(1, 1, 1, 1, 1.7)
 		end)
 	end
 
