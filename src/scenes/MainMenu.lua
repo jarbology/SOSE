@@ -22,6 +22,10 @@ return class(..., function(i, c)
 	end
 
 	function i:start(engine, sceneTask)
+		local bgm = getAsset("audio:bgm.mp3")
+		bgm:setLooping(true)
+		bgm:play()
+
 		createEntity{
 			{"jaeger.Renderable", layer = self.layers.background },
 			{"jaeger.Background", texture = "bg1.png", width = 4000, height = 4000}
