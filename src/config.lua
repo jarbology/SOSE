@@ -6,15 +6,15 @@ return {
 	},
 
 	assets = {
-		assetsPath = "../assets",
+		assetsPath = ASSET_PATH,
 
-		texturePath = "../assets/gfx/textures/",
-		spriteBankPath = "../assets/gfx/sprites/",
-		atlasPath = "../assets/gfx/atlases/",
-		fontPath = "../assets/fonts/",
-		tilesetPath = "../assets/gfx/tilesets/",
-		audioPath = "../assets/sfx/",
-		stretchPatchPath = "../assets/gfx/stretchPatches/",
+		texturePath = ASSET_PATH.."/gfx/textures/",
+		spriteBankPath = ASSET_PATH.."/gfx/sprites/",
+		atlasPath = ASSET_PATH.."/gfx/atlases/",
+		fontPath = ASSET_PATH.."/fonts/",
+		tilesetPath = ASSET_PATH.."/gfx/tilesets/",
+		audioPath = ASSET_PATH.."/sfx/",
+		stretchPatchPath = ASSET_PATH.."/gfx/stretchPatches/",
 
 		loaders = {
 			texture = "jaeger.assetLoaders.TextureLoader",

@@ -15,11 +15,8 @@ MSGPACK_DIR=$(DEPS_DIR)/lua-msgpack
 MSGPACK_SRC_FILES=msgpack.lua luabit.lua
 MSGPACK_OBJ_FILES=$(MSGPACK_SRC_FILES:%.lua=$(OBJ_DIR)/$(MSGPACK_DIR)/%.luac)
 
-ASSET_SPEC_FILES=$(shell find $(ASSETS_DIR) -name '*.lua')
-ASSET_SPEC_OBJ_FILES=$(ASSET_SPEC_FILES:%.lua=$(OBJ_DIR)/%.luac)
-
 SRC_FILES=$(shell find $(SRC_DIR) -name '*.lua')
-OBJ_FILES=$(SRC_FILES:src/%.lua=$(OBJ_DIR)/%.luac) $(MSGPACK_OBJ_FILES) $(ASSET_SPEC_OBJ_FILES)
+OBJ_FILES=$(SRC_FILES:src/%.lua=$(OBJ_DIR)/%.luac) $(MSGPACK_OBJ_FILES)
 OBJ_TREE=$(sort $(dir $(OBJ_FILES)))
 
 all: $(EXE) sync-assets
@@ -32,7 +29,6 @@ sync-assets: | $(REL_DIR)/
 	@echo Synchronizing assets...
 	@rsync -avm \
 	       --delete \
-	       --exclude '*.lua' \
 	       --exclude 'raw' \
 	       $(ASSETS_DIR) $(REL_DIR)
 
