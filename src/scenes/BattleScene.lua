@@ -90,7 +90,7 @@ return class(..., function(i, c)
 		end
 
 		if self.serverSkt then
-			self.serverSkt:shutdown()
+			self.serverSkt:close()
 		end
 	end
 
@@ -315,8 +315,8 @@ return class(..., function(i, c)
 		}
 		lblNumEnemyBases:sendMessage("msgAttach", txtNumEnemyBases, LINK_SPEC)
 
-		Popup.init(getSystem("jaeger.EntityManager"))
-		Popup.showInfoPopup(self.layers.GUI, "Waiting for opponent")
+		Popup.init(getSystem("jaeger.EntityManager"), self.layers.GUI)
+		Popup.showInfoPopup("Waiting for opponent")
 	end
 
 	function i:onNumBasesChanged(num)

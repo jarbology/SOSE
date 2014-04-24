@@ -17,8 +17,8 @@ return class(..., function(i, c)
 	local TILE_HEIGHT = 40
 	local LAYERS = {
 		"ground",
-		"building",
 		"fog",
+		"building",
 		"overlay",
 		"projectile"
 	}

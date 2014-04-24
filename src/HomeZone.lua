@@ -4,6 +4,7 @@ local NetworkCommand = require "NetworkCommand"
 local BuildingType = require "BuildingType"
 local WeaponType = require "WeaponType"
 local Quadrant = require "Quadrant"
+local Popup = require "Popup"
 
 return class(..., function(i, c)
 	local BUILD_MENU = {
@@ -24,6 +25,17 @@ return class(..., function(i, c)
 		self.currentWeapon = "rocket"
 		self.numBases = self.entity:query("getNumBases")
 		self.battleStarted = false
+
+		self.numBases.changed:addListener(self, "onNumBasesChanged")
+	end
+
+	function i:onNumBasesChanged(new)
+		if new <= 0 then
+			MOAISim.showCursor()
+			Popup.showInfoPopup("You lose", function()
+				changeScene("scenes.MainMenu")
+			end)
+		end
 	end
 
 	function i:msgTileClicked(tileX, tileY, worldX, worldY)

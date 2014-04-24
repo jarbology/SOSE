@@ -1,4 +1,5 @@
 local class = require "jaeger.Class"
+local Popup = require "Popup"
 
 return class(..., function(i, c)
 	function i:__constructor(data)
@@ -14,6 +15,18 @@ return class(..., function(i, c)
 		self.cursor = cursor
 		local cursorProp = cursor:query("getProp")
 		self.cursorProp = cursorProp
+
+		local numBases = self.entity:query("getNumBases")
+		numBases.changed:addListener(self, "onNumBasesChanged")
+	end
+
+	function i:onNumBasesChanged(new)
+		if new <= 0 then
+			MOAISim.showCursor()
+			Popup.showInfoPopup("You win", function()
+				changeScene("scenes.MainMenu")
+			end)
+		end
 	end
 
 	function i:msgTileClicked(tileX, tileY, worldX, worldY)
