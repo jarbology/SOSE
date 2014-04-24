@@ -7,12 +7,18 @@ local Quadrant = require "Quadrant"
 local Popup = require "Popup"
 
 return class(..., function(i, c)
-	local BUILD_MENU = {
+	local BUILDING_MENU = {
+		{id = "upgrade", sprite = "ui/radialMenu/upgrade"},
+		{id = "demolish", sprite = "ui/radialMenu/upgrade"}
+	}
+
+	local TILE_MENU = {
 		{id = "mechBay", sprite = "ui/radialMenu/mech"},
 		{id = "rocketLauncher", sprite = "ui/radialMenu/rocketLauncher"},
 		{id = "interceptor", sprite = "ui/radialMenu/interceptor"},
 		{id = "turret", sprite = "ui/radialMenu/turret"},
-		{id = "generator", sprite = "ui/radialMenu/generator"}
+		{id = "generator", sprite = "ui/radialMenu/generator"},
+		{id = "fakeCore", sprite = "ui/radialMenu/core"}
 	}
 
 	function i:__constructor(data)
@@ -47,7 +53,14 @@ return class(..., function(i, c)
 				end
 			else
 				local wndX, wndY = self.entity:query("worldToWnd", worldX, worldY)
-				RingMenuUtils.show(BUILD_MENU, wndX, wndY, self.entity)
+				local building = self.entity:query("getBuildingAt", tileX, tileY)
+				if building then
+					RingMenuUtils.show(BUILDING_MENU, wndX, wndY, self.entity)
+					self.mode = "building"
+				else
+					RingMenuUtils.show(TILE_MENU, wndX, wndY, self.entity)
+					self.mode = "tile"
+				end
 				self.tileX, self.tileY = tileX, tileY
 			end
 		else
@@ -61,7 +74,10 @@ return class(..., function(i, c)
 	end
 
 	function i:msgItemChosen(item)
-		self:build(item, self.tileX, self.tileY)
+		if self.mode == "tile" then
+			self:build(item, self.tileX, self.tileY)
+		elseif item == "upgrade" then
+		end
 	end
 
 	function i:msgBattleStart()

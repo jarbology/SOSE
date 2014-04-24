@@ -11,6 +11,16 @@ return {
 			{"Core"}
 		}
 	},
+	fakeCore = {
+		cost = 100,
+		entitySpec = {
+			{"jaeger.Actor", phase="buildings"},
+			{"jaeger.Renderable"},
+			{"jaeger.Sprite", spriteName="buildings/core", autoPlay=true},
+			{"Destructible", hp=20},
+			{"Building"}
+		}
+	},
 	mechBay = {
 		cost = 200,
 		entitySpec = {
