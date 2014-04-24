@@ -194,13 +194,13 @@ describe("Set", function()
 
 	it("is fast enough", function()
 		local start = os.clock()
-		for i = 1, 10000 do
+		for i = 1, 100 do
 			set:add(i)
 		end
-		for i = 1, 10000 do
+		for i = 1, 100 do
 			set:remove(i)
 		end
-		for i = 1, 10000 do
+		for i = 1, 100 do
 			set:add(i)
 		end
 		set:beginIteration()
