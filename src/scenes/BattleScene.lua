@@ -10,6 +10,7 @@ local Property = require "jaeger.Property"
 local NetworkCommand = require "NetworkCommand"
 local GameAnnouncer = require "GameAnnouncer"
 local BuildingType = require "BuildingType"
+local Popup = require "Popup"
 
 return class(..., function(i, c)
 
@@ -313,6 +314,9 @@ return class(..., function(i, c)
 			{"jaeger.TextDisplay", property=enemyZone:query("getNumBases"), format="%01d"}
 		}
 		lblNumEnemyBases:sendMessage("msgAttach", txtNumEnemyBases, LINK_SPEC)
+
+		Popup.init(getSystem("jaeger.EntityManager"))
+		Popup.showInfoPopup(self.layers.GUI, "Waiting for opponent")
 	end
 
 	function i:onNumBasesChanged(num)
@@ -325,6 +329,8 @@ return class(..., function(i, c)
 	end
 
 	function i:onGameStart()
+		Popup.hidePopup()
+
 		local myId = self.client:getId()
 		self.zones[myId] = self.homeZone
 		self.zones[3 - myId] = self.enemyZone
