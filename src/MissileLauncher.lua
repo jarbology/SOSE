@@ -74,7 +74,7 @@ return class(..., function(i)
 		local startX, startY
 		local zoneWidth, zoneHeight = zone:getSize()
 		local rotation
-		AudioSystem:playOnce("gun1.wav")
+		AudioSystem:playOnce("missile.wav")
 
 		if quadrant == "left" then--left to right
 			startX = 1
