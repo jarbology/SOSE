@@ -28,6 +28,12 @@ return class(..., function(i)
 		robot:link(self.entity)
 		robot:query("getProp"):setLoc(0, 10)
 		self.upgraded = false
+		self.available = true
+		self.damage = 2
+
+		self.sideSprite = "projectiles/robot_side"
+		self.upSprite = "projectiles/robot_up"
+		self.downSprite = "projectiles/robot_down"
 	end
 
 	function i:canUpgrade()
@@ -38,7 +44,29 @@ return class(..., function(i)
 		self.weaponQueue:remove(self.entity)
 	end
 
+	function i:msgUpgrade()
+		self.upgraded = true
+		self.damage = 4
+
+		self.sideSprite = "projectiles/big_robot_side"
+		self.upSprite = "projectiles/big_robot_up"
+		self.downSprite = "projectiles/big_robot_down"
+		self.robot:sendMessage("msgChangeSprite", self.downSprite)
+
+		local zone = self.entity:query("getZone") 
+		local weaponQueue = zone:getWeaponQueue("robot2")
+
+		if self.available then
+			self.weaponQueue:remove(self.entity)
+			weaponQueue:enqueue(self.entity)
+		end
+
+		self.weaponQueue = weaponQueue
+	end
+
 	function i:msgAttack(targetZone, targetX, targetY, quadrant)
+		self.available = false
+
 		local zone = self.zone
 		local vx, vy
 		local startX, startY
@@ -52,28 +80,28 @@ return class(..., function(i)
 			startY = targetY
 			vx = SPEED
 			vy = 0
-			sprite = "projectiles/robot_right"
+			sprite = self.sideSprite
 		elseif quadrant == "top" then--top to bottom
 			xScale = 1
 			startX = targetX
 			startY = zoneHeight
 			vx = 0
 			vy = -SPEED
-			sprite = "projectiles/robot_down"
+			sprite = self.downSprite
 		elseif quadrant == "right" then--right to left
 			xScale = -1
 			startX = zoneWidth
 			startY = targetY
 			vx = -SPEED
 			vy = 0
-			sprite = "projectiles/robot_left"
+			sprite = self.sideSprite
 		else--bottom to top
 			xScale = 1
 			startX = targetX
 			startY = 1
 			vx = 0
 			vy = SPEED
-			sprite = "projectiles/robot_up"
+			sprite = self.upSprite
 		end
 
 		createEntity{
@@ -83,7 +111,7 @@ return class(..., function(i)
 			{"Projectile", x=startX, y=startY,
 			               zone=targetZone, grid="bots"},
 			{"Destructible", hp=5},
-			{"Robot", vx=vx, vy=vy, damage=1, base=self.entity}
+			{"Robot", vx=vx, vy=vy, damage=self.damage, base=self.entity}
 		}
 
 		local robotProp = self.robot:query("getProp")
@@ -92,6 +120,7 @@ return class(..., function(i)
 
 	function i:msgRobotReturned()
 		if self.entity:isAlive() then
+			self.available = true
 			self.weaponQueue:enqueue(self.entity)
 			local robotProp = self.robot:query("getProp")
 			robotProp:setLoc(0, 1000)

@@ -14,7 +14,7 @@ return class(..., function(i)
 		local prop = self.entity:query("getProp")
 		local x, y = prop:getLoc()
 		local yield = coroutine.yield
-		for i = 1, 40 do
+		for i = 1, 80 do
 			y = y + 0.7
 			prop:setLoc(x, y)
 			yield()

@@ -27,6 +27,9 @@ return class(..., function(i)
 
 	-- Deal damage and destroy the entity if hp <= 0
 	function i:msgDealDamage(dmg)
+		if dmg==nil then
+			print(debug.traceback())
+		end
 		if self.prop then
 			local damageText = createEntity{
 				{"jaeger.Actor", phase="visual"},

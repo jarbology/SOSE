@@ -5,9 +5,9 @@ return {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
 			{"jaeger.Sprite", spriteName="buildings/core", autoPlay=true},
-			{"Destructible", hp=20},
+			{"Destructible", hp=60},
 			{"Building"},
-			{"Generator", yield=5, interval=120},
+			{"Generator", yield=3, interval=120},
 			{"Core"}
 		}
 	},
@@ -17,7 +17,7 @@ return {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
 			{"jaeger.Sprite", spriteName="buildings/core", autoPlay=true},
-			{"Destructible", hp=20},
+			{"Destructible", hp=60},
 			{"Building"}
 		}
 	},
@@ -27,7 +27,7 @@ return {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
 			{"jaeger.Sprite", spriteName="buildings/mech", autoPlay=true},
-			{"Destructible", hp=5},
+			{"Destructible", hp=20},
 			{"Building"},
 			{"RobotBase", damage=2}
 		}
@@ -38,7 +38,7 @@ return {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
 			{"jaeger.Sprite", spriteName="buildings/rocket", autoPlay=true},
-			{"Destructible", hp=5},
+			{"Destructible", hp=20},
 			{"Building"},
 			{"MissileLauncher", damage=2}
 		},
@@ -54,7 +54,7 @@ return {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
 			{"jaeger.Sprite", spriteName="buildings/interceptor", autoPlay=true},
-			{"Destructible", hp=15},
+			{"Destructible", hp=40},
 			{"Building"},
 			{"Interceptor"}
 		},
@@ -70,9 +70,9 @@ return {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
 			{"jaeger.Sprite", spriteName="buildings/generator", autoPlay=true},
-			{"Destructible", hp=5},
+			{"Destructible", hp=20},
 			{"Building"},
-			{"Generator", yield=5, interval=60}
+			{"Generator", yield=3, interval=60}
 		}
 	},
 	turret = {
@@ -81,7 +81,7 @@ return {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
 			{"jaeger.Sprite", spriteName="buildings/turret", autoPlay=true},
-			{"Destructible", hp=5},
+			{"Destructible", hp=40},
 			{"Building"},
 			{"Turret"}
 		}
