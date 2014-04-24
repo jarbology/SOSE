@@ -9,12 +9,11 @@ return class(..., function(i)
 		self.gameDiscovered = Event.new()
 	end
 
-	function i:start(task, gameName)
+	function i:start(task)
 		local socket = assert(socket.udp())
 		assert(socket:settimeout(0))
 		assert(socket:setoption('broadcast', true))
 		self.socket = socket
-		self.gameName = gameName
 
 		local action = ActionUtils.newLoopCoroutine(self, "update")
 		action:attach(task)
