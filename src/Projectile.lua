@@ -34,7 +34,7 @@ return class(..., function(i)
 
 		local x, y = self.prop:getLoc()
 		local explosion = createEntity{
-			{"jaeger.Renderable", x=x, y=y, layer=self.layer},
+			{"jaeger.Renderable", x=x, y=y, layer=self.layer, xScale=1.6, yScale=1.6},
 			{"jaeger.Sprite", spriteName="fx/explosionMid", autoPlay=true},
 			{"jaeger.Actor", phase="visual"}
 		}
