@@ -12,6 +12,10 @@ return class(..., function(i, c)
 		{id = "demolish", sprite = "ui/radialMenu/upgrade"}
 	}
 
+	local BUILDING_MENU_DEMOLISH = {
+		{id = "demolish", sprite = "ui/radialMenu/upgrade"}
+	}
+
 	local TILE_MENU = {
 		{id = "mechBay", sprite = "ui/radialMenu/mech"},
 		{id = "rocketLauncher", sprite = "ui/radialMenu/rocketLauncher"},
@@ -55,8 +59,12 @@ return class(..., function(i, c)
 				local wndX, wndY = self.entity:query("worldToWnd", worldX, worldY)
 				local building = self.entity:query("getBuildingAt", tileX, tileY)
 				if building then
-					RingMenuUtils.show(BUILDING_MENU, wndX, wndY, self.entity)
 					self.mode = "building"
+					if building:query("canUpgrade") then
+						RingMenuUtils.show(BUILDING_MENU, wndX, wndY, self.entity)
+					else
+						RingMenuUtils.show(BUILDING_MENU_DEMOLISH, wndX, wndY, self.entity)
+					end
 				else
 					RingMenuUtils.show(TILE_MENU, wndX, wndY, self.entity)
 					self.mode = "tile"
@@ -77,11 +85,24 @@ return class(..., function(i, c)
 		if self.mode == "tile" then
 			self:build(item, self.tileX, self.tileY)
 		elseif item == "upgrade" then
+			self:upgrade(self.tileX, self.tileY)
+		elseif item == "demolish" then
+			self:destroy(self.tileX, self.tileY)
 		end
 	end
 
 	function i:msgBattleStart()
 		self.battleStarted = true
+	end
+
+	function i:upgrade(x, y)
+		local commandCode = NetworkCommand.nameToCode("cmdUpgrade")
+		self.client:sendCmd{commandCode, x, y}
+	end
+
+	function i:destroy(x, y)
+		local commandCode = NetworkCommand.nameToCode("cmdDestroy")
+		self.client:sendCmd{commandCode, x, y}
 	end
 
 	function i:build(item, x, y)

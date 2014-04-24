@@ -7,7 +7,7 @@ return {
 			{"jaeger.Sprite", spriteName="buildings/core", autoPlay=true},
 			{"Destructible", hp=20},
 			{"Building"},
-			{"Generator", yield=1, interval=120},
+			{"Generator", yield=5, interval=120},
 			{"Core"}
 		}
 	},
@@ -22,7 +22,7 @@ return {
 		}
 	},
 	mechBay = {
-		cost = 200,
+		cost = 150,
 		entitySpec = {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},
@@ -72,11 +72,11 @@ return {
 			{"jaeger.Sprite", spriteName="buildings/generator", autoPlay=true},
 			{"Destructible", hp=5},
 			{"Building"},
-			{"Generator", yield=2, interval=60}
+			{"Generator", yield=5, interval=60}
 		}
 	},
 	turret = {
-		cost = 200,
+		cost = 100,
 		entitySpec = {
 			{"jaeger.Actor", phase="buildings"},
 			{"jaeger.Renderable"},

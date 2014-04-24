@@ -243,8 +243,8 @@ return class(..., function(i, c)
 
 		createWeaponButton("rocket", "ui/weaponIcons/rocket")
 		createWeaponButton("robot", "ui/weaponIcons/robot")
-		createWeaponButton("upgradedRocket", "ui/weaponIcons/upgradedRocket")
-		createWeaponButton("upgradedRobot", "ui/weaponIcons/upgradedRobot")
+		createWeaponButton("rocket2", "ui/weaponIcons/upgradedRocket")
+		createWeaponButton("robot2", "ui/weaponIcons/upgradedRobot")
 
 		local dummyProperty = Property.new(0)
 		createEntity{
@@ -272,7 +272,7 @@ return class(..., function(i, c)
 			                font="karmatic_arcade.ttf",
 			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
 			                size=11},
-			{"jaeger.TextDisplay", property=dummyProperty, format="%02d"}
+			{"jaeger.TextDisplay", property=homeZone:query("getWeaponQueue", "rocket2"):getSize(), format="%02d"}
 		}
 		createEntity{
 			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=63 },
@@ -281,7 +281,7 @@ return class(..., function(i, c)
 			                font="karmatic_arcade.ttf",
 			                alignment={MOAITextBox.RIGHT_JUSTIFY, MOAITextBox.LEFT_JUSTIFY},
 			                size=11},
-			{"jaeger.TextDisplay", property=dummyProperty, format="%02d"}
+			{"jaeger.TextDisplay", property=homeZone:query("getWeaponQueue", "robot2"):getSize(), format="%02d"}
 		}
 
 		--Friendly bar

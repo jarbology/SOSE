@@ -41,7 +41,7 @@ return class(..., function(i, c)
 			renderTable[index] = layer
 		end
 
-		self.resource = Property.new(2000)
+		self.resource = Property.new(300)
 		self.layers = layers
 		self.renderTable = renderTable
 		self.refLayer = layers.ground -- for object picking
@@ -316,6 +316,15 @@ return class(..., function(i, c)
 		if weaponQueue:getSize():get() > 0 then--enough weapon
 			local building = weaponQueue:dequeue()
 			building:sendMessage("msgAttack", self.opposingZone, targetX, targetY, quadrant)
+		end
+	end
+
+	function i:cmdUpgrade(tileX, tileY)
+		local hasEnoughResource = self.resource:get() >= 100
+		local building = self:getBuildingAt(tileX, tileY)
+		if building ~= nil and hasEnoughResource then
+			self:changeResource(-100)
+			building:sendMessage("msgUpgrade")
 		end
 	end
 

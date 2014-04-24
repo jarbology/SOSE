@@ -27,6 +27,11 @@ return class(..., function(i)
 		self.robot = robot
 		robot:link(self.entity)
 		robot:query("getProp"):setLoc(0, 10)
+		self.upgraded = false
+	end
+
+	function i:canUpgrade()
+		return not self.upgraded
 	end
 
 	function i:msgDestroy()
