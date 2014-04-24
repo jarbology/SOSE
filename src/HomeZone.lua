@@ -79,6 +79,23 @@ return class(..., function(i, c)
 	function i:msgSwitchWeapon(weapon)
 		print("switch weapon", weapon)
 		self.currentWeapon = weapon
+
+		local weaponButtons = getCurrentScene().weaponButtons
+		for _, button in ipairs(weaponButtons) do
+			button:sendMessage("msgChangeSprite", "ui/weaponBar")
+		end
+
+		local idx
+		if weapon=="rocket" then
+			idx = 1
+		elseif weapon=="robot" then
+			idx = 2
+		elseif weapon=="rocket2" then
+			idx = 3
+		else
+			idx = 4
+		end
+		weaponButtons[idx]:sendMessage("msgChangeSprite", "ui/weaponBarActive")
 	end
 
 	function i:msgItemChosen(item)

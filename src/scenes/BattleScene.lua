@@ -225,12 +225,13 @@ return class(..., function(i, c)
 			{ MOAIProp2D.INHERIT_LOC, MOAIProp2D.TRANSFORM_TRAIT }
 		}
 
+		local weaponButtons = {}
 		local function createWeaponButton(id, iconSprite)
 			local button = createEntity{
 				{"jaeger.Renderable", layer=self.layers.GUI},
 				{"jaeger.Sprite", spriteName="ui/weaponBar"},
 				{"jaeger.Widget", receiver=homeZone},
-				{"Button", id=id, message="msgSwitchWeapon"},
+				{"Button", id=id, message="msgSwitchWeapon"}
 			}
 			local icon = createEntity{
 				{"jaeger.Renderable", layer=self.layers.GUI},
@@ -239,14 +240,16 @@ return class(..., function(i, c)
 			icon:query("getProp"):setLoc(58, -7)
 			button:sendMessage("msgAttach", icon, LINK_SPEC)
 			leftBar:sendMessage("msgAddItem", button)
+
+			table.insert(weaponButtons, button)
 		end
+		self.weaponButtons = weaponButtons
 
 		createWeaponButton("rocket", "ui/weaponIcons/rocket")
 		createWeaponButton("robot", "ui/weaponIcons/robot")
 		createWeaponButton("rocket2", "ui/weaponIcons/upgradedRocket")
 		createWeaponButton("robot2", "ui/weaponIcons/upgradedRobot")
 
-		local dummyProperty = Property.new(0)
 		createEntity{
 			{"jaeger.Renderable", layer=self.layers.GUI, x=-515, y=225 },
 			{"jaeger.Text", text="01",
@@ -317,6 +320,8 @@ return class(..., function(i, c)
 
 		Popup.init(getSystem("jaeger.EntityManager"), self.layers.GUI)
 		Popup.showInfoPopup("Waiting for opponent")
+
+		homeZone:sendMessage("msgSwitchWeapon", "rocket")
 	end
 
 	function i:onNumBasesChanged(num)

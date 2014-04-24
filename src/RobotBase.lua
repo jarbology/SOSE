@@ -110,7 +110,7 @@ return class(..., function(i)
 			{"jaeger.Sprite", spriteName=sprite, autoPlay=true},
 			{"Projectile", x=startX, y=startY,
 			               zone=targetZone, grid="bots"},
-			{"Destructible", hp=5},
+			{"Destructible", hp=15},
 			{"Robot", vx=vx, vy=vy, damage=self.damage, base=self.entity}
 		}
 
