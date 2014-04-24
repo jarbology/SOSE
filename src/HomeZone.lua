@@ -9,11 +9,11 @@ local Popup = require "Popup"
 return class(..., function(i, c)
 	local BUILDING_MENU = {
 		{id = "upgrade", sprite = "ui/radialMenu/upgrade"},
-		{id = "demolish", sprite = "ui/radialMenu/upgrade"}
+		{id = "demolish", sprite = "ui/radialMenu/demolish"}
 	}
 
 	local BUILDING_MENU_DEMOLISH = {
-		{id = "demolish", sprite = "ui/radialMenu/upgrade"}
+		{id = "demolish", sprite = "ui/radialMenu/demolish"}
 	}
 
 	local TILE_MENU = {

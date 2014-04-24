@@ -328,6 +328,13 @@ return class(..., function(i, c)
 		end
 	end
 
+	function i:cmdDestroy(tileX, tileY)
+		local building = self:getBuildingAt(tileX, tileY)
+		if building ~= nil then
+			destroyEntity(building)
+		end
+	end
+
 	-- Static
 	function c.getMapSize(map)
 		return #(map[1]), #map

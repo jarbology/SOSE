@@ -1,6 +1,6 @@
 return {
-	atlas = "gameScene",
-	frameFormat = "demolishIcon.png",
-	xOrigin = 32,
+	atlas = "gui",
+	frameFormat = "destroyIcon.png",
+	xOrigin = 25,
 	yOrigin = 32
 }
