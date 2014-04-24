@@ -3,6 +3,12 @@ local class = require "jaeger.Class"
 return class(..., function(i)
 	local SPEED = 5
 
+	local LINK_SPEC = {
+		{ MOAIProp2D.INHERIT_LOC,    MOAIProp2D.TRANSFORM_TRAIT },
+		{ MOAIColor.INHERIT_COLOR,  MOAIColor.COLOR_TRAIT },
+		{ MOAIProp2D.INHERIT_VISIBLE,   MOAIProp2D.ATTR_VISIBLE }
+	}
+
 	function i:msgActivate()
 		local zone = self.entity:query("getZone") 
 		self.zone = zone
@@ -11,6 +17,16 @@ return class(..., function(i)
 		self.weaponQueue = weaponQueue
 
 		weaponQueue:enqueue(self.entity)
+
+		local layer = zone:getLayer("projectile")
+		local robot = createEntity{
+			{"jaeger.Renderable", layer=layer},
+			{"jaeger.Sprite", spriteName="projectiles/robot_down"}
+		}
+		self.entity:sendMessage("msgAttach", robot, LINK_SPEC)
+		self.robot = robot
+		robot:link(self.entity)
+		robot:query("getProp"):setLoc(0, 10)
 	end
 
 	function i:msgDestroy()
@@ -59,19 +75,23 @@ return class(..., function(i)
 			{"Destructible", hp=5},
 			{"Robot", vx=vx, vy=vy, damage=1, base=self.entity}
 		}
+
+		local robotProp = self.robot:query("getProp")
+		robotProp:seekLoc(0, 1000, 1.7, MOAIEaseType.SOFT_EASE_OUT)
 	end
 
 	function i:msgRobotReturned()
 		if self.entity:isAlive() then
 			self.weaponQueue:enqueue(self.entity)
+			local robotProp = self.robot:query("getProp")
+			robotProp:setLoc(0, 1000)
+			robotProp:seekLoc(0, 10, 1.7, MOAIEaseType.SOFT_EASE_IN)
 		end
 	end
 
 	function i:msgRobotDestroyed()
-		if self.entity:isAlive() then
-			self.entity:sendMessage("msgPerformWithDelay", 10, function()
-				self.weaponQueue:enqueue(self.entity)
-			end)
-		end
+		self.entity:sendMessage("msgPerformWithDelay", 10, function()
+			self:msgRobotReturned()
+		end)
 	end
 end)
