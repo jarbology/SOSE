@@ -37,28 +37,33 @@ return class(..., function(i)
 		local zone = self.zone
 		local vx, vy
 		local startX, startY
+		local xScale
 		local zoneWidth, zoneHeight = zone:getSize()
 		local sprite
 
 		if quadrant == "left" then--left to right
+			xScale = 1
 			startX = 1
 			startY = targetY
 			vx = SPEED
 			vy = 0
 			sprite = "projectiles/robot_right"
 		elseif quadrant == "top" then--top to bottom
+			xScale = 1
 			startX = targetX
 			startY = zoneHeight
 			vx = 0
 			vy = -SPEED
 			sprite = "projectiles/robot_down"
 		elseif quadrant == "right" then--right to left
+			xScale = -1
 			startX = zoneWidth
 			startY = targetY
 			vx = -SPEED
 			vy = 0
 			sprite = "projectiles/robot_left"
 		else--bottom to top
+			xScale = 1
 			startX = targetX
 			startY = 1
 			vx = 0
@@ -67,7 +72,7 @@ return class(..., function(i)
 		end
 
 		createEntity{
-			{"jaeger.Renderable", layer=targetZone:getLayer("projectile")},
+			{"jaeger.Renderable", layer=targetZone:getLayer("projectile"), xScale=xScale},
 			{"jaeger.Actor", phase="robots"},
 			{"jaeger.Sprite", spriteName=sprite, autoPlay=true},
 			{"Projectile", x=startX, y=startY,
