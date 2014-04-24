@@ -27,6 +27,11 @@ return class(..., function(i, c)
 			{"jaeger.Background", texture = "bg1.png", width = 4000, height = 4000}
 		}
 
+		createEntity{
+			{"jaeger.Renderable", layer = self.layers.GUI, y=250},
+			{"jaeger.Sprite", spriteName="ui/title"}
+		}
+
 		local sceneController = createEntity{
 			{"jaeger.InlineScript",
 				msgHostGame = function()
