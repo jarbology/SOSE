@@ -41,7 +41,6 @@ return class(..., function(i, c)
 		}
 		self.viewport = viewport
 
-
 		if type(data) == "string" then
 			local mode = data
 			self.mode = data
@@ -192,6 +191,11 @@ return class(..., function(i, c)
 		local sceneGUI = createEntity{{"BattleSceneGUI"}}
 		RingMenuUtils.create(engine:getSystem("jaeger.EntityManager"), self.layers.GUI)
 
+		local splitter = createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=0, y=576/2, xScale=0.5},
+			{"jaeger.Sprite", spriteName="ui/splitter"}
+		}
+
 		local leftBar = createEntity{
 			{"jaeger.Renderable", layer=self.layers.GUI, x=-512, y=288 },
 			{"jaeger.VerticalContainer", gap=0 }
@@ -280,14 +284,12 @@ return class(..., function(i, c)
 		}
 
 		--Friendly bar
-		leftBar:sendMessage("msgAddItem",
-			createEntity{
-				{"jaeger.Renderable", layer=self.layers.GUI},
-				{"jaeger.Sprite", spriteName="ui/friendlyBar"}
-			}
-		)
-		createEntity{
-			{"jaeger.Renderable", layer=self.layers.GUI, x=-475, y=15 },
+		local lblNumFriendlyBases = createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=-90, y=290},
+			{"jaeger.Sprite", spriteName="ui/friendlyBar"}
+		}
+		local txtNumFriendlyBases = createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=37, y=-12 },
 			{"jaeger.Text", text="01",
 			                rect={0, -25, 35, 0},
 			                font="karmatic_arcade.ttf",
@@ -295,15 +297,14 @@ return class(..., function(i, c)
 			                size=11},
 			{"jaeger.TextDisplay", property=homeZone:query("getNumBases"), format="%01d"}
 		}
+		lblNumFriendlyBases:sendMessage("msgAttach", txtNumFriendlyBases, LINK_SPEC)
 		--Enemy bar
-		leftBar:sendMessage("msgAddItem",
-			createEntity{
-				{"jaeger.Renderable", layer=self.layers.GUI},
-				{"jaeger.Sprite", spriteName="ui/enemyBar"}
-			}
-		)
-		createEntity{
-			{"jaeger.Renderable", layer=self.layers.GUI, x=-475, y=-37 },
+		local lblNumEnemyBases = createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=10, y=290},
+			{"jaeger.Sprite", spriteName="ui/enemyBar"}
+		}
+		local txtNumEnemyBases = createEntity{
+			{"jaeger.Renderable", layer=self.layers.GUI, x=37, y=-12 },
 			{"jaeger.Text", text="01",
 			                rect={0, -25, 35, 0},
 			                font="karmatic_arcade.ttf",
@@ -311,6 +312,7 @@ return class(..., function(i, c)
 			                size=11},
 			{"jaeger.TextDisplay", property=enemyZone:query("getNumBases"), format="%01d"}
 		}
+		lblNumEnemyBases:sendMessage("msgAttach", txtNumEnemyBases, LINK_SPEC)
 	end
 
 	function i:onNumBasesChanged(num)
